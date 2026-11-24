@@ -1,0 +1,13 @@
+# Client internal docs (brief & implementation plan)
+Client/docx/
+
+# Project-scoped AI skills (vendor)
+skills/
+.gemini/skills/
+
+# Environment & local tooling
+.env
+.env.local
+.antigravity_studio/
+node_modules/
+dist/

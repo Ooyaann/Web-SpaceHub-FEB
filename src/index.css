@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-unnes-gold ring-offset-2 ring-offset-white dark:ring-offset-unnes-surface-dark;
+  }
+}
+
+@layer components {
+  .sh-card {
+    @apply rounded-2xl border border-unnes-border bg-white shadow-card dark:border-unnes-border-dark dark:bg-unnes-card-dark;
+  }
+
+  .sh-input {
+    @apply w-full rounded-xl border border-unnes-border bg-[#f7faff] px-3 py-2 text-sm text-[#0f1d3d] transition focus:border-unnes-blue focus:bg-white focus:outline-none focus:ring-2 focus:ring-unnes-blue/20 dark:border-unnes-border-dark dark:bg-[#0d1730] dark:text-[#e7ecf8] dark:focus:border-unnes-blue-light;
+  }
+
+  .sh-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-unnes-gold px-4 py-2.5 text-sm font-extrabold text-unnes-gold-ink shadow-sm transition hover:brightness-95 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .sh-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-unnes-border bg-white px-4 py-2.5 text-sm font-semibold text-[#0f1d3d] transition hover:border-unnes-blue/50 hover:bg-[#f5f8ff] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 dark:border-unnes-border-dark dark:bg-unnes-card-dark dark:text-[#e7ecf8] dark:hover:border-unnes-blue-light/50 dark:hover:bg-[#19264a];
+  }
+
+  .sh-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-unnes-border bg-white px-3.5 py-1.5 text-xs font-semibold text-[#0f1d3d] transition hover:border-unnes-blue/50 dark:border-unnes-border-dark dark:bg-unnes-card-dark dark:text-[#e7ecf8];
+  }
+
+  .sh-chip-active {
+    @apply border-unnes-gold bg-unnes-gold font-extrabold text-unnes-gold-ink hover:border-unnes-gold dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink;
+  }
+}
+
+/* Scrollbar halus untuk tab horizontal mobile */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
