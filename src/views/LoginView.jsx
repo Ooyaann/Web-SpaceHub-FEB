@@ -47,60 +47,57 @@ export default function LoginView() {
   };
 
   return (
-    <div className="grid min-h-screen bg-[#F8F9FB] dark:bg-ink-canvas lg:grid-cols-2">
-      <div className="flex flex-col justify-between px-4 py-5 sm:px-10 sm:py-8 lg:px-16">
-        {/* Top Bar: Brand + Prominent Theme Switcher Button */}
-        <div className="mx-auto flex w-full max-w-sm items-center justify-between gap-3">
-          <div>
-            <div className="text-2xl font-extrabold leading-none tracking-[-0.03em] text-unnes-navy dark:text-white">
+    <div className="grid h-[100dvh] w-full overflow-hidden bg-[#F8F9FB] dark:bg-ink-canvas lg:grid-cols-2">
+      {/* Left Column: Proporsional penuh 1 layar tanpa scroll */}
+      <div className="flex h-full min-h-0 flex-col justify-between px-5 py-4 sm:px-10 sm:py-6 lg:px-14">
+        {/* Top Bar */}
+        <header className="mx-auto flex w-full max-w-[380px] flex-none items-center justify-between gap-3">
+          <div className="flex items-baseline gap-2">
+            <span className="text-[22px] font-extrabold leading-none tracking-[-0.03em] text-unnes-navy dark:text-white">
               Space<span className="text-unnes-gold">Hub</span>
-            </div>
-            <div className="mt-1 text-xs font-medium text-[#667085] dark:text-[#8A93A6]">FEB UNNES</div>
+            </span>
+            <span className="text-xs font-semibold text-[#667085] dark:text-[#8A93A6]">FEB UNNES</span>
           </div>
 
           <button
             type="button"
             onClick={toggleTheme}
-            className="sh-btn-secondary h-9 px-3 text-xs"
+            className="sh-btn-secondary h-8 rounded-lg px-2.5 text-xs"
           >
             {theme === 'dark' ? (
               <>
-                <Sun className="h-4 w-4 text-unnes-gold" />
+                <Sun className="h-3.5 w-3.5 text-unnes-gold" />
                 Mode Terang
               </>
             ) : (
               <>
-                <Moon className="h-4 w-4 text-unnes-navy" />
+                <Moon className="h-3.5 w-3.5 text-unnes-navy" />
                 Mode Gelap
               </>
             )}
           </button>
-        </div>
+        </header>
 
-        {/* Center Auth Form */}
-        <div className="animate-view-in mx-auto my-5 w-full max-w-sm sm:my-8">
-          {/* Mobile Campus Photo Banner (< lg) */}
-          <div className="mb-4 h-28 overflow-hidden rounded-2xl border border-[#E4E7EE] bg-unnes-navy lg:hidden dark:border-ink-line">
-            <img src="/images/login-bg.jpg" alt="Gedung FEB UNNES" className="h-full w-full object-cover" />
-          </div>
-
-          <div>
-            <h1 className="text-xl font-bold tracking-[-0.025em] text-[#101828] sm:text-2xl dark:text-[#F5F7FA]">
-              Selamat datang
+        {/* Center Auth Block */}
+        <div className="animate-view-in mx-auto my-auto w-full max-w-[380px]">
+          <div className="mb-3.5">
+            <h1 className="text-xl font-bold tracking-[-0.025em] text-[#101828] sm:text-[22px] dark:text-[#F5F7FA]">
+              Cari & booking ruang kosong
             </h1>
-            <p className="mt-1 text-xs text-[#475467] sm:text-[13px] dark:text-[#B0B8C9]">
-              Cari & booking ruang kelas kosong di Gedung L2, L4, dan L5.
+            <p className="mt-0.5 text-xs text-[#475467] dark:text-[#B0B8C9]">
+              Akses ketersediaan 64 ruang Gedung L2, L4, dan L5 FEB UNNES.
             </p>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 rounded-xl border border-[#DCE2EC] bg-[#EEF1F6] p-1 sm:mt-6 dark:border-ink-line dark:bg-ink-card">
+          {/* Role Switcher */}
+          <div className="grid grid-cols-2 rounded-xl border border-[#DCE2EC] bg-[#EEF1F6] p-1 dark:border-ink-line dark:bg-ink-card">
             <button
               type="button"
               onClick={() => {
                 setPortal('student');
                 setError('');
               }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-semibold transition-all sm:py-2 ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
                 portal === 'student'
                   ? 'bg-white text-[#101828] shadow-sm dark:bg-ink-subtle dark:text-[#F5F7FA]'
                   : 'text-[#475467] dark:text-[#B0B8C9]'
@@ -115,7 +112,7 @@ export default function LoginView() {
                 setPortal('admin');
                 setError('');
               }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs font-semibold transition-all sm:py-2 ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
                 portal === 'admin'
                   ? 'bg-white text-[#101828] shadow-sm dark:bg-ink-subtle dark:text-[#F5F7FA]'
                   : 'text-[#475467] dark:text-[#B0B8C9]'
@@ -127,10 +124,10 @@ export default function LoginView() {
           </div>
 
           {portal === 'student' ? (
-            <div className="sh-panel mt-3.5 p-4 sm:mt-4 sm:p-6">
+            <div className="sh-panel mt-3 p-4 sm:p-5">
               <div className="flex items-baseline justify-between">
-                <h2 className="text-base font-bold text-[#101828] dark:text-[#F5F7FA]">
-                  {mode === 'login' ? 'Masuk akun mahasiswa' : 'Daftar akun mahasiswa'}
+                <h2 className="text-[15px] font-bold text-[#101828] dark:text-[#F5F7FA]">
+                  {mode === 'login' ? 'Masuk akun mahasiswa' : 'Daftar akun baru'}
                 </h2>
                 <button
                   type="button"
@@ -145,14 +142,14 @@ export default function LoginView() {
                   }}
                   className="text-xs font-semibold text-unnes-navy hover:underline dark:text-unnes-gold"
                 >
-                  {mode === 'login' ? 'Buat akun' : 'Masuk'}
+                  {mode === 'login' ? 'Buat akun' : 'Sudah punya akun'}
                 </button>
               </div>
 
-              <form onSubmit={handleStudentSubmit} className="mt-4 space-y-3.5">
+              <form onSubmit={handleStudentSubmit} className="mt-3 space-y-2.5">
                 {mode === 'register' && (
                   <label className="block">
-                    <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
+                    <span className="mb-1 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                       Nama lengkap
                     </span>
                     <div className="relative">
@@ -162,14 +159,14 @@ export default function LoginView() {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Nama lengkap"
-                        className="sh-control pl-9"
+                        className="sh-control h-10 pl-9"
                       />
                     </div>
                   </label>
                 )}
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
+                  <span className="mb-1 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                     Email UNNES
                   </span>
                   <div className="relative">
@@ -181,13 +178,13 @@ export default function LoginView() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="nama@student.unnes.ac.id"
-                      className="sh-control pl-9"
+                      className="sh-control h-10 pl-9"
                     />
                   </div>
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
+                  <span className="mb-1 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                     Password
                   </span>
                   <div className="relative">
@@ -199,13 +196,13 @@ export default function LoginView() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Minimal 6 karakter"
-                      className="sh-control pl-9 pr-10"
+                      className="sh-control h-10 pl-9 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPass((v) => !v)}
                       aria-label="Toggle password"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1.5 text-[#667085] hover:text-[#101828] dark:text-[#8F98AD] dark:hover:text-[#F5F7FA]"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-[#667085] hover:text-[#101828] dark:text-[#8F98AD] dark:hover:text-[#F5F7FA]"
                     >
                       {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -218,13 +215,13 @@ export default function LoginView() {
                   </p>
                 )}
 
-                <button type="submit" disabled={submitting} className="sh-btn-primary w-full">
+                <button type="submit" disabled={submitting} className="sh-btn-primary h-10 w-full">
                   {submitting ? 'Memproses...' : mode === 'login' ? 'Masuk' : 'Daftar & masuk'}
                 </button>
               </form>
 
-              <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#ECEFF4] pt-3.5 text-xs text-[#667085] sm:mt-5 sm:pt-4 dark:border-ink-line dark:text-[#8A93A6]">
-                <span className="truncate">Akun demo siap pakai</span>
+              <div className="mt-3.5 flex items-center justify-between gap-2 border-t border-[#ECEFF4] pt-3 text-xs text-[#667085] dark:border-ink-line dark:text-[#8A93A6]">
+                <span className="truncate">Akun demo siap coba</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -240,17 +237,17 @@ export default function LoginView() {
               </div>
             </div>
           ) : (
-            <div className="sh-panel mt-3.5 p-4 sm:mt-4 sm:p-6">
+            <div className="sh-panel mt-3 p-4 sm:p-5">
               <div>
-                <h2 className="text-base font-bold text-[#101828] dark:text-[#F5F7FA]">Portal pengelola</h2>
-                <p className="mt-1 text-xs text-[#475467] dark:text-[#B0B8C9]">
-                  Kelola ruangan, tarif sewa, blokir jadwal fakultas, dan laporan lapangan.
+                <h2 className="text-[15px] font-bold text-[#101828] dark:text-[#F5F7FA]">Portal pengelola</h2>
+                <p className="mt-0.5 text-xs text-[#475467] dark:text-[#B0B8C9]">
+                  Kelola ruangan, tarif sewa, blokir jadwal fakultas, dan laporan.
                 </p>
               </div>
 
-              <form onSubmit={handleAdminSubmit} className="mt-4 space-y-3.5">
+              <form onSubmit={handleAdminSubmit} className="mt-3 space-y-3">
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
+                  <span className="mb-1 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                     PIN pengelola
                   </span>
                   <div className="relative">
@@ -261,7 +258,7 @@ export default function LoginView() {
                       value={adminPin}
                       onChange={(e) => setAdminPin(e.target.value)}
                       placeholder="Masukkan PIN"
-                      className="sh-control pl-9"
+                      className="sh-control h-10 pl-9"
                     />
                   </div>
                 </label>
@@ -272,12 +269,12 @@ export default function LoginView() {
                   </p>
                 )}
 
-                <button type="submit" className="sh-btn-primary w-full">
+                <button type="submit" className="sh-btn-primary h-10 w-full">
                   Masuk pengelola
                 </button>
               </form>
 
-              <div className="mt-4 flex items-center justify-between border-t border-[#ECEFF4] pt-3.5 text-xs text-[#667085] sm:mt-5 sm:pt-4 dark:border-ink-line dark:text-[#8A93A6]">
+              <div className="mt-3.5 flex items-center justify-between border-t border-[#ECEFF4] pt-3 text-xs text-[#667085] dark:border-ink-line dark:text-[#8A93A6]">
                 <span>PIN demo: {ADMIN_PIN}</span>
                 <button
                   type="button"
@@ -294,17 +291,18 @@ export default function LoginView() {
           )}
         </div>
 
-        <p className="mx-auto w-full max-w-sm text-center text-[11px] text-[#98A2B3] sm:text-xs dark:text-[#667085]">
+        {/* Footer */}
+        <footer className="mx-auto w-full max-w-[380px] flex-none text-center text-[11px] text-[#98A2B3] dark:text-[#667085]">
           Fakultas Ekonomika dan Bisnis · Universitas Negeri Semarang
-        </p>
+        </footer>
       </div>
 
-      {/* Desktop Campus Photo */}
-      <div className="relative hidden overflow-hidden bg-unnes-navy lg:block">
+      {/* Right Column: Constrained Full-Bleed Photo (absolute inset-0 prevents intrinsic image height overflow!) */}
+      <div className="relative hidden h-full min-h-0 overflow-hidden bg-unnes-navy lg:block">
         <img
           src="/images/login-bg.jpg"
           alt="Gedung FEB UNNES"
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
     </div>
