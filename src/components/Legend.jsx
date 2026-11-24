@@ -1,19 +1,23 @@
 import { SLOT_LABELS } from '../lib/constants';
 
 const SWATCH_CLASS = {
-  f: 'bg-[#a7e3bd] dark:bg-[#1f6a43]',
-  k: 'bg-[#1d4ed8] dark:bg-[#5b8cff]',
-  o: 'bg-[#f08a24] dark:bg-[#ff9f45]',
-  m: 'bg-[#ffc72c]',
-  p: 'bg-[#dbe3f3] opacity-70 dark:bg-[#25335a]',
+  f: 'bg-emerald-500/80 dark:bg-emerald-400/75',
+  k: 'bg-blue-500/80 dark:bg-blue-400/75',
+  o: 'bg-amber-500/80 dark:bg-amber-400/75',
+  m: 'bg-brand-gold',
+  p: 'bg-slate-300 dark:bg-slate-700',
 };
 
 export default function Legend({ keys = ['f', 'k', 'o', 'm', 'p'], compact = false }) {
   return (
-    <div className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-600 dark:text-slate-300 ${compact ? 'text-[11px]' : 'text-xs'}`}>
+    <div
+      className={`flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-500 dark:text-slate-400 ${
+        compact ? 'text-[11px]' : 'text-xs'
+      }`}
+    >
       {keys.map((k) => (
-        <span key={k} className="inline-flex items-center gap-1.5">
-          <span className={`inline-block h-3 w-3 rounded-[4px] ${SWATCH_CLASS[k]}`} />
+        <span key={k} className="inline-flex items-center gap-1.5 font-medium">
+          <span className={`inline-block h-2.5 w-2.5 rounded-sm ${SWATCH_CLASS[k]}`} />
           <span>{SLOT_LABELS[k]}</span>
         </span>
       ))}

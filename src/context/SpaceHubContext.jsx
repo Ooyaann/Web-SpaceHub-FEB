@@ -14,7 +14,7 @@ import {
 
 const SpaceHubContext = createContext(null);
 
-const USER_SESSION_KEY = 'spacehub_session_user_v1';
+const USER_SESSION_KEY = 'spacehub_session_user_v2';
 const NOTIF_STORAGE_KEY = 'spacehub_notifications_v1';
 
 function loadSessionUser() {
@@ -50,12 +50,11 @@ export function SpaceHubProvider({ children }) {
   const days = useMemo(() => getNext31DaysWib(), [nowWib.dateKey]);
   const isAfterHours = nowWib.hour >= 16;
 
-  const [activeView, setActiveView] = useState('find');
+  const [activeView, setActiveView] = useState(() => (loadSessionUser()?.role === 'admin' ? 'admin' : 'find'));
   const [selectedRoomCode, setSelectedRoomCode] = useState(null);
   const [detailDayIndex, setDetailDayIndex] = useState(() => (isAfterHours ? 1 : 0));
   const [bookingPresetDay, setBookingPresetDay] = useState(() => (isAfterHours ? 1 : 0));
   const [bookingPresetHour, setBookingPresetHour] = useState(null);
-  const [adminUnlocked, setAdminUnlocked] = useState(false);
 
   const [toast, setToast] = useState(null);
   const toastTimerRef = useRef(null);
@@ -67,7 +66,7 @@ export function SpaceHubProvider({ children }) {
     floorKey: '',
     cap: 0,
     sort: 'cap',
-    priceType: 'all', // 'all' | 'free' | 'paid'
+    priceType: 'all',
     facilities: [],
     favOnly: false,
     search: '',
@@ -144,22 +143,46 @@ export function SpaceHubProvider({ children }) {
       const res = await authUnnesUser({ email, password, fullName, mode });
       if (!res?.ok) return res;
 
-      setUser(res.user);
+      const sessionUser = { ...res.user, role: 'student' };
+      setUser(sessionUser);
       try {
-        localStorage.setItem(USER_SESSION_KEY, JSON.stringify(res.user));
+        localStorage.setItem(USER_SESSION_KEY, JSON.stringify(sessionUser));
       } catch {
         // ignore
       }
       setActiveView('find');
-      showToast(`Halo, ${res.user.name}!`, 'success');
+      showToast(`Halo, ${sessionUser.name}!`, 'success');
       return res;
+    },
+    [showToast]
+  );
+
+  const loginAsAdmin = useCallback(
+    (pin) => {
+      if (String(pin || '').trim().toLowerCase() !== ADMIN_PIN) {
+        return { ok: false, error: 'PIN Pengelola tidak sesuai.' };
+      }
+      const adminUser = {
+        email: 'pengelola@unnes.ac.id',
+        name: 'Pengelola FEB',
+        nim: '',
+        role: 'admin',
+      };
+      setUser(adminUser);
+      try {
+        localStorage.setItem(USER_SESSION_KEY, JSON.stringify(adminUser));
+      } catch {
+        // ignore
+      }
+      setActiveView('admin');
+      showToast('Masuk sebagai Pengelola FEB.', 'success');
+      return { ok: true, user: adminUser };
     },
     [showToast]
   );
 
   const logout = useCallback(() => {
     setUser(null);
-    setAdminUnlocked(false);
     setSelectedRoomCode(null);
     setActiveView('find');
     try {
@@ -221,6 +244,16 @@ export function SpaceHubProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
+  const goToFindWithDate = useCallback((dayIdx) => {
+    setFilters((prev) => ({
+      ...prev,
+      day: dayIdx,
+      start: dayIdx === 0 ? clampStartHour(getNowWib().hour) : 8,
+    }));
+    setActiveView('find');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   const navigate = useCallback((view) => {
     setActiveView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -229,6 +262,10 @@ export function SpaceHubProvider({ children }) {
   const toggleFavorite = useCallback(
     async (roomCode) => {
       if (!user) return;
+      if (user.role === 'admin') {
+        showToast('Fitur favorit tersedia pada akun mahasiswa.');
+        return;
+      }
       const res = await toggleFavoriteSafe({ userEmail: user.email, roomCode });
       if (!res?.ok) {
         showToast(res?.error || 'Gagal memperbarui favorit.', 'error');
@@ -340,7 +377,7 @@ export function SpaceHubProvider({ children }) {
       showToast(`Booking dikonfirmasi (${code})`, 'success');
       pushNotification('Booking Disetujui', detailMsg, 'booking');
       setBookingPresetHour(null);
-      setActiveView('mine');
+      setActiveView(user.role === 'admin' ? 'admin' : 'mine');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return res;
     },
@@ -365,18 +402,6 @@ export function SpaceHubProvider({ children }) {
     [user, refreshData, showToast, pushNotification]
   );
 
-  const unlockAdmin = useCallback(
-    (pin) => {
-      if (String(pin || '').trim().toLowerCase() === ADMIN_PIN) {
-        setAdminUnlocked(true);
-        showToast('Mode Pengelola aktif.', 'success');
-        return true;
-      }
-      return false;
-    },
-    [showToast]
-  );
-
   const myBookings = useMemo(() => {
     if (!user) return [];
     const email = user.email.toLowerCase();
@@ -395,8 +420,11 @@ export function SpaceHubProvider({ children }) {
     return myBookings.filter((b) => isBookingActive(b, current.dateKey, current.hour)).length;
   }, [myBookings]);
 
+  const isAdmin = user?.role === 'admin';
+
   const value = {
     user,
+    isAdmin,
     rooms,
     bookings,
     reports,
@@ -417,17 +445,17 @@ export function SpaceHubProvider({ children }) {
     updateFilter,
     toggleFacilityFilter,
     resetFilters,
-    adminUnlocked,
-    unlockAdmin,
     toast,
     showToast,
     clearNotifications,
     refreshData,
     loginOrRegister,
+    loginAsAdmin,
     logout,
     navigate,
     openRoomDetail,
     openBookingForm,
+    goToFindWithDate,
     toggleFavorite,
     reportRoomUsed,
     submitBooking,

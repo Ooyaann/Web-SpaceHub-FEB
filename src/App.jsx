@@ -17,7 +17,7 @@ import NotificationsView from './views/NotificationsView';
 import FlowView from './views/FlowView';
 
 export default function App() {
-  const { user, activeView, isSupabaseConfigured } = useSpaceHub();
+  const { user, isAdmin, activeView, isSupabaseConfigured } = useSpaceHub();
 
   if (!user) {
     return (
@@ -37,9 +37,9 @@ export default function App() {
       case 'bk':
         return <BookingView />;
       case 'mine':
-        return <MyBookingsView />;
+        return isAdmin ? <AdminView /> : <MyBookingsView />;
       case 'admin':
-        return <AdminView />;
+        return isAdmin ? <AdminView /> : <FindView />;
       case 'plan':
         return <FloorPlanView />;
       case 'sched':
@@ -47,33 +47,33 @@ export default function App() {
       case 'cal':
         return <CalendarView />;
       case 'favs':
-        return <FavoritesView />;
+        return isAdmin ? <FindView /> : <FavoritesView />;
       case 'notif':
-        return <NotificationsView />;
+        return isAdmin ? <AdminView /> : <NotificationsView />;
       case 'flow':
         return <FlowView />;
       default:
-        return <FindView />;
+        return isAdmin ? <AdminView /> : <FindView />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-unnes-surface text-[#0f1d3d] dark:bg-unnes-surface-dark dark:text-[#e7ecf8] lg:flex">
+    <div className="min-h-screen bg-canvas-light text-slate-900 dark:bg-canvas-dark dark:text-slate-100 lg:flex">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />
         {!isSupabaseConfigured && (
-          <div className="border-b border-amber-300/60 bg-amber-50/90 px-4 py-1.5 text-[11px] font-medium text-amber-900 dark:border-amber-500/25 dark:bg-amber-500/10 dark:text-amber-200">
+          <div className="border-b border-amber-200/80 bg-amber-50/70 px-4 py-1.5 text-[11px] font-medium text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
             <div className="mx-auto flex max-w-6xl items-center gap-1.5">
               <Database className="h-3.5 w-3.5 flex-none" />
               <span>
-                <strong>Demo Lokal</strong> — isi <code className="font-mono">.env</code> Supabase untuk sinkronisasi
+                <strong>Mode Demo Lokal</strong> — isi <code className="font-mono">.env</code> Supabase untuk sinkronisasi
                 lintas perangkat.
               </span>
             </div>
           </div>
         )}
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 sm:px-6 lg:py-7">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {renderView()}
         </main>
       </div>

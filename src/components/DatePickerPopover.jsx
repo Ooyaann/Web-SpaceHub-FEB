@@ -18,18 +18,7 @@ const MONTH_NAMES = [
   'Desember',
 ];
 
-/**
- * DatePickerPopover — Popup kalender interaktif untuk memilih tanggal dalam jendela 31 hari WIB.
- * Mendukung shortcut cepat (Hari ini, Besok, Lusa) + navigasi bulan.
- */
-export default function DatePickerPopover({
-  days,
-  value,
-  onChange,
-  label,
-  align = 'left',
-  compact = false,
-}) {
+export default function DatePickerPopover({ days, value, onChange, label, align = 'left' }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -50,9 +39,7 @@ export default function DatePickerPopover({
   useEffect(() => {
     if (!open) return;
     const handleOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false);
-      }
+      if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false);
     };
     const handleEsc = (e) => {
       if (e.key === 'Escape') setOpen(false);
@@ -79,10 +66,9 @@ export default function DatePickerPopover({
 
   const cells = useMemo(() => {
     const firstUtc = new Date(Date.UTC(cursor.year, cursor.month, 1));
-    const offset = (firstUtc.getUTCDay() + 6) % 7; // Senin = 0
+    const offset = (firstUtc.getUTCDay() + 6) % 7;
     const daysInMonth = new Date(Date.UTC(cursor.year, cursor.month + 1, 0)).getUTCDate();
     const arr = [];
-
     for (let i = 0; i < offset; i += 1) arr.push(null);
     for (let dt = 1; dt <= daysInMonth; dt += 1) {
       const key = `${cursor.year}-${pad2(cursor.month + 1)}-${pad2(dt)}`;
@@ -100,7 +86,7 @@ export default function DatePickerPopover({
   return (
     <div ref={containerRef} className="relative">
       {label && (
-        <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+        <span className="mb-1.5 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
           {label}
         </span>
       )}
@@ -109,26 +95,27 @@ export default function DatePickerPopover({
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className={`sh-input flex items-center justify-between gap-2 text-left font-semibold ${
-          compact ? 'py-1.5 text-xs' : ''
+        className={`sh-control flex items-center justify-between gap-2 text-left ${
+          open ? 'border-brand ring-2 ring-brand/15 dark:border-brand-dark dark:ring-brand-dark/20' : ''
         }`}
       >
         <span className="flex min-w-0 items-center gap-2 truncate">
-          <CalendarDays className="h-4 w-4 flex-none text-unnes-blue dark:text-unnes-gold" />
-          <span className="truncate">{selectedDay.label}</span>
+          <CalendarDays className="h-4 w-4 flex-none text-slate-400" />
+          <span className="truncate font-semibold">{selectedDay.label}</span>
         </span>
         <ChevronDown
-          className={`h-4 w-4 flex-none text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 flex-none text-slate-400 transition-transform duration-150 ${
+            open ? 'rotate-180 text-brand dark:text-brand-dark' : ''
+          }`}
         />
       </button>
 
       {open && (
         <div
-          className={`absolute z-50 mt-2 w-[296px] rounded-2xl border border-unnes-border bg-white p-3.5 shadow-2xl dark:border-unnes-border-dark dark:bg-[#101a35] ${
+          className={`absolute z-50 mt-1.5 w-[292px] rounded-2xl border border-line-light bg-white p-3.5 shadow-popover dark:border-line-dark dark:bg-[#131c2e] ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
-          {/* Shortcut cepat */}
           <div className="mb-3 flex gap-1.5">
             {[
               { idx: 0, text: 'Hari ini' },
@@ -139,10 +126,10 @@ export default function DatePickerPopover({
                 key={s.idx}
                 type="button"
                 onClick={() => handleSelect(s.idx)}
-                className={`flex-1 rounded-lg py-1.5 text-[11px] font-bold transition ${
+                className={`flex-1 rounded-lg py-1.5 text-[11px] font-semibold transition ${
                   value === s.idx
-                    ? 'bg-unnes-navy text-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink'
-                    : 'bg-unnes-surface text-slate-600 hover:bg-[#dfe8fb] dark:bg-[#19264a] dark:text-slate-300 dark:hover:bg-[#223363]'
+                    ? 'bg-brand text-white dark:bg-brand-dark'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
                 }`}
               >
                 {s.text}
@@ -150,18 +137,17 @@ export default function DatePickerPopover({
             ))}
           </div>
 
-          {/* Header Bulan */}
           <div className="mb-2 flex items-center justify-between">
             <button
               type="button"
               disabled={!canPrev}
               onClick={() => shiftMonth(-1)}
               aria-label="Bulan sebelumnya"
-              className="rounded-lg p-1.5 text-slate-600 transition hover:bg-unnes-surface disabled:opacity-30 dark:text-slate-300 dark:hover:bg-[#1c2a52]"
+              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:opacity-30 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="text-xs font-extrabold text-[#0f1d3d] dark:text-white">
+            <div className="text-xs font-bold text-slate-900 dark:text-white">
               {MONTH_NAMES[cursor.month]} {cursor.year}
             </div>
             <button
@@ -169,14 +155,13 @@ export default function DatePickerPopover({
               disabled={!canNext}
               onClick={() => shiftMonth(1)}
               aria-label="Bulan berikutnya"
-              className="rounded-lg p-1.5 text-slate-600 transition hover:bg-unnes-surface disabled:opacity-30 dark:text-slate-300 dark:hover:bg-[#1c2a52]"
+              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:opacity-30 dark:text-slate-300 dark:hover:bg-slate-800"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Hari */}
-          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase text-slate-400">
+          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase text-slate-400">
             {WEEKDAYS.map((w) => (
               <div key={w} className="py-1">
                 {w}
@@ -184,7 +169,6 @@ export default function DatePickerPopover({
             ))}
           </div>
 
-          {/* Grid Tanggal */}
           <div className="grid grid-cols-7 gap-1">
             {cells.map((cell, i) => {
               if (!cell) return <div key={`blank-${i}`} />;
@@ -197,17 +181,17 @@ export default function DatePickerPopover({
                   type="button"
                   disabled={disabled}
                   onClick={() => handleSelect(cell.idx)}
-                  className={`relative flex h-9 items-center justify-center rounded-xl text-xs font-bold tabular-nums transition ${
+                  className={`relative flex h-9 items-center justify-center rounded-lg text-xs font-semibold tabular-nums transition ${
                     isSelected
-                      ? 'bg-unnes-gold font-extrabold text-unnes-gold-ink shadow-sm'
+                      ? 'bg-brand font-bold text-white shadow-sm dark:bg-brand-dark'
                       : disabled
                         ? 'cursor-not-allowed text-slate-300 dark:text-slate-700'
-                        : 'text-[#0f1d3d] hover:bg-unnes-surface dark:text-slate-200 dark:hover:bg-[#1d2d59]'
+                        : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
                   }`}
                 >
                   {cell.dt}
                   {isToday && !isSelected && (
-                    <span className="absolute bottom-1 h-1 w-1 rounded-full bg-unnes-blue dark:bg-unnes-gold" />
+                    <span className="absolute bottom-1 h-1 w-1 rounded-full bg-brand dark:bg-brand-dark" />
                   )}
                 </button>
               );

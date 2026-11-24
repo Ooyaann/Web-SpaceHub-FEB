@@ -1,10 +1,11 @@
 import { Compass, LogOut, Moon, RefreshCw, Sun } from 'lucide-react';
 import { useSpaceHub } from '../context/SpaceHubContext';
 import { useTheme } from '../context/ThemeContext';
-import { NAV_ITEMS } from './Sidebar';
+import { getNavGroups } from './Sidebar';
 
 export default function MobileNav() {
   const {
+    isAdmin,
     activeView,
     navigate,
     logout,
@@ -16,6 +17,7 @@ export default function MobileNav() {
   } = useSpaceHub();
   const { theme, toggleTheme } = useTheme();
 
+  const items = getNavGroups(isAdmin).flatMap((g) => g.items);
   const currentNav = activeView === 'det' || activeView === 'bk' ? 'find' : activeView;
 
   const getBadge = (id) => {
@@ -26,14 +28,18 @@ export default function MobileNav() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-unnes-border bg-white/95 backdrop-blur-md dark:border-unnes-border-dark dark:bg-[#0c152d]/95 lg:hidden">
+    <header className="sticky top-0 z-30 border-b border-line-light bg-surface-light/95 backdrop-blur-md dark:border-line-dark dark:bg-surface-dark/95 lg:hidden">
       <div className="flex items-center justify-between px-4 py-2.5">
-        <button type="button" onClick={() => navigate('find')} className="flex items-center gap-2 text-left">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-unnes-navy text-unnes-gold">
+        <button
+          type="button"
+          onClick={() => navigate(isAdmin ? 'admin' : 'find')}
+          className="flex items-center gap-2 text-left"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-brand-gold dark:bg-brand-dark/20">
             <Compass className="h-4 w-4" />
           </div>
-          <span className="text-base font-extrabold tracking-tight text-unnes-navy dark:text-white">
-            Space<span className="text-unnes-blue dark:text-unnes-gold">Hub</span>
+          <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Space<span className="text-brand dark:text-brand-dark">Hub</span>
           </span>
         </button>
 
@@ -43,7 +49,7 @@ export default function MobileNav() {
             onClick={() => refreshData(true)}
             disabled={syncing}
             aria-label="Muat ulang"
-            className="rounded-lg border border-unnes-border p-1.5 text-slate-600 dark:border-unnes-border-dark dark:text-slate-300"
+            className="rounded-lg border border-line-light p-1.5 text-slate-500 dark:border-line-dark dark:text-slate-400"
           >
             <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
           </button>
@@ -51,26 +57,23 @@ export default function MobileNav() {
             type="button"
             onClick={toggleTheme}
             aria-label="Ubah tema"
-            className="rounded-lg border border-unnes-border p-1.5 text-slate-600 dark:border-unnes-border-dark dark:text-slate-300"
+            className="rounded-lg border border-line-light p-1.5 text-slate-500 dark:border-line-dark dark:text-slate-400"
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
+            {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
           </button>
           <button
             type="button"
             onClick={logout}
             aria-label="Keluar"
-            className="rounded-lg border border-unnes-border p-1.5 text-slate-600 dark:border-unnes-border-dark dark:text-slate-300"
+            className="rounded-lg border border-line-light p-1.5 text-slate-500 dark:border-line-dark dark:text-slate-400"
           >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <nav
-        aria-label="Navigasi mobile"
-        className="no-scrollbar flex gap-1.5 overflow-x-auto px-3 pb-2.5 pt-0.5"
-      >
-        {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
+      <nav aria-label="Navigasi mobile" className="no-scrollbar flex gap-1.5 overflow-x-auto px-3 pb-2.5 pt-0.5">
+        {items.map(({ id, label, icon: Icon }) => {
           const isActive = currentNav === id;
           const badge = getBadge(id);
           return (
@@ -78,20 +81,18 @@ export default function MobileNav() {
               key={id}
               type="button"
               onClick={() => navigate(id)}
-              className={`flex flex-none items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+              className={`flex flex-none items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                 isActive
-                  ? 'bg-unnes-navy text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
-                  : 'bg-unnes-surface text-slate-600 dark:bg-[#172344] dark:text-slate-300'
+                  ? 'bg-brand text-white dark:bg-brand-dark'
+                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
               {label}
               {badge > 0 && (
                 <span
-                  className={`rounded-full px-1.5 text-[10px] font-extrabold ${
-                    isActive
-                      ? 'bg-unnes-gold text-unnes-gold-ink dark:bg-unnes-navy dark:text-white'
-                      : 'bg-unnes-navy/10 text-unnes-navy dark:bg-white/10 dark:text-unnes-gold'
+                  className={`rounded-full px-1.5 text-[10px] font-bold ${
+                    isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200'
                   }`}
                 >
                   {badge}

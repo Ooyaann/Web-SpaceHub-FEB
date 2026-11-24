@@ -1,16 +1,28 @@
-import { useMemo } from 'react';
-import { RotateCcw, Search, Star } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import {
+  ArrowUpDown,
+  Building2,
+  Clock,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  Star,
+  Tag,
+  Users,
+} from 'lucide-react';
 import { FACILITY_OPTIONS, START_HOURS, getFloorOptions } from '../lib/constants';
 import { formatHour } from '../lib/dateWib';
 import { getFreeUntilHour, getSlotStatus, isWindowFree } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
 import DatePickerPopover from '../components/DatePickerPopover';
+import SelectPopover from '../components/SelectPopover';
 import RoomCard from '../components/RoomCard';
 import SkeletonCard from '../components/SkeletonCard';
 
 export default function FindView() {
   const {
     user,
+    isAdmin,
     rooms,
     bookings,
     reports,
@@ -24,7 +36,39 @@ export default function FindView() {
     resetFilters,
   } = useSpaceHub();
 
-  const floorOptions = useMemo(() => getFloorOptions(rooms), [rooms]);
+  const [showFacilities, setShowFacilities] = useState(false);
+
+  const floorOptions = useMemo(
+    () => [
+      { value: '', label: `Semua Gedung (${rooms.length})` },
+      ...getFloorOptions(rooms).map(([key, label]) => ({ value: key, label })),
+    ],
+    [rooms]
+  );
+
+  const hourOptions = useMemo(
+    () => START_HOURS.map((h) => ({ value: h, label: `${formatHour(h)} WIB` })),
+    []
+  );
+
+  const capOptions = [
+    { value: 0, label: 'Semua Kapasitas' },
+    { value: 30, label: '30+ kursi' },
+    { value: 45, label: '45+ kursi' },
+    { value: 60, label: '60+ kursi' },
+  ];
+
+  const priceOptions = [
+    { value: 'all', label: 'Semua Tarif' },
+    { value: 'free', label: 'Gratis Mahasiswa FEB' },
+    { value: 'paid', label: 'Lab / Berbayar' },
+  ];
+
+  const sortOptions = [
+    { value: 'cap', label: 'Kapasitas terbesar' },
+    { value: 'long', label: 'Kosong terlama' },
+  ];
+
   const selectedDay = days[filters.day] || days[0];
 
   const freeNowCount = useMemo(() => {
@@ -102,58 +146,47 @@ export default function FindView() {
       });
   }, [rooms, filters, favorites, selectedDay, bookings, reports, user, nowWib]);
 
-  const hasExtraFilter =
+  const activeFacCount = filters.facilities.length + (filters.favOnly ? 1 : 0);
+  const hasAnyExtraFilter =
     Boolean(filters.floorKey) ||
     filters.cap > 0 ||
     filters.priceType !== 'all' ||
-    filters.facilities.length > 0 ||
-    filters.favOnly ||
+    activeFacCount > 0 ||
     Boolean(filters.search.trim());
 
   return (
-    <div className="space-y-5">
-      {/* Compact Hero */}
-      <section
-        className="overflow-hidden rounded-2xl px-6 py-5 text-white shadow-soft"
-        style={{
-          backgroundImage: `linear-gradient(95deg, rgba(11, 42, 111, 0.94) 40%, rgba(11, 42, 111, 0.52) 100%), url(/images/feb-hero.jpg)`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <span className="inline-block rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-bold text-unnes-gold">
-              {nowWib.timeLabel}
-            </span>
-            <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight">Halo, {user?.name}!</h2>
-          </div>
-
-          <div className="flex gap-2.5">
-            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center backdrop-blur-sm">
-              <div className="text-xl font-extrabold leading-none text-unnes-gold tabular-nums">
-                {freeNowCount}
-              </div>
-              <div className="mt-1 text-[10px] font-medium text-blue-100">Kosong kini</div>
-            </div>
-            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center backdrop-blur-sm">
-              <div className="text-xl font-extrabold leading-none text-unnes-gold tabular-nums">
-                {filteredRooms.length}
-              </div>
-              <div className="mt-1 text-[10px] font-medium text-blue-100">Tersedia</div>
-            </div>
-            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center backdrop-blur-sm">
-              <div className="text-xl font-extrabold leading-none text-unnes-gold tabular-nums">
-                {favorites.size}
-              </div>
-              <div className="mt-1 text-[10px] font-medium text-blue-100">Favorit</div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Clean Page Header (No bulky banner) */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Cari Ruang Kosong
+          </h1>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+            {selectedDay.label} · {formatHour(filters.start)} ({filters.dur} jam) · {nowWib.timeLabel}
+          </p>
         </div>
-      </section>
 
-      {/* Modern Booking Filter Bar */}
-      <section className="sh-card space-y-3.5 p-4">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-slate-700 dark:border-line-dark dark:bg-surface-dark dark:text-slate-200">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            <strong className="tabular-nums">{filteredRooms.length}</strong> tersedia
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-slate-500 dark:border-line-dark dark:bg-surface-dark dark:text-slate-400">
+            Kosong kini: <strong className="tabular-nums text-slate-800 dark:text-white">{freeNowCount}</strong>
+          </span>
+          {!isAdmin && (
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-slate-500 dark:border-line-dark dark:bg-surface-dark dark:text-slate-400">
+              <Star className="h-3.5 w-3.5 fill-brand-gold text-brand-gold" />
+              <strong className="tabular-nums text-slate-800 dark:text-white">{favorites.size}</strong>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Symmetrical 2-Row Filter Card (100% uniform h-10 custom controls) */}
+      <section className="sh-card space-y-4 p-4 sm:p-5">
+        {/* Row 1: Waktu & Pencarian Cepat */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-3">
             <DatePickerPopover
@@ -164,34 +197,28 @@ export default function FindView() {
             />
           </div>
 
-          <label className="block lg:col-span-2">
-            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jam Mulai</span>
-            <select
+          <div className="lg:col-span-3">
+            <SelectPopover
+              label="Jam Mulai"
+              icon={Clock}
               value={filters.start}
-              onChange={(e) => updateFilter('start', Number(e.target.value))}
-              className="sh-input font-semibold"
-            >
-              {START_HOURS.map((h) => (
-                <option key={h} value={h}>
-                  {formatHour(h)} WIB
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={(v) => updateFilter('start', Number(v))}
+              options={hourOptions}
+            />
+          </div>
 
-          {/* Segmented Duration */}
           <div className="lg:col-span-2">
-            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Durasi</span>
-            <div className="grid grid-cols-3 rounded-xl border border-unnes-border bg-[#f7faff] p-0.5 dark:border-unnes-border-dark dark:bg-[#0d1730]">
+            <span className="mb-1.5 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Durasi</span>
+            <div className="grid h-10 grid-cols-3 rounded-xl border border-line-light bg-slate-50 p-1 dark:border-line-dark dark:bg-surface-subtle-dark">
               {[1, 2, 3].map((d) => (
                 <button
                   key={d}
                   type="button"
                   onClick={() => updateFilter('dur', d)}
-                  className={`rounded-lg py-1.5 text-xs font-extrabold transition ${
+                  className={`rounded-lg text-xs font-bold transition ${
                     filters.dur === d
-                      ? 'bg-unnes-navy text-unnes-gold shadow-sm dark:bg-unnes-gold dark:text-unnes-gold-ink'
-                      : 'text-slate-600 hover:text-unnes-navy dark:text-slate-400 dark:hover:text-white'
+                      ? 'bg-brand text-white shadow-sm dark:bg-brand-dark'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
                   }`}
                 >
                   {d}j
@@ -200,141 +227,139 @@ export default function FindView() {
             </div>
           </div>
 
-          <label className="block lg:col-span-3">
-            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-              Gedung / Lantai
+          <div className="lg:col-span-4">
+            <span className="mb-1.5 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+              Cari Kode Ruang
             </span>
-            <select
-              value={filters.floorKey}
-              onChange={(e) => updateFilter('floorKey', e.target.value)}
-              className="sh-input"
-            >
-              <option value="">Semua ({rooms.length})</option>
-              {floorOptions.map(([key, label]) => (
-                <option key={key} value={key}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block lg:col-span-2">
-            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Kapasitas</span>
-            <select
-              value={filters.cap}
-              onChange={(e) => updateFilter('cap', Number(e.target.value))}
-              className="sh-input"
-            >
-              <option value={0}>Semua</option>
-              <option value={30}>30+ kursi</option>
-              <option value={45}>45+ kursi</option>
-              <option value={60}>60+ kursi</option>
-            </select>
-          </label>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                value={filters.search}
+                onChange={(e) => updateFilter('search', e.target.value)}
+                placeholder="Mis. L4 512, Lab 5A..."
+                className="sh-control pl-9"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Search + Facility + Tarif + Sort Row */}
-        <div className="flex flex-wrap items-center gap-2 border-t border-unnes-border/70 pt-3 dark:border-unnes-border-dark">
-          <div className="relative min-w-[170px] flex-1 sm:max-w-[210px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={filters.search}
-              onChange={(e) => updateFilter('search', e.target.value)}
-              placeholder="Cari kode (L4 512, Lab)..."
-              className="sh-input py-1.5 pl-8 text-xs"
-            />
-          </div>
+        {/* Row 2: Filter Terstruktur Simetris (5 kolom rata) */}
+        <div className="grid grid-cols-1 gap-3 border-t border-line-light pt-3.5 dark:border-line-dark sm:grid-cols-2 lg:grid-cols-5">
+          <SelectPopover
+            icon={Building2}
+            value={filters.floorKey}
+            onChange={(v) => updateFilter('floorKey', v)}
+            options={floorOptions}
+          />
 
-          <div className="flex flex-wrap items-center gap-1.5">
-            {FACILITY_OPTIONS.map((fac) => {
-              const active = filters.facilities.includes(fac);
-              return (
+          <SelectPopover
+            icon={Users}
+            value={filters.cap}
+            onChange={(v) => updateFilter('cap', Number(v))}
+            options={capOptions}
+          />
+
+          <SelectPopover
+            icon={Tag}
+            value={filters.priceType}
+            onChange={(v) => updateFilter('priceType', v)}
+            options={priceOptions}
+          />
+
+          <SelectPopover
+            icon={ArrowUpDown}
+            value={filters.sort}
+            onChange={(v) => updateFilter('sort', v)}
+            options={sortOptions}
+            align="right"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowFacilities((s) => !s)}
+            className={`sh-control flex items-center justify-between gap-2 ${
+              showFacilities || activeFacCount > 0
+                ? 'border-brand text-brand dark:border-brand-dark dark:text-blue-300'
+                : ''
+            }`}
+          >
+            <span className="flex items-center gap-2 font-semibold">
+              <SlidersHorizontal className="h-4 w-4" />
+              Fasilitas
+            </span>
+            {activeFacCount > 0 ? (
+              <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white dark:bg-brand-dark">
+                {activeFacCount}
+              </span>
+            ) : (
+              <span className="text-xs text-slate-400">{showFacilities ? 'Tutup' : 'Pilih'}</span>
+            )}
+          </button>
+        </div>
+
+        {/* Collapsible Facility & Favorite Tray */}
+        {(showFacilities || activeFacCount > 0) && (
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 px-3.5 py-2.5 dark:bg-surface-subtle-dark">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {FACILITY_OPTIONS.map((fac) => {
+                const active = filters.facilities.includes(fac);
+                return (
+                  <button
+                    key={fac}
+                    type="button"
+                    onClick={() => toggleFacilityFilter(fac)}
+                    className={`sh-chip ${active ? 'sh-chip-active' : ''}`}
+                  >
+                    {fac}
+                  </button>
+                );
+              })}
+
+              {!isAdmin && (
                 <button
-                  key={fac}
                   type="button"
-                  onClick={() => toggleFacilityFilter(fac)}
-                  className={`sh-chip ${active ? 'sh-chip-active' : ''}`}
+                  onClick={() => updateFilter('favOnly', !filters.favOnly)}
+                  className={`sh-chip ${filters.favOnly ? 'sh-chip-active' : ''}`}
                 >
-                  {fac}
+                  <Star className={`h-3.5 w-3.5 ${filters.favOnly ? 'fill-current' : ''}`} />
+                  Favorit saja
                 </button>
-              );
-            })}
+              )}
+            </div>
 
-            <button
-              type="button"
-              onClick={() => updateFilter('favOnly', !filters.favOnly)}
-              className={`sh-chip ${filters.favOnly ? 'sh-chip-active' : ''}`}
-            >
-              <Star className={`h-3 w-3 ${filters.favOnly ? 'fill-unnes-gold-ink' : ''}`} />
-              Favorit
-            </button>
-
-            <span className="mx-0.5 hidden h-4 w-px bg-unnes-border dark:bg-unnes-border-dark sm:inline-block" />
-
-            {[
-              { id: 'all', label: 'Semua Tarif' },
-              { id: 'free', label: 'Gratis FEB' },
-              { id: 'paid', label: 'Lab' },
-            ].map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => updateFilter('priceType', t.id)}
-                className={`sh-chip ${filters.priceType === t.id && t.id !== 'all' ? 'sh-chip-active' : ''} ${
-                  filters.priceType === 'all' && t.id === 'all'
-                    ? 'border-unnes-navy/40 bg-unnes-surface font-bold dark:border-unnes-blue-light/40 dark:bg-[#19264a]'
-                    : ''
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <select
-              aria-label="Urutkan ruangan"
-              value={filters.sort}
-              onChange={(e) => updateFilter('sort', e.target.value)}
-              className="sh-input w-auto py-1.5 text-xs"
-            >
-              <option value="cap">Kapasitas terbesar</option>
-              <option value="long">Kosong terlama</option>
-            </select>
-
-            {hasExtraFilter && (
+            {hasAnyExtraFilter && (
               <button
                 type="button"
                 onClick={resetFilters}
-                title="Reset filter"
-                className="rounded-lg p-1.5 text-slate-500 transition hover:bg-unnes-surface hover:text-unnes-blue dark:text-slate-400 dark:hover:bg-[#19264a]"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition hover:text-brand dark:text-slate-400 dark:hover:text-blue-300"
               >
-                <RotateCcw className="h-4 w-4" />
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset
               </button>
             )}
           </div>
-        </div>
+        )}
       </section>
 
-      {/* 3-Column Modern Room Grid */}
+      {/* Room Cards Grid */}
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, idx) => (
             <SkeletonCard key={idx} />
           ))}
         </div>
       ) : filteredRooms.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {filteredRooms.map((room) => (
             <RoomCard key={room.code} room={room} dayIndex={filters.day} />
           ))}
         </div>
       ) : (
-        <div className="sh-card border-dashed px-6 py-12 text-center">
-          <p className="text-sm font-bold text-[#0f1d3d] dark:text-white">Tidak ada ruang kosong di slot ini.</p>
+        <div className="sh-card border-dashed px-6 py-14 text-center">
+          <p className="text-sm font-bold text-slate-900 dark:text-white">Tidak ada ruang kosong di slot ini.</p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Coba ganti tanggal, jam mulai, atau reset filter.
+            Ubah tanggal, jam mulai, atau reset filter untuk melihat ruang lain.
           </p>
           <button type="button" onClick={resetFilters} className="sh-btn-secondary mt-4">
             Reset Filter

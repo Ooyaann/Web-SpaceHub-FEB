@@ -4,7 +4,7 @@ import { getFreeUntilHour } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
 
 export default function RoomCard({ room, dayIndex }) {
-  const { days, bookings, reports, user, nowWib, filters, favorites, openRoomDetail, toggleFavorite } =
+  const { days, bookings, reports, user, isAdmin, nowWib, filters, favorites, openRoomDetail, toggleFavorite } =
     useSpaceHub();
 
   const targetDayIdx = dayIndex ?? filters.day;
@@ -36,50 +36,48 @@ export default function RoomCard({ room, dayIndex }) {
           openRoomDetail(room.code, targetDayIdx);
         }
       }}
-      className="sh-card group flex cursor-pointer flex-col overflow-hidden text-left transition duration-200 hover:-translate-y-1 hover:border-unnes-blue/60 hover:shadow-soft dark:hover:border-unnes-blue-light/60"
+      className="sh-card group flex cursor-pointer flex-col overflow-hidden text-left transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-soft dark:hover:border-slate-600"
     >
-      {/* Visual Header */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-200 dark:bg-slate-800">
         <img
           src={room.image_url}
           alt={`Ruang ${room.code}`}
           loading="lazy"
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/15 to-transparent" />
 
-        {/* Status Pill */}
+        {/* Status Pill — Emerald untuk Kosong */}
         <span
-          className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[11px] font-extrabold shadow-sm ${
+          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold backdrop-blur-md ${
             isFreeStart
-              ? 'bg-unnes-gold text-unnes-gold-ink'
-              : 'bg-black/60 text-white backdrop-blur-md'
+              ? 'bg-emerald-600/90 text-white'
+              : 'bg-slate-900/70 text-slate-200'
           }`}
         >
+          <span className={`h-1.5 w-1.5 rounded-full ${isFreeStart ? 'bg-emerald-200' : 'bg-slate-400'}`} />
           {isFreeStart ? `Kosong s.d. ${formatHour(freeUntil)}` : `Terisi ${formatHour(filters.start)}`}
         </span>
 
-        {/* Favorite Glass Button */}
-        <button
-          type="button"
-          aria-label={isFav ? `Hapus ${room.code} dari favorit` : `Simpan ${room.code} ke favorit`}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleFavorite(room.code);
-          }}
-          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md transition hover:bg-black/60"
-        >
-          <Star className={`h-4 w-4 ${isFav ? 'fill-unnes-gold text-unnes-gold' : 'text-white'}`} />
-        </button>
+        {!isAdmin && (
+          <button
+            type="button"
+            aria-label={isFav ? `Hapus ${room.code} dari favorit` : `Simpan ${room.code} ke favorit`}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleFavorite(room.code);
+            }}
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-slate-950/45 text-white backdrop-blur-md transition hover:bg-slate-950/70"
+          >
+            <Star className={`h-4 w-4 ${isFav ? 'fill-brand-gold text-brand-gold' : 'text-white/90'}`} />
+          </button>
+        )}
 
-        {/* Bottom overlay: Room Code + Location */}
-        <div className="absolute inset-x-3 bottom-2.5 flex items-end justify-between text-white">
+        <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between text-white">
           <div>
-            <h3 className="text-lg font-extrabold leading-tight tracking-tight drop-shadow-sm">
-              {room.code}
-            </h3>
-            <span className="text-[11px] font-medium text-white/85">
-              Gedung {room.building} · Lt. {room.floor}
+            <h3 className="text-base font-extrabold leading-tight tracking-tight">{room.code}</h3>
+            <span className="text-[11px] font-medium text-slate-200/90">
+              Gedung {room.building} · Lantai {room.floor}
             </span>
           </div>
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/15 text-white opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
@@ -88,30 +86,29 @@ export default function RoomCard({ room, dayIndex }) {
         </div>
       </div>
 
-      {/* Concise Body */}
-      <div className="flex flex-1 flex-col justify-between gap-2.5 p-3.5">
+      <div className="flex flex-1 flex-col justify-between gap-3 p-4">
         <div className="flex items-center justify-between gap-2">
           <span
-            className={`inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-bold ${
+            className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${
               isPaid
-                ? 'bg-amber-100 text-amber-900 dark:bg-amber-500/20 dark:text-amber-300'
-                : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300'
+                ? 'bg-amber-50 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300'
+                : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
             }`}
           >
             <Tag className="h-3 w-3" />
             {formatPriceBadge(room.price_per_hour)}
           </span>
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-slate-600 dark:text-slate-300">
-            <Users className="h-3.5 w-3.5 text-unnes-blue dark:text-unnes-blue-light" />
-            {room.capacity}
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <Users className="h-3.5 w-3.5" />
+            {room.capacity} kursi
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {(room.facilities || []).map((f) => (
             <span
               key={f}
-              className="rounded-md bg-unnes-surface px-2 py-0.5 text-[10px] font-semibold text-slate-700 dark:bg-[#1a274c] dark:text-blue-200"
+              className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300"
             >
               {f}
             </span>

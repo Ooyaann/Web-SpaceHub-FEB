@@ -27,7 +27,6 @@ export default function BookingView() {
 
   const room = rooms.find((r) => r.code === selectedRoomCode) || rooms[0];
   const [dayIndex, setDayIndex] = useState(bookingPresetDay ?? filters.day ?? 0);
-
   const selectedDay = days[dayIndex] || days[0];
 
   const slotStatuses = useMemo(() => {
@@ -85,9 +84,7 @@ export default function BookingView() {
   const [duration, setDuration] = useState(Math.min(filters.dur || 2, Math.max(1, maxDuration)));
 
   useEffect(() => {
-    if (maxDuration > 0 && duration > maxDuration) {
-      setDuration(maxDuration);
-    }
+    if (maxDuration > 0 && duration > maxDuration) setDuration(maxDuration);
   }, [maxDuration, duration]);
 
   const [nim, setNim] = useState(user?.nim || '');
@@ -105,23 +102,11 @@ export default function BookingView() {
     e.preventDefault();
     setError('');
 
-    if (!isValidNim(nim)) {
-      setError('NIM wajib 8–12 digit angka.');
-      return;
-    }
-    if (!purpose.trim()) {
-      setError('Isi keperluan pemakaian.');
-      return;
-    }
+    if (!isValidNim(nim)) return setError('NIM wajib 8–12 digit angka.');
+    if (!purpose.trim()) return setError('Isi keperluan pemakaian.');
     const ppl = Number(participants);
-    if (!ppl || ppl < 1 || ppl > room.capacity) {
-      setError(`Peserta harus 1–${room.capacity} orang.`);
-      return;
-    }
-    if (myActiveBookingCount >= MAX_ACTIVE_BOOKINGS) {
-      setError(`Kuota ${MAX_ACTIVE_BOOKINGS} booking aktif penuh.`);
-      return;
-    }
+    if (!ppl || ppl < 1 || ppl > room.capacity) return setError(`Peserta harus 1–${room.capacity} orang.`);
+    if (myActiveBookingCount >= MAX_ACTIVE_BOOKINGS) return setError(`Kuota ${MAX_ACTIVE_BOOKINGS} booking aktif penuh.`);
 
     setSubmitting(true);
     try {
@@ -147,21 +132,19 @@ export default function BookingView() {
         Detail {room.code}
       </button>
 
-      <form onSubmit={handleSubmit} className="sh-card space-y-5 p-5 sm:p-6">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-unnes-border pb-4 dark:border-unnes-border-dark">
+      <form onSubmit={handleSubmit} className="sh-card space-y-5 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-light pb-4 dark:border-line-dark">
           <div>
-            <h2 className="text-xl font-extrabold text-[#0f1d3d] dark:text-white">Booking {room.code}</h2>
+            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Booking {room.code}</h1>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {room.location_label} · Maks. {room.capacity} kursi
             </p>
           </div>
-          <span className="rounded-full bg-[#e6eeff] px-3 py-1 text-xs font-bold text-unnes-blue dark:bg-[#1c2a52] dark:text-unnes-blue-light">
+          <span className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
             Kuota {myActiveBookingCount}/{MAX_ACTIVE_BOOKINGS}
           </span>
         </div>
 
-        {/* Date Picker */}
         <div className="max-w-xs">
           <DatePickerPopover
             label="Tanggal Pemakaian"
@@ -172,15 +155,14 @@ export default function BookingView() {
         </div>
 
         {freeStartHours.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-unnes-border p-6 text-center text-xs text-slate-500 dark:border-unnes-border-dark dark:text-slate-400">
-            Semua slot pada <strong>{selectedDay.label}</strong> sudah terisi atau lewat. Pilih tanggal lain di atas.
+          <div className="rounded-xl border border-dashed border-line-light p-6 text-center text-xs text-slate-500 dark:border-line-dark dark:text-slate-400">
+            Semua slot pada <strong>{selectedDay.label}</strong> sudah terisi atau lewat. Pilih tanggal lain.
           </div>
         ) : (
           <>
-            {/* Interactive Time Slot Grid */}
             <div>
               <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
-                Pilih Jam Mulai
+                Jam Mulai
               </span>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
                 {slotStatuses.map(({ hour, status }) => {
@@ -192,16 +174,15 @@ export default function BookingView() {
                       type="button"
                       disabled={!isFree}
                       onClick={() => setStartHour(hour)}
-                      title={isFree ? `Pilih ${formatHour(hour)}` : SLOT_LABELS[status]}
                       className={`rounded-xl border px-2 py-2 text-center transition ${
                         isSelected
-                          ? 'border-unnes-gold bg-unnes-gold text-unnes-gold-ink shadow-sm'
+                          ? 'border-brand bg-brand text-white shadow-sm dark:border-brand-dark dark:bg-brand-dark'
                           : isFree
-                            ? 'border-unnes-border bg-white text-[#0f1d3d] hover:border-unnes-blue dark:border-unnes-border-dark dark:bg-[#0d1730] dark:text-white'
-                            : 'cursor-not-allowed border-transparent bg-slate-100 text-slate-400 line-through opacity-60 dark:bg-slate-800/60 dark:text-slate-500'
+                            ? 'border-line-light bg-white text-slate-800 hover:border-brand dark:border-line-dark dark:bg-surface-subtle-dark dark:text-slate-100'
+                            : 'cursor-not-allowed border-transparent bg-slate-100 text-slate-400 line-through opacity-55 dark:bg-slate-800/60 dark:text-slate-500'
                       }`}
                     >
-                      <div className="text-xs font-extrabold tabular-nums">{formatHour(hour)}</div>
+                      <div className="text-xs font-bold tabular-nums">{formatHour(hour)}</div>
                       {!isFree && <div className="text-[9px] no-underline">{SLOT_LABELS[status]}</div>}
                     </button>
                   );
@@ -209,7 +190,6 @@ export default function BookingView() {
               </div>
             </div>
 
-            {/* Segmented Duration */}
             <div>
               <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">Durasi</span>
               <div className="grid grid-cols-3 gap-2">
@@ -224,42 +204,38 @@ export default function BookingView() {
                       onClick={() => setDuration(d)}
                       className={`rounded-xl border px-3 py-2 text-center transition ${
                         selected
-                          ? 'border-unnes-navy bg-unnes-navy text-white dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                          ? 'border-brand bg-brand text-white dark:border-brand-dark dark:bg-brand-dark'
                           : allowed
-                            ? 'border-unnes-border bg-white text-[#0f1d3d] hover:border-unnes-blue dark:border-unnes-border-dark dark:bg-[#0d1730] dark:text-slate-200'
+                            ? 'border-line-light bg-white text-slate-800 hover:border-brand dark:border-line-dark dark:bg-surface-subtle-dark dark:text-slate-200'
                             : 'cursor-not-allowed border-transparent bg-slate-100 text-slate-400 opacity-50 dark:bg-slate-800/60'
                       }`}
                     >
-                      <div className="text-xs font-extrabold">{d} Jam</div>
-                      {allowed && (
-                        <div className="text-[10px] opacity-80">{formatHourRange(startHour, d)}</div>
-                      )}
+                      <div className="text-xs font-bold">{d} Jam</div>
+                      {allowed && <div className="text-[10px] opacity-80">{formatHourRange(startHour, d)}</div>}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Estimasi Tarif */}
-            <div className="flex items-center justify-between rounded-xl border border-amber-300/60 bg-amber-50/70 px-4 py-2.5 text-xs dark:border-amber-500/30 dark:bg-amber-500/10">
-              <span className="flex items-center gap-1.5 font-semibold text-amber-950 dark:text-amber-200">
+            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-2.5 text-xs dark:bg-surface-subtle-dark">
+              <span className="flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300">
                 <Tag className="h-3.5 w-3.5" />
                 Estimasi Tarif ({duration} jam)
               </span>
-              <span className="font-extrabold text-unnes-navy dark:text-unnes-gold">
-                {pricePerHour > 0 ? formatRupiah(estimatedPrice) : 'Gratis FEB'}
+              <span className="font-bold text-slate-900 dark:text-white">
+                {pricePerHour > 0 ? formatRupiah(estimatedPrice) : 'Gratis Mahasiswa FEB'}
               </span>
             </div>
 
-            {/* Form Fields */}
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">Nama</span>
-                <input type="text" value={user?.name || ''} readOnly className="sh-input opacity-75" />
+                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">Nama</span>
+                <input type="text" value={user?.name || ''} readOnly className="sh-control opacity-75" />
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">NIM</span>
+                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">NIM</span>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -267,24 +243,26 @@ export default function BookingView() {
                   value={nim}
                   onChange={(e) => setNim(e.target.value.replace(/\D/g, '').slice(0, 12))}
                   placeholder="8–12 digit angka"
-                  className="sh-input"
+                  className="sh-control"
                 />
               </label>
 
               <label className="block sm:col-span-2">
-                <span className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">Keperluan</span>
+                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  Keperluan
+                </span>
                 <input
                   type="text"
                   required
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   placeholder="Mis. Diskusi kelompok Akuntansi"
-                  className="sh-input"
+                  className="sh-control"
                 />
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
                   Jumlah Peserta
                 </span>
                 <input
@@ -295,7 +273,7 @@ export default function BookingView() {
                   value={participants}
                   onChange={(e) => setParticipants(e.target.value)}
                   placeholder={`1–${room.capacity}`}
-                  className="sh-input"
+                  className="sh-control"
                 />
               </label>
             </div>
@@ -311,7 +289,7 @@ export default function BookingView() {
               </div>
             )}
 
-            <button type="submit" disabled={submitting} className="sh-btn-primary w-full py-3">
+            <button type="submit" disabled={submitting} className="sh-btn-primary w-full">
               <CalendarCheck2 className="h-4 w-4" />
               {submitting ? 'Menyimpan...' : 'Konfirmasi Booking'}
             </button>
