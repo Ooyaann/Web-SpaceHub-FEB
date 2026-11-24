@@ -166,8 +166,8 @@ export default function FloorPlanView() {
 
   const renderWing = (list, wingLabel) => (
     <div>
-      <div className="mb-2.5 text-xs font-semibold text-[#667085] dark:text-[#8A93A6]">{wingLabel}</div>
-      <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="mb-2 text-xs font-semibold text-[#667085] dark:text-[#8A93A6]">{wingLabel}</div>
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3.5 lg:grid-cols-4">
         {list.map((r) => {
           const isLab = Number(r.price_per_hour) > 0 || r.code.includes('Lab');
           const badge = BADGE_META[r.status];
@@ -175,13 +175,13 @@ export default function FloorPlanView() {
 
           const statusText =
             r.status === 'f'
-              ? `Kosong s.d. ${formatHour(r.freeUntil)}`
+              ? `s.d. ${formatHour(r.freeUntil)}`
               : r.status === 'm' && r.detail.booking
-                ? `Bookingmu (${r.detail.booking.id})`
+                ? r.detail.booking.id
                 : r.status === 'o' && r.detail.booking
                   ? r.detail.booking.user_name
                   : r.status === 'o' && r.detail.report
-                    ? 'Dilaporkan terpakai'
+                    ? 'Dilaporkan'
                     : SLOT_LABELS[r.status];
 
           return (
@@ -190,31 +190,35 @@ export default function FloorPlanView() {
               type="button"
               title={`${r.code} · ${(r.facilities || []).join(', ')} · ${formatPriceBadge(r.price_per_hour)}`}
               onClick={() => openRoomDetail(r.code, filters.day)}
-              className={`group flex flex-col justify-between rounded-xl border p-4 text-left transition-all duration-150 active:scale-[0.99] ${TILE_ACCENTS[r.status]}`}
+              className={`group flex flex-col justify-between rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.99] sm:p-4 ${TILE_ACCENTS[r.status]}`}
             >
               <div>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[15px] font-bold tracking-tight text-[#101828] dark:text-[#F5F7FA]">
+                <div className="flex items-center justify-between gap-1.5">
+                  <span className="truncate text-sm font-bold tracking-tight text-[#101828] sm:text-[15px] dark:text-[#F5F7FA]">
                     {r.code}
                   </span>
 
                   {isLab ? (
-                    <span className="rounded-md border border-[#FDE68A] bg-[#FEF8E6] px-2 py-0.5 text-[10px] font-semibold text-[#92400E] dark:border-unnes-gold/35 dark:bg-[#2F2817] dark:text-unnes-gold">
+                    <span className="rounded-md border border-[#FDE68A] bg-[#FEF8E6] px-1.5 py-0.5 text-[10px] font-semibold text-[#92400E] dark:border-unnes-gold/35 dark:bg-[#2F2817] dark:text-unnes-gold">
                       Lab
                     </span>
                   ) : (
-                    <ArrowUpRight className="h-3.5 w-3.5 text-[#98A2B3] opacity-0 transition-all group-hover:opacity-100 dark:text-[#8A93A6]" />
+                    <ArrowUpRight className="h-3.5 w-3.5 flex-none text-[#98A2B3] opacity-60 transition-all group-hover:opacity-100 sm:opacity-0 dark:text-[#8A93A6]" />
                   )}
                 </div>
-                <div className="mt-0.5 text-xs text-[#667085] dark:text-[#B0B8C9]">{r.capacity} kursi</div>
+                <div className="mt-0.5 text-[11px] text-[#667085] sm:text-xs dark:text-[#B0B8C9]">
+                  {r.capacity} kursi
+                </div>
               </div>
 
-              <div className="mt-3.5">
+              <div className="mt-3">
                 <span
-                  className={`inline-flex max-w-full items-center gap-1.5 rounded-lg border px-2 py-1 text-[11px] font-semibold ${badge.className}`}
+                  className={`inline-flex max-w-full items-center gap-1 rounded-lg border px-2 py-1 text-[10px] font-semibold sm:text-[11px] ${badge.className}`}
                 >
                   <StatusIcon className="h-3 w-3 flex-none stroke-[2.25]" />
-                  <span className="truncate">{statusText}</span>
+                  <span className="truncate">
+                    {r.status === 'f' ? `Kosong ${statusText}` : statusText}
+                  </span>
                 </span>
               </div>
             </button>
@@ -225,18 +229,18 @@ export default function FloorPlanView() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-[-0.025em] text-[#101828] dark:text-[#F5F7FA]">
+          <h1 className="text-xl font-bold tracking-[-0.025em] text-[#101828] sm:text-2xl dark:text-[#F5F7FA]">
             Denah lantai
           </h1>
-          <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
-            Peta tata ruang per lantai dengan indikator status & pemakai. Klik ruang untuk detail & booking.
+          <p className="mt-0.5 text-xs text-[#475467] sm:mt-1 sm:text-[13px] dark:text-[#B0B8C9]">
+            Ketuk ruang untuk melihat foto, tarif, dan booking.
           </p>
         </div>
 
-        <div className="grid w-full max-w-sm grid-cols-2 gap-3">
+        <div className="grid w-full grid-cols-2 gap-2.5 sm:max-w-sm sm:gap-3">
           <DatePickerPopover
             label="Tanggal"
             days={days}
@@ -254,16 +258,16 @@ export default function FloorPlanView() {
         </div>
       </div>
 
-      {/* Selector Panel */}
-      <div className="sh-panel flex flex-wrap items-center justify-between gap-4 p-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex rounded-xl border border-[#DCE2EC] bg-[#F2F4F8] p-1 dark:border-ink-line dark:bg-ink-canvas">
+      {/* Selector Panel — Rapi di Smartphone */}
+      <div className="sh-panel space-y-3 p-3.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:gap-4 sm:space-y-0 sm:p-4">
+        <div className="space-y-2.5 sm:flex sm:flex-wrap sm:items-center sm:gap-3 sm:space-y-0">
+          <div className="grid grid-cols-3 rounded-xl border border-[#DCE2EC] bg-[#F2F4F8] p-1 sm:inline-flex dark:border-ink-line dark:bg-ink-canvas">
             {buildings.map(({ building }) => (
               <button
                 key={building}
                 type="button"
                 onClick={() => setPlanPrefs((prev) => ({ ...prev, building }))}
-                className={`rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                className={`rounded-lg px-3 py-2 text-xs font-semibold transition-all sm:px-3.5 sm:py-1.5 ${
                   building === selectedBuilding
                     ? 'bg-unnes-navy text-white shadow-sm dark:bg-unnes-gold dark:text-unnes-gold-ink'
                     : 'text-[#475467] hover:text-[#101828] dark:text-[#B0B8C9] dark:hover:text-[#F5F7FA]'
@@ -274,7 +278,7 @@ export default function FloorPlanView() {
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1 py-0.5 sm:flex-wrap">
             {(activeBuildingObj?.floors || []).map((fl) => {
               const count = floorCounts.get(fl) || { free: 0, total: 0 };
               const active = fl === selectedFloor;
@@ -283,7 +287,7 @@ export default function FloorPlanView() {
                   key={fl}
                   type="button"
                   onClick={() => setPlanPrefs((prev) => ({ ...prev, floor: fl }))}
-                  className={`sh-chip ${active ? 'sh-chip-active' : ''}`}
+                  className={`sh-chip flex-none ${active ? 'sh-chip-active' : ''}`}
                 >
                   <span>Lantai {fl}</span>
                   <span className="tabular-nums opacity-80">
@@ -295,7 +299,7 @@ export default function FloorPlanView() {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
+        <div className="flex items-center justify-between border-t border-[#ECEFF4] pt-2.5 text-xs font-medium text-[#475467] sm:border-0 sm:pt-0 sm:gap-4 dark:border-ink-line dark:text-[#B0B8C9]">
           <span>
             <strong className="tabular-nums font-bold text-[#101828] dark:text-[#F5F7FA]">{summary.free}</strong> kosong
           </span>
@@ -311,9 +315,9 @@ export default function FloorPlanView() {
       </div>
 
       {/* Architectural Floor Map */}
-      <section className="sh-panel space-y-6 p-5 sm:p-6">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECEFF4] pb-4 dark:border-ink-line">
-          <h2 className="text-base font-bold text-[#101828] dark:text-[#F5F7FA]">
+      <section className="sh-panel space-y-5 p-3.5 sm:space-y-6 sm:p-6">
+        <div className="space-y-2 border-b border-[#ECEFF4] pb-3.5 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:space-y-0 sm:pb-4 dark:border-ink-line">
+          <h2 className="text-[15px] font-bold text-[#101828] sm:text-base dark:text-[#F5F7FA]">
             Gedung {selectedBuilding} · Lantai {selectedFloor}
           </h2>
           <Legend compact />
@@ -321,14 +325,16 @@ export default function FloorPlanView() {
 
         {renderWing(northWing, 'Sayap utara')}
 
-        <div className="flex items-center justify-between rounded-xl border border-dashed border-[#D5DCE8] bg-[#F5F7FA] px-4 py-3 text-xs font-medium text-[#667085] dark:border-ink-line dark:bg-ink-canvas dark:text-[#8A93A6]">
-          <span className="inline-flex items-center gap-1.5">
+        <div className="flex items-center justify-between rounded-xl border border-dashed border-[#D5DCE8] bg-[#F5F7FA] px-3 py-2.5 text-[11px] font-medium text-[#667085] sm:px-4 sm:py-3 sm:text-xs dark:border-ink-line dark:bg-ink-canvas dark:text-[#8A93A6]">
+          <span className="inline-flex items-center gap-1">
             <DoorOpen className="h-3.5 w-3.5" />
-            Tangga barat
+            <span className="hidden sm:inline">Tangga barat</span>
+            <span className="sm:hidden">Barat</span>
           </span>
-          <span className="font-semibold tracking-wide">Koridor utama lantai {selectedFloor}</span>
-          <span className="inline-flex items-center gap-1.5">
-            Tangga timur
+          <span className="font-semibold">Koridor lantai {selectedFloor}</span>
+          <span className="inline-flex items-center gap-1">
+            <span className="hidden sm:inline">Tangga timur</span>
+            <span className="sm:hidden">Timur</span>
             <DoorOpen className="h-3.5 w-3.5" />
           </span>
         </div>

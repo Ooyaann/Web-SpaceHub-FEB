@@ -129,10 +129,10 @@ export default function BookingView() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
-      {/* Contextual Back Bar + Optional Room Detail Link */}
+    <div className="mx-auto max-w-2xl space-y-4 sm:space-y-5">
+      {/* Contextual Back Bar (di Smartphone tombol kembali ada di Top Bar, pintasan detail tetap tampil) */}
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <button type="button" onClick={goBack} className="sh-btn-secondary h-9 px-3.5 text-xs">
+        <button type="button" onClick={goBack} className="sh-btn-secondary hidden h-9 px-3.5 text-xs lg:inline-flex">
           <ArrowLeft className="h-4 w-4" />
           Kembali ke {backLabel}
         </button>
@@ -141,7 +141,7 @@ export default function BookingView() {
           <button
             type="button"
             onClick={() => openRoomDetail(room.code, dayIndex)}
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-unnes-navy transition hover:bg-[#EEF3FC] dark:text-unnes-gold dark:hover:bg-ink-subtle"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#DCE2EC] bg-white px-3 py-1.5 text-xs font-semibold text-unnes-navy transition hover:bg-[#EEF3FC] dark:border-ink-line dark:bg-ink-card dark:text-unnes-gold"
           >
             <DoorOpen className="h-3.5 w-3.5" />
             Lihat detail & foto {room.code}
@@ -149,22 +149,22 @@ export default function BookingView() {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="sh-panel space-y-6 p-6">
-        <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#ECEFF4] pb-5 dark:border-ink-line">
+      <form onSubmit={handleSubmit} className="sh-panel space-y-5 p-4 sm:space-y-6 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-2 border-b border-[#ECEFF4] pb-4 sm:pb-5 dark:border-ink-line">
           <div>
-            <h1 className="text-xl font-bold tracking-[-0.02em] text-[#101828] dark:text-[#F5F7FA]">
+            <h1 className="text-lg font-bold tracking-[-0.02em] text-[#101828] sm:text-xl dark:text-[#F5F7FA]">
               Booking ruang {room.code}
             </h1>
-            <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
+            <p className="mt-0.5 text-xs text-[#475467] sm:mt-1 sm:text-[13px] dark:text-[#B0B8C9]">
               {room.location_label} · Maks. {room.capacity} kursi
             </p>
           </div>
-          <span className="rounded-lg border border-[#DCE2EC] bg-[#F4F6FA] px-3 py-1.5 tabular-nums text-xs font-semibold text-[#101828] dark:border-ink-line dark:bg-ink-subtle dark:text-unnes-gold">
+          <span className="rounded-lg border border-[#DCE2EC] bg-[#F4F6FA] px-2.5 py-1 tabular-nums text-xs font-semibold text-[#101828] dark:border-ink-line dark:bg-ink-subtle dark:text-unnes-gold">
             Kuota {myActiveBookingCount}/{MAX_ACTIVE_BOOKINGS}
           </span>
         </div>
 
-        <div className="max-w-xs">
+        <div className="w-full sm:max-w-xs">
           <DatePickerPopover
             label="Tanggal pemakaian"
             days={days}
@@ -196,7 +196,7 @@ export default function BookingView() {
                         isSelected
                           ? 'border-unnes-navy bg-unnes-navy text-white shadow-sm dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink'
                           : isFree
-                            ? 'border-[#D8DDE7] bg-white text-[#101828] hover:border-unnes-navy dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#F5F7FA] dark:hover:border-unnes-gold'
+                            ? 'border-[#86EFAC] bg-[#DCFCE7] text-[#166534] hover:border-[#16A34A] dark:border-[#22C55E]/40 dark:bg-[#14532D] dark:text-[#ECFDF5]'
                             : 'cursor-not-allowed border-transparent bg-[#F1F3F7] text-[#98A2B3] line-through dark:bg-ink-canvas dark:text-[#4F5769]'
                       }`}
                     >
@@ -210,7 +210,7 @@ export default function BookingView() {
 
             <div>
               <span className="mb-2 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">Durasi</span>
-              <div className="grid grid-cols-3 gap-2.5">
+              <div className="grid grid-cols-3 gap-2">
                 {[1, 2, 3].map((d) => {
                   const allowed = d <= maxDuration;
                   const selected = duration === d && allowed;
@@ -220,17 +220,17 @@ export default function BookingView() {
                       type="button"
                       disabled={!allowed}
                       onClick={() => setDuration(d)}
-                      className={`rounded-xl border px-3 py-2.5 text-center transition-all duration-150 active:scale-95 ${
+                      className={`rounded-xl border px-2 py-2.5 text-center transition-all duration-150 active:scale-95 ${
                         selected
                           ? 'border-unnes-navy bg-unnes-navy text-white shadow-sm dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink'
                           : allowed
-                            ? 'border-[#D8DDE7] bg-white text-[#101828] hover:border-unnes-navy dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#F5F7FA] dark:hover:border-unnes-gold'
+                            ? 'border-[#D8DDE7] bg-white text-[#101828] hover:border-unnes-navy dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#F5F7FA]'
                             : 'cursor-not-allowed border-transparent bg-[#F1F3F7] text-[#98A2B3] dark:bg-ink-canvas dark:text-[#4F5769]'
                       }`}
                     >
                       <div className="text-xs font-bold">{d} jam</div>
                       {allowed && (
-                        <div className="font-mono text-[11px] tabular-nums opacity-85">
+                        <div className="font-mono text-[10px] tabular-nums opacity-85 sm:text-[11px]">
                           {formatHourRange(startHour, d)}
                         </div>
                       )}
@@ -241,7 +241,7 @@ export default function BookingView() {
             </div>
 
             {/* Ringkasan Jadwal & Tarif */}
-            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#DCE2EC] bg-[#F6F8FB] px-4 py-3 text-[13px] dark:border-ink-line dark:bg-ink-subtle">
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#DCE2EC] bg-[#F6F8FB] px-3.5 py-3 text-xs sm:px-4 sm:text-[13px] dark:border-ink-line dark:bg-ink-subtle">
               <span className="font-medium text-[#475467] dark:text-[#D0D7E6]">
                 {selectedDay.label} · <strong className="font-mono">{formatHourRange(startHour, duration)}</strong>
               </span>
@@ -250,7 +250,7 @@ export default function BookingView() {
               </span>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">Nama</span>
                 <input type="text" value={user?.name || ''} readOnly className="sh-control opacity-75" />
@@ -287,6 +287,7 @@ export default function BookingView() {
                 </span>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min={1}
                   max={room.capacity}
                   required

@@ -13,7 +13,7 @@ export default function Toast() {
       key={toast.id}
       role="status"
       aria-live="polite"
-      className="animate-toast-in fixed bottom-5 left-1/2 z-50 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl bg-[#101828] px-4 py-3 text-[13px] font-medium text-white shadow-popover dark:border dark:border-ink-line-strong dark:bg-ink-subtle"
+      className="animate-toast-in fixed bottom-20 left-1/2 z-50 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl bg-[#101828] px-4 py-3 text-[13px] font-medium text-white shadow-popover lg:bottom-5 dark:border dark:border-ink-line-strong dark:bg-ink-subtle"
     >
       <Icon
         className={`h-4 w-4 flex-none ${

@@ -1,7 +1,7 @@
 import { Database } from 'lucide-react';
 import { useSpaceHub } from './context/SpaceHubContext';
 import Sidebar from './components/Sidebar';
-import MobileNav from './components/MobileNav';
+import MobileNav, { MobileBottomBar } from './components/MobileNav';
 import Toast from './components/Toast';
 import LoginView from './views/LoginView';
 import FindView from './views/FindView';
@@ -27,6 +27,8 @@ export default function App() {
       </>
     );
   }
+
+  const isDrilldown = activeView === 'det' || activeView === 'bk';
 
   const renderView = () => {
     switch (activeView) {
@@ -63,21 +65,26 @@ export default function App() {
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />
         {!isSupabaseConfigured && (
-          <div className="border-b border-[#E4E7EE] bg-white px-4 py-2 text-xs text-[#475467] dark:border-ink-line dark:bg-ink-card dark:text-[#B0B8C9]">
+          <div className="border-b border-[#E4E7EE] bg-white px-3.5 py-2 text-[11px] text-[#475467] sm:px-4 sm:text-xs dark:border-ink-line dark:bg-ink-card dark:text-[#B0B8C9]">
             <div className="mx-auto flex max-w-6xl items-center gap-2">
               <Database className="h-3.5 w-3.5 flex-none text-unnes-navy dark:text-unnes-gold" />
-              <span>
-                Mode demo lokal aktif. Isi <code className="font-mono text-[11px]">.env</code> Supabase untuk
-                sinkronisasi lintas perangkat.
+              <span className="truncate sm:whitespace-normal">
+                Mode demo aktif · Isi <code className="font-mono text-[11px]">.env</code> Supabase untuk sinkronisasi
+                lintas perangkat.
               </span>
             </div>
           </div>
         )}
-        <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-7 sm:px-8 lg:px-10 lg:py-9">
+        <main
+          className={`mx-auto w-full max-w-6xl flex-1 px-3.5 py-4 sm:px-8 sm:py-7 lg:px-10 lg:py-9 ${
+            isDrilldown ? 'pb-24 lg:pb-9' : 'pb-24 lg:pb-9'
+          }`}
+        >
           <div key={activeView} className="animate-view-in">
             {renderView()}
           </div>
         </main>
+        <MobileBottomBar />
       </div>
       <Toast />
     </div>

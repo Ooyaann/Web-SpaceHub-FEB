@@ -16,18 +16,18 @@ export default function FavoritesView() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-[-0.025em] text-[#101828] dark:text-[#F5F7FA]">
+          <h1 className="text-xl font-bold tracking-[-0.025em] text-[#101828] sm:text-2xl dark:text-[#F5F7FA]">
             Ruang favorit
           </h1>
-          <p className="mt-1 text-[13px] tabular-nums text-[#475467] dark:text-[#B0B8C9]">
+          <p className="mt-0.5 text-xs tabular-nums text-[#475467] sm:mt-1 sm:text-[13px] dark:text-[#B0B8C9]">
             {favRooms.length} ruang tersimpan.
           </p>
         </div>
 
-        <div className="grid w-full max-w-sm grid-cols-2 gap-3">
+        <div className="grid w-full grid-cols-2 gap-2.5 sm:max-w-sm sm:gap-3">
           <DatePickerPopover
             label="Tanggal"
             days={days}
@@ -46,13 +46,13 @@ export default function FavoritesView() {
       </div>
 
       {favRooms.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
           {favRooms.map((r) => (
             <RoomCard key={r.code} room={r} dayIndex={filters.day} />
           ))}
         </div>
       ) : (
-        <div className="sh-panel py-16 text-center">
+        <div className="sh-panel py-14 text-center sm:py-16">
           <p className="text-[15px] font-bold text-[#101828] dark:text-[#F5F7FA]">Belum ada ruang favorit</p>
           <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
             Simpan ruang yang sering dipakai agar cepat ditemukan kembali.

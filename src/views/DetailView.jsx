@@ -137,9 +137,9 @@ export default function DetailView() {
   };
 
   return (
-    <div className="space-y-7">
-      {/* Contextual Back Button & Breadcrumb */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-5 sm:space-y-7">
+      {/* Desktop Back Button & Breadcrumb (Pada Smartphone tombol kembali sudah menempel di Top App Bar) */}
+      <div className="hidden flex-wrap items-center justify-between gap-3 lg:flex">
         <button type="button" onClick={goBack} className="sh-btn-secondary h-9 px-3.5 text-xs">
           <ArrowLeft className="h-4 w-4" />
           Kembali ke {backLabel}
@@ -152,26 +152,26 @@ export default function DetailView() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
         {/* Left: Photo & Room Details Card */}
         <div className="sh-panel overflow-hidden lg:col-span-7">
-          <div className="aspect-[16/9] w-full overflow-hidden bg-[#EBEEF4] dark:bg-ink-subtle">
+          <div className="aspect-[16/10] w-full overflow-hidden bg-[#EBEEF4] sm:aspect-[16/9] dark:bg-ink-subtle">
             <img src={room.image_url} alt={`Ruang ${room.code}`} className="h-full w-full object-cover" />
           </div>
 
-          <div className="space-y-5 p-5 sm:p-6">
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#ECEFF4] pb-5 dark:border-ink-line">
+          <div className="space-y-4 p-4 sm:space-y-5 sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-2.5 border-b border-[#ECEFF4] pb-4 sm:pb-5 dark:border-ink-line">
               <div>
-                <h1 className="text-2xl font-bold tracking-[-0.025em] text-[#101828] dark:text-[#F5F7FA]">
+                <h1 className="text-xl font-bold tracking-[-0.025em] text-[#101828] sm:text-2xl dark:text-[#F5F7FA]">
                   Ruang {room.code}
                 </h1>
-                <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
-                  {room.location_label} · Kapasitas {room.capacity} kursi · {freeHoursOnDetailDay.length}/10 jam kosong
+                <p className="mt-1 text-xs text-[#475467] sm:text-[13px] dark:text-[#B0B8C9]">
+                  {room.location_label} · {room.capacity} kursi · {freeHoursOnDetailDay.length}/10 jam kosong
                 </p>
               </div>
 
               <span
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold sm:px-3 sm:text-xs ${
                   isFreeAtFilter
                     ? 'border-[#CBEFD9] bg-[#F2FBF6] text-[#067647] dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#F5F7FA]'
                     : 'border-[#E4E7EC] bg-[#F4F6F9] text-[#667085] dark:border-ink-line dark:bg-ink-canvas dark:text-[#98A2B3]'
@@ -183,22 +183,22 @@ export default function DetailView() {
             </div>
 
             {/* Tarif Ruangan */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECEFF4] pb-5 dark:border-ink-line">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECEFF4] pb-4 sm:pb-5 dark:border-ink-line">
               <div>
                 <h2 className="text-sm font-bold text-[#101828] dark:text-[#F5F7FA]">Informasi tarif ruangan</h2>
-                <p className="mt-0.5 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
+                <p className="mt-0.5 text-xs text-[#475467] sm:text-[13px] dark:text-[#B0B8C9]">
                   {room.price_note || 'Mahasiswa FEB gratis'}
                 </p>
                 {isPaid && (
                   <p className="mt-1.5 text-xs font-medium text-[#667085] dark:text-[#8A93A6]">
-                    Estimasi: 1 jam {formatRupiah(pricePerHour)} · 2 jam {formatRupiah(pricePerHour * 2)} · 3 jam{' '}
+                    1j {formatRupiah(pricePerHour)} · 2j {formatRupiah(pricePerHour * 2)} · 3j{' '}
                     {formatRupiah(pricePerHour * 3)}
                   </p>
                 )}
               </div>
 
               <span
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold ${
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold ${
                   isPaid
                     ? 'border-[#FDE68A] bg-[#FEF8E6] text-[#92400E] dark:border-unnes-gold/35 dark:bg-[#2F2817] dark:text-unnes-gold'
                     : 'border-[#D5E0F6] bg-[#EEF3FC] text-unnes-navy dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#F5F7FA]'
@@ -210,9 +210,11 @@ export default function DetailView() {
             </div>
 
             {/* Deskripsi & Fasilitas */}
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               <h2 className="text-sm font-bold text-[#101828] dark:text-[#F5F7FA]">Fasilitas & deskripsi</h2>
-              <p className="text-[13px] leading-relaxed text-[#475467] dark:text-[#B0B8C9]">{room.description}</p>
+              <p className="text-xs leading-relaxed text-[#475467] sm:text-[13px] dark:text-[#B0B8C9]">
+                {room.description}
+              </p>
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {(room.facilities || []).map((fac) => (
                   <span
@@ -227,9 +229,9 @@ export default function DetailView() {
           </div>
         </div>
 
-        {/* Right: Sticky Schedule & Booking Panel */}
+        {/* Right: Schedule & Booking Panel */}
         <div className="lg:col-span-5">
-          <div className="sh-panel sticky top-6 space-y-5 p-5 sm:p-6">
+          <div className="sh-panel sticky top-6 space-y-4 p-4 sm:space-y-5 sm:p-6">
             <div className="flex items-center justify-between">
               <h2 className="text-[15px] font-bold text-[#101828] dark:text-[#F5F7FA]">Jadwal ketersediaan</h2>
               <span className="text-xs font-medium text-[#667085] dark:text-[#8A93A6]">07.00–17.00 WIB</span>
@@ -261,15 +263,15 @@ export default function DetailView() {
             {!isAdmin && (
               <>
                 <p className="flex items-center gap-1.5 text-xs text-[#667085] dark:text-[#8A93A6]">
-                  <MousePointerClick className="h-3.5 w-3.5 flex-none text-[#10B981]" />
-                  Klik angka jam bertitik hijau untuk langsung booking mulai jam tersebut.
+                  <MousePointerClick className="h-3.5 w-3.5 flex-none text-[#16A34A]" />
+                  Ketuk jam hijau (+) untuk langsung booking mulai jam tersebut.
                 </p>
 
                 <button
                   type="button"
                   disabled={!hasBookableSlot}
                   onClick={() => openBookingForm(room.code, detailDayIndex)}
-                  className="sh-btn-primary w-full"
+                  className="sh-btn-primary hidden w-full lg:inline-flex"
                 >
                   {hasBookableSlot ? `Booking ruang ${room.code}` : 'Slot penuh / lewat'}
                 </button>
@@ -297,13 +299,13 @@ export default function DetailView() {
       </div>
 
       {/* Alternatif Kosong */}
-      <section className="space-y-4 border-t border-[#E4E7EE] pt-6 dark:border-ink-line">
-        <h2 className="text-base font-bold text-[#101828] dark:text-[#F5F7FA]">
-          Rekomendasi ruang alternatif kosong · {filterDay.label}, {formatHour(filters.start)}
+      <section className="space-y-4 border-t border-[#E4E7EE] pt-5 sm:pt-6 dark:border-ink-line">
+        <h2 className="text-[15px] font-bold text-[#101828] sm:text-base dark:text-[#F5F7FA]">
+          Alternatif kosong · {filterDay.label}, {formatHour(filters.start)}
         </h2>
 
         {alternatives.length > 0 ? (
-          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
             {alternatives.map((alt) => (
               <RoomCard key={alt.code} room={alt} dayIndex={filters.day} />
             ))}
@@ -314,6 +316,31 @@ export default function DetailView() {
           </p>
         )}
       </section>
+
+      {/* Sticky Bottom Action Bar khusus Smartphone (< lg) ala aplikasi Traveloka/Airbnb */}
+      {!isAdmin && (
+        <div className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-[#E2E6EE] bg-white/95 px-4 py-3 backdrop-blur-md dark:border-ink-line dark:bg-ink-rail/95 lg:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="truncate text-xs font-bold text-[#101828] dark:text-unnes-gold">
+                {formatPriceBadge(pricePerHour)}
+              </div>
+              <div className="truncate text-[11px] text-[#667085] dark:text-[#B0B8C9]">
+                {detailDay.label} · {freeHoursOnDetailDay.length} jam tersedia
+              </div>
+            </div>
+
+            <button
+              type="button"
+              disabled={!hasBookableSlot}
+              onClick={() => openBookingForm(room.code, detailDayIndex)}
+              className="sh-btn-primary h-11 flex-none px-5 text-xs"
+            >
+              {hasBookableSlot ? `Booking ${room.code}` : 'Slot Penuh'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

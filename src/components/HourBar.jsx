@@ -36,7 +36,8 @@ export default function HourBar({
 }) {
   return (
     <div className="w-full">
-      <div className="grid grid-cols-10 gap-1.5">
+      {/* 5 kolom x 2 baris di Smartphone (nyaman ditekan jempol), 10 kolom x 1 baris di Tablet/Desktop */}
+      <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-10">
         {OPERATIONAL_HOURS.map((h) => {
           const isPast = dateKey === todayWib && h < nowHourWib;
           const detail = getSlotDetail({
@@ -62,7 +63,9 @@ export default function HourBar({
                   ? ` (${detail.booking.id} · ${detail.booking.purpose})`
                   : '';
 
-          const baseClass = `flex flex-col ${compact ? 'h-8' : 'h-11'} items-center justify-center gap-0.5 rounded-lg text-[10px] font-bold tabular-nums transition-all duration-150 ${BAR_STYLES[status]} ${
+          const baseClass = `flex flex-col ${
+            compact ? 'h-10 sm:h-8' : 'h-12 sm:h-11'
+          } items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold tabular-nums transition-all duration-150 sm:rounded-lg sm:text-[10px] ${BAR_STYLES[status]} ${
             highlighted
               ? 'ring-2 ring-unnes-navy ring-offset-1 ring-offset-white dark:ring-unnes-gold dark:ring-offset-ink-card'
               : ''
@@ -77,8 +80,13 @@ export default function HourBar({
                 title={`Klik untuk booking mulai ${formatHour(h)}`}
                 className={`${baseClass} cursor-pointer hover:-translate-y-0.5 hover:border-[#16A34A] hover:bg-[#16A34A] hover:text-white active:scale-95 dark:hover:border-[#22C55E] dark:hover:bg-[#22C55E] dark:hover:text-[#052E16]`}
               >
-                <Icon className="h-3 w-3 stroke-[2.5]" />
-                {showLabels && <span>{pad2(h)}</span>}
+                <Icon className="h-3.5 w-3.5 stroke-[2.5] sm:h-3 sm:w-3" />
+                {showLabels && (
+                  <span>
+                    {pad2(h)}
+                    <span className="sm:hidden">.00</span>
+                  </span>
+                )}
               </button>
             );
           }
@@ -89,8 +97,13 @@ export default function HourBar({
               title={`${formatHour(h)} · ${SLOT_LABELS[status]}${extraTooltip}`}
               className={baseClass}
             >
-              <Icon className="h-3 w-3 opacity-85" />
-              {showLabels && <span>{pad2(h)}</span>}
+              <Icon className="h-3.5 w-3.5 opacity-85 sm:h-3 sm:w-3" />
+              {showLabels && (
+                <span>
+                  {pad2(h)}
+                  <span className="sm:hidden">.00</span>
+                </span>
+              )}
             </div>
           );
         })}
