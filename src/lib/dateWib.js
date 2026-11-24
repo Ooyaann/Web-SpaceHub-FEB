@@ -45,13 +45,24 @@ export function getNowWib() {
   };
 }
 
+export function getOffsetDayWib(offsetDays) {
+  const { year, month, day } = getNowWib();
+  const baseUtc = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  const d = new Date(baseUtc.getTime() + offsetDays * 86400000);
+  const y = d.getUTCFullYear();
+  const m = d.getUTCMonth() + 1;
+  const dt = d.getUTCDate();
+  const weekday = d.getUTCDay();
+  const key = `${y}-${pad2(m)}-${pad2(dt)}`;
+  return { key, weekday, dayNum: dt };
+}
+
 export function clampStartHour(hour) {
   return Math.min(15, Math.max(7, hour));
 }
 
 export function getNext31DaysWib() {
   const { year, month, day } = getNowWib();
-  // Gunakan UTC noon agar tidak pernah meleset tanggal akibat offset lokal browser
   const baseUtc = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
   return Array.from({ length: 31 }, (_, i) => {
@@ -59,7 +70,7 @@ export function getNext31DaysWib() {
     const y = d.getUTCFullYear();
     const m = d.getUTCMonth() + 1;
     const dt = d.getUTCDate();
-    const weekday = d.getUTCDay(); // 0=Min .. 6=Sab
+    const weekday = d.getUTCDay();
     const key = `${y}-${pad2(m)}-${pad2(dt)}`;
     const shortDate = `${dt} ${ID_MONTHS[m - 1]}`;
     const prefix = i === 0 ? 'Hari ini' : i === 1 ? 'Besok' : ID_WEEKDAYS[weekday];

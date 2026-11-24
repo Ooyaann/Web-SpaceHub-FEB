@@ -3,19 +3,24 @@ import { ADMIN_PIN, FALLBACK_ROOMS } from '../lib/constants';
 import { clampStartHour, formatHourRange, getNext31DaysWib, getNowWib } from '../lib/dateWib';
 import { isBookingActive, isWindowFree } from '../lib/schedule';
 import {
+  adminCreateBlockSafe,
+  adminDeleteRoomSafe,
+  adminManageStatusSafe,
+  adminUpsertRoomSafe,
   authUnnesUser,
   cancelBookingSafe,
   createBookingSafe,
   fetchAllData,
+  getLocalNotifications,
   isSupabaseConfigured,
   reportRoomUsedSafe,
+  saveLocalNotifications,
   toggleFavoriteSafe,
 } from '../lib/supabase';
 
 const SpaceHubContext = createContext(null);
 
 const USER_SESSION_KEY = 'spacehub_session_user_v2';
-const NOTIF_STORAGE_KEY = 'spacehub_notifications_v1';
 
 export const VIEW_LABELS = {
   find: 'Cari Ruang',
@@ -40,22 +45,13 @@ function loadSessionUser() {
   }
 }
 
-function loadNotifications() {
-  try {
-    const raw = localStorage.getItem(NOTIF_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
 export function SpaceHubProvider({ children }) {
   const [user, setUser] = useState(loadSessionUser);
   const [rooms, setRooms] = useState(FALLBACK_ROOMS);
   const [bookings, setBookings] = useState([]);
   const [reports, setReports] = useState([]);
   const [favorites, setFavorites] = useState(new Set());
-  const [notifications, setNotifications] = useState(loadNotifications);
+  const [notifications, setNotifications] = useState(getLocalNotifications);
 
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -87,14 +83,13 @@ export function SpaceHubProvider({ children }) {
     search: '',
   }));
 
-  // Persisted sub-view preferences so returning via Back keeps exact selections
   const [planPrefs, setPlanPrefs] = useState({
     building: 'L4',
     floor: 2,
   });
 
   const [schedPrefs, setSchedPrefs] = useState({
-    building: 'L4',
+    building: 'L2',
     floorFilter: 'ALL',
     minConsecutive: 0,
     query: '',
@@ -103,7 +98,7 @@ export function SpaceHubProvider({ children }) {
   const [calPrefs, setCalPrefs] = useState(() => ({
     selectedDayIdx: isAfterHours ? 1 : 0,
     scope: 'ALL',
-    panelTab: 'idle',
+    panelTab: 'booked',
     monthIdx: 0,
   }));
 
@@ -126,22 +121,14 @@ export function SpaceHubProvider({ children }) {
     };
     setNotifications((prev) => {
       const next = [item, ...prev].slice(0, 50);
-      try {
-        localStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        // ignore
-      }
+      saveLocalNotifications(next);
       return next;
     });
   }, []);
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);
-    try {
-      localStorage.removeItem(NOTIF_STORAGE_KEY);
-    } catch {
-      // ignore
-    }
+    saveLocalNotifications([]);
     showToast('Riwayat notifikasi dibersihkan.');
   }, [showToast]);
 
@@ -264,21 +251,18 @@ export function SpaceHubProvider({ children }) {
     });
   }, []);
 
-  // Navigate to a top-level menu view (clears sub-view history)
   const navigate = useCallback((view) => {
     setNavHistory([]);
     setActiveView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
-  // Open Detail View while remembering exact origin view (Find, Denah, Jadwal, Kalender, Favorit, Booking Saya)
   const openRoomDetail = useCallback(
     (roomCode, dayIdx = filters.day) => {
       setSelectedRoomCode(roomCode);
       setDetailDayIndex(dayIdx);
       setNavHistory((prev) => {
         if (activeView === 'det') return prev;
-        // If user clicked "Lihat detail ruang" while inside BookingView, keep their original menu root
         if (activeView === 'bk') return prev.length > 0 ? prev.filter((v) => v !== 'det') : ['find'];
         return [...prev, activeView];
       });
@@ -288,7 +272,6 @@ export function SpaceHubProvider({ children }) {
     [filters.day, activeView]
   );
 
-  // Open Booking Form while remembering exact previous screen (e.g. Jadwal Ruang '+' directly, or DetailView)
   const openBookingForm = useCallback(
     (roomCode, dayIdx, presetHour = null) => {
       setSelectedRoomCode(roomCode);
@@ -304,7 +287,6 @@ export function SpaceHubProvider({ children }) {
     [activeView]
   );
 
-  // Contextual Back action: pops the exact previous view
   const goBack = useCallback(() => {
     const defaultHome = user?.role === 'admin' ? 'admin' : 'find';
     if (navHistory.length === 0) {
@@ -356,10 +338,13 @@ export function SpaceHubProvider({ children }) {
   );
 
   const reportRoomUsed = useCallback(
-    async (roomCode) => {
+    async (roomCode, customDate = null, customHour = null) => {
       if (!user) return { ok: false, error: 'Silakan login.' };
       const current = getNowWib();
-      if (current.hour < 7 || current.hour > 16) {
+      const repDate = customDate || current.dateKey;
+      const repHour = customHour !== null ? Number(customHour) : current.hour;
+
+      if (repHour < 7 || repHour > 16) {
         const errMsg = 'Pelaporan hanya tersedia pukul 07.00–17.00 WIB.';
         showToast(errMsg, 'error');
         return { ok: false, error: errMsg };
@@ -367,8 +352,8 @@ export function SpaceHubProvider({ children }) {
 
       const res = await reportRoomUsedSafe({
         roomCode,
-        reportDate: current.dateKey,
-        reportHour: current.hour,
+        reportDate: repDate,
+        reportHour: repHour,
         reportedBy: user.email,
       });
 
@@ -378,7 +363,7 @@ export function SpaceHubProvider({ children }) {
       }
 
       await refreshData(true);
-      const msg = `${roomCode} ditandai terpakai pukul ${String(current.hour).padStart(2, '0')}.00 WIB.`;
+      const msg = `${roomCode} ditandai terpakai pukul ${String(repHour).padStart(2, '0')}.00 WIB.`;
       showToast(msg, 'success');
       pushNotification('Laporan Terpakai', msg, 'report');
       return { ok: true };
@@ -472,6 +457,66 @@ export function SpaceHubProvider({ children }) {
     [user, refreshData, showToast, pushNotification]
   );
 
+  // Fungsi CRUD Pengelola
+  const adminSaveRoom = useCallback(
+    async (roomPayload) => {
+      const res = await adminUpsertRoomSafe(roomPayload);
+      if (!res?.ok) {
+        showToast(res?.error || 'Gagal menyimpan ruangan.', 'error');
+        return res;
+      }
+      await refreshData(true);
+      showToast(
+        roomPayload.originalCode ? `Ruang ${roomPayload.code} diperbarui.` : `Ruang ${roomPayload.code} ditambahkan.`,
+        'success'
+      );
+      return res;
+    },
+    [refreshData, showToast]
+  );
+
+  const adminRemoveRoom = useCallback(
+    async (roomCode) => {
+      const res = await adminDeleteRoomSafe(roomCode);
+      if (!res?.ok) {
+        showToast(res?.error || 'Gagal menghapus ruangan.', 'error');
+        return res;
+      }
+      await refreshData(true);
+      showToast(`Ruang ${roomCode} dihapus.`, 'success');
+      return res;
+    },
+    [refreshData, showToast]
+  );
+
+  const adminCreateBlock = useCallback(
+    async (payload) => {
+      const res = await adminCreateBlockSafe(payload);
+      if (!res?.ok) {
+        showToast(res?.error || 'Gagal memblokir slot ruangan.', 'error');
+        return res;
+      }
+      await refreshData(true);
+      showToast(`Slot ${payload.roomCode} berhasil diblokir (${res.booking?.id}).`, 'success');
+      return res;
+    },
+    [refreshData, showToast]
+  );
+
+  const adminManageStatus = useCallback(
+    async (action, targetId, successText) => {
+      const res = await adminManageStatusSafe({ action, targetId });
+      if (!res?.ok) {
+        showToast(res?.error || 'Aksi gagal diproses.', 'error');
+        return res;
+      }
+      await refreshData(true);
+      if (successText) showToast(successText, 'success');
+      return res;
+    },
+    [refreshData, showToast]
+  );
+
   const myBookings = useMemo(() => {
     if (!user) return [];
     const email = user.email.toLowerCase();
@@ -479,8 +524,8 @@ export function SpaceHubProvider({ children }) {
       .filter((b) => (b.user_email || '').toLowerCase() === email)
       .sort((a, b) => {
         if (a.status !== b.status) return a.status === 'confirmed' ? -1 : 1;
-        return `${a.booking_date}-${String(a.start_hour).padStart(2, '0')}`.localeCompare(
-          `${b.booking_date}-${String(b.start_hour).padStart(2, '0')}`
+        return `${b.booking_date}-${String(b.start_hour).padStart(2, '0')}`.localeCompare(
+          `${a.booking_date}-${String(a.start_hour).padStart(2, '0')}`
         );
       });
   }, [bookings, user]);
@@ -549,6 +594,10 @@ export function SpaceHubProvider({ children }) {
     reportRoomUsed,
     submitBooking,
     cancelBooking,
+    adminSaveRoom,
+    adminRemoveRoom,
+    adminCreateBlock,
+    adminManageStatus,
     myBookings,
     myActiveBookingCount,
   };

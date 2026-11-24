@@ -1,23 +1,21 @@
 -- ============================================================================
--- SpaceHub FEB UNNES — Seed Master Data 64 Ruangan + Akun Demo UNNES
+-- SpaceHub FEB UNNES — Seed Master Data 64 Ruangan + Akun & Transaksi Demo UNNES
 -- Jalankan setelah supabase/schema.sql pada Supabase SQL Editor.
--- Idempoten (aman dijalankan ulang dengan ON CONFLICT DO UPDATE).
+-- Idempoten (aman dijalankan ulang dengan ON CONFLICT DO UPDATE / DO NOTHING).
 -- ============================================================================
 
 SET search_path TO public, extensions;
 
--- 1. Seed akun demo default agar presentasi langsung bisa login
+-- 1. Seed akun demo default & organisasi mahasiswa
 INSERT INTO public.app_users (email, full_name, nim, password_hash)
-VALUES (
-  'mahasiswa@student.unnes.ac.id',
-  'Mahasiswa FEB',
-  '7101422001',
-  crypt('contoh123', gen_salt('bf'))
-)
+VALUES
+  ('mahasiswa@student.unnes.ac.id', 'Mahasiswa FEB', '7101422001', crypt('contoh123', gen_salt('bf'))),
+  ('hima.akt@student.unnes.ac.id', 'HIMA Akuntansi', '7211422018', crypt('contoh123', gen_salt('bf'))),
+  ('bem.feb@student.unnes.ac.id', 'BEM FEB UNNES', '7101421044', crypt('contoh123', gen_salt('bf'))),
+  ('ksep.feb@student.unnes.ac.id', 'KSEP FEB', '7311422031', crypt('contoh123', gen_salt('bf')))
 ON CONFLICT (email) DO NOTHING;
 
 -- 2. Seed 64 ruangan FEB UNNES persis sesuai prototype terbaru (Gedung L2, L4, L5)
---    Tarif & deskripsi dapat diedit langsung di Table Editor -> rooms begitu data final klien diterima.
 INSERT INTO public.rooms (code, building, floor, location_label, capacity, facilities, price_per_hour, price_note, description, image_url)
 VALUES
   -- ==================== GEDUNG L2 · LANTAI 3 (8 Ruang) ====================
@@ -113,3 +111,30 @@ ON CONFLICT (code) DO UPDATE SET
   price_note = EXCLUDED.price_note,
   description = EXCLUDED.description,
   image_url = EXCLUDED.image_url;
+
+-- 3. Seed Contoh Booking & Aktivitas Awal (mengikuti tanggal WIB saat seed dijalankan)
+INSERT INTO public.bookings (id, room_code, booking_date, start_hour, duration, user_email, user_name, nim, purpose, participants, status)
+VALUES
+  ('SH-9K4M2', 'L2 301', (now() AT TIME ZONE 'Asia/Jakarta')::date + 1, 9, 2, 'mahasiswa@student.unnes.ac.id', 'Mahasiswa FEB', '7101422001', 'Diskusi Kelompok Akuntansi Keuangan', 14, 'confirmed'),
+  ('SH-7P2N8', 'L4 512', (now() AT TIME ZONE 'Asia/Jakarta')::date + 2, 13, 2, 'mahasiswa@student.unnes.ac.id', 'Mahasiswa FEB', '7101422001', 'Latihan Presentasi Studi Kasus Manajemen', 18, 'confirmed'),
+  ('SH-3V8R1', 'L4 201', (now() AT TIME ZONE 'Asia/Jakarta')::date - 1, 10, 2, 'mahasiswa@student.unnes.ac.id', 'Mahasiswa FEB', '7101422001', 'Review Proposal PKM Riset Sosial', 8, 'confirmed'),
+  ('SH-5T1W6', 'L5 103', (now() AT TIME ZONE 'Asia/Jakarta')::date + 1, 13, 2, 'mahasiswa@student.unnes.ac.id', 'Mahasiswa FEB', '7101422001', 'Rapat Panitia Seminar Kewirausahaan', 24, 'cancelled'),
+  ('SH-4H8L3', 'L2 303', (now() AT TIME ZONE 'Asia/Jakarta')::date, 13, 2, 'hima.akt@student.unnes.ac.id', 'HIMA Akuntansi', '7211422018', 'Rapat Divisi Keilmuan HIMA', 22, 'confirmed'),
+  ('SH-2M9C4', 'L4 203', (now() AT TIME ZONE 'Asia/Jakarta')::date, 10, 2, 'ksep.feb@student.unnes.ac.id', 'KSEP FEB', '7311422031', 'Diskusi Ekonomi Pembangunan', 30, 'confirmed'),
+  ('SH-8B5X7', 'L4 214', (now() AT TIME ZONE 'Asia/Jakarta')::date + 1, 13, 2, 'pengelola@unnes.ac.id', 'Pengelola FEB', '19880412', 'Ujian Susulan Pengantar Bisnis', 35, 'confirmed')
+ON CONFLICT (id) DO NOTHING;
+
+-- 4. Seed Contoh Laporan Lapangan & Ruang Favorit
+INSERT INTO public.room_reports (report_date, room_code, report_hour, reported_by)
+VALUES
+  ((now() AT TIME ZONE 'Asia/Jakarta')::date, 'L2 311', 14, 'alya.putri@student.unnes.ac.id'),
+  ((now() AT TIME ZONE 'Asia/Jakarta')::date, 'L4 211', 13, 'rizky.pratama@student.unnes.ac.id')
+ON CONFLICT (room_code, report_date, report_hour) DO NOTHING;
+
+INSERT INTO public.user_favorites (user_email, room_code)
+VALUES
+  ('mahasiswa@student.unnes.ac.id', 'L2 301'),
+  ('mahasiswa@student.unnes.ac.id', 'L4 203'),
+  ('mahasiswa@student.unnes.ac.id', 'L4 512'),
+  ('mahasiswa@student.unnes.ac.id', 'L4 Lab 5A')
+ON CONFLICT (user_email, room_code) DO NOTHING;

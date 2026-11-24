@@ -1,28 +1,54 @@
 import { useEffect, useMemo } from 'react';
-import { ArrowUpRight, Clock, DoorOpen } from 'lucide-react';
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  Clock,
+  DoorOpen,
+  GraduationCap,
+  Plus,
+  Users,
+} from 'lucide-react';
 import { SLOT_LABELS, START_HOURS } from '../lib/constants';
 import { formatHour, formatPriceBadge } from '../lib/dateWib';
-import { getFreeUntilHour, getSlotStatus } from '../lib/schedule';
+import { getFreeUntilHour, getSlotDetail } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
 import DatePickerPopover from '../components/DatePickerPopover';
 import SelectPopover from '../components/SelectPopover';
 import Legend from '../components/Legend';
 
-/* Clean Neutral Architectural Cards — ZERO murky green/blue background swamps */
-const TILE_STYLES = {
-  f: 'border border-[#D5DCE8] border-l-[3.5px] border-l-[#10B981] bg-white shadow-card hover:-translate-y-0.5 hover:border-[#B4C0D4] hover:border-l-[#10B981] hover:shadow-card-hover dark:border-ink-line dark:border-l-[#10B981] dark:bg-ink-card dark:hover:border-ink-line-strong dark:hover:border-l-[#10B981]',
-  m: 'border border-unnes-gold/60 border-l-[3.5px] border-l-unnes-gold bg-white shadow-card hover:-translate-y-0.5 dark:border-unnes-gold/40 dark:border-l-unnes-gold dark:bg-ink-card',
-  k: 'border border-[#E4E7EC] bg-[#EFF2F6] text-[#667085] hover:border-[#CFD6E2] dark:border-ink-line/70 dark:bg-[#181B22] dark:hover:border-ink-line',
-  o: 'border border-[#E8DFCE] bg-[#FAF6EE] hover:border-[#DECBA8] dark:border-[#3D3322] dark:bg-[#211E18] dark:hover:border-[#52442D]',
-  p: 'border border-[#E6E9EF] bg-[#F2F4F7] opacity-75 dark:border-ink-line/50 dark:bg-[#14171D]',
+const TILE_ACCENTS = {
+  f: 'border-[#C6DFD1] border-l-[4px] border-l-[#16A34A] bg-white shadow-card hover:-translate-y-0.5 hover:shadow-card-hover dark:border-ink-line dark:border-l-[#22C55E] dark:bg-ink-card dark:hover:border-ink-line-strong dark:hover:border-l-[#22C55E]',
+  m: 'border-unnes-gold/65 border-l-[4px] border-l-unnes-gold bg-white shadow-card hover:-translate-y-0.5 dark:border-unnes-gold/45 dark:border-l-unnes-gold dark:bg-ink-card',
+  o: 'border-[#F7D0A2] border-l-[4px] border-l-[#F59E0B] bg-white hover:-translate-y-0.5 dark:border-ink-line dark:border-l-[#FB923C] dark:bg-ink-card',
+  k: 'border-[#C9DAF8] border-l-[4px] border-l-[#3B82F6] bg-[#F8FAFE] hover:-translate-y-0.5 dark:border-ink-line dark:border-l-[#60A5FA] dark:bg-[#1A1E28]',
+  p: 'border-[#E6E9EF] border-l-[4px] border-l-[#CBD5E1] bg-[#F2F4F7] opacity-75 dark:border-ink-line/60 dark:border-l-[#475467] dark:bg-[#15181F]',
 };
 
-const DOT_COLORS = {
-  f: 'bg-[#10B981]',
-  k: 'bg-[#64748B] dark:bg-[#7E879B]',
-  o: 'bg-[#F59E0B]',
-  m: 'bg-unnes-gold',
-  p: 'bg-[#98A2B3] dark:bg-[#525B6E]',
+const BADGE_META = {
+  f: {
+    icon: Plus,
+    className:
+      'border-[#86EFAC] bg-[#DCFCE7] text-[#166534] dark:border-[#22C55E]/45 dark:bg-[#14532D] dark:text-[#ECFDF5]',
+  },
+  k: {
+    icon: GraduationCap,
+    className:
+      'border-[#93C5FD] bg-[#DBEAFE] text-[#1E40AF] dark:border-[#60A5FA]/40 dark:bg-[#1E3A8A]/80 dark:text-[#DBEAFE]',
+  },
+  o: {
+    icon: Users,
+    className:
+      'border-[#FDBA74] bg-[#FFEDD5] text-[#9A3412] dark:border-[#FB923C]/45 dark:bg-[#7C2D12]/85 dark:text-[#FFEDD5]',
+  },
+  m: {
+    icon: CheckCircle2,
+    className: 'border-[#D99B00] bg-unnes-gold font-bold text-unnes-gold-ink',
+  },
+  p: {
+    icon: Clock,
+    className:
+      'border-[#DCE2EC] bg-[#EAEEF4] text-[#667085] dark:border-ink-line dark:bg-[#1E222B] dark:text-[#8A93A6]',
+  },
 };
 
 export default function FloorPlanView() {
@@ -70,58 +96,57 @@ export default function FloorPlanView() {
 
   const floorCounts = useMemo(() => {
     const res = new Map();
+    const isPastHour = selectedDay.key === nowWib.dateKey && filters.start < nowWib.hour;
     for (const fl of activeBuildingObj?.floors || []) {
       const list = rooms.filter((r) => r.building === selectedBuilding && r.floor === fl);
-      const free = list.filter(
-        (r) =>
-          getSlotStatus({
-            roomCode: r.code,
-            dateKey: selectedDay.key,
-            weekday: selectedDay.weekday,
-            hour: filters.start,
-            bookings,
-            reports,
-            userEmail: user?.email,
-            todayWib: nowWib.dateKey,
-            nowHourWib: nowWib.hour,
-          }) === 'f'
-      ).length;
+      const free = isPastHour
+        ? 0
+        : list.filter(
+            (r) =>
+              getSlotDetail({
+                roomCode: r.code,
+                dateKey: selectedDay.key,
+                weekday: selectedDay.weekday,
+                hour: filters.start,
+                bookings,
+                reports,
+                userEmail: user?.email,
+              }).status === 'f'
+          ).length;
       res.set(fl, { free, total: list.length });
     }
     return res;
   }, [activeBuildingObj, rooms, selectedBuilding, selectedDay, filters.start, bookings, reports, user, nowWib]);
 
-  const floorRooms = useMemo(
-    () =>
-      rooms
-        .filter((r) => r.building === selectedBuilding && r.floor === selectedFloor)
-        .map((r) => {
-          const status = getSlotStatus({
-            roomCode: r.code,
-            dateKey: selectedDay.key,
-            weekday: selectedDay.weekday,
-            hour: filters.start,
-            bookings,
-            reports,
-            userEmail: user?.email,
-            todayWib: nowWib.dateKey,
-            nowHourWib: nowWib.hour,
-          });
-          const freeUntil = getFreeUntilHour({
-            roomCode: r.code,
-            dateKey: selectedDay.key,
-            weekday: selectedDay.weekday,
-            startHour: filters.start,
-            bookings,
-            reports,
-            userEmail: user?.email,
-            todayWib: nowWib.dateKey,
-            nowHourWib: nowWib.hour,
-          });
-          return { ...r, status, freeUntil };
-        }),
-    [rooms, selectedBuilding, selectedFloor, selectedDay, filters.start, bookings, reports, user, nowWib]
-  );
+  const floorRooms = useMemo(() => {
+    const isPastHour = selectedDay.key === nowWib.dateKey && filters.start < nowWib.hour;
+    return rooms
+      .filter((r) => r.building === selectedBuilding && r.floor === selectedFloor)
+      .map((r) => {
+        const detail = getSlotDetail({
+          roomCode: r.code,
+          dateKey: selectedDay.key,
+          weekday: selectedDay.weekday,
+          hour: filters.start,
+          bookings,
+          reports,
+          userEmail: user?.email,
+        });
+        const status = isPastHour ? 'p' : detail.status;
+        const freeUntil = getFreeUntilHour({
+          roomCode: r.code,
+          dateKey: selectedDay.key,
+          weekday: selectedDay.weekday,
+          startHour: filters.start,
+          bookings,
+          reports,
+          userEmail: user?.email,
+          todayWib: nowWib.dateKey,
+          nowHourWib: nowWib.hour,
+        });
+        return { ...r, status, detail, freeUntil };
+      });
+  }, [rooms, selectedBuilding, selectedFloor, selectedDay, filters.start, bookings, reports, user, nowWib]);
 
   const summary = useMemo(() => {
     let free = 0;
@@ -145,50 +170,51 @@ export default function FloorPlanView() {
       <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-4">
         {list.map((r) => {
           const isLab = Number(r.price_per_hour) > 0 || r.code.includes('Lab');
-          const isAvailable = r.status === 'f' || r.status === 'm';
+          const badge = BADGE_META[r.status];
+          const StatusIcon = badge.icon;
+
+          const statusText =
+            r.status === 'f'
+              ? `Kosong s.d. ${formatHour(r.freeUntil)}`
+              : r.status === 'm' && r.detail.booking
+                ? `Bookingmu (${r.detail.booking.id})`
+                : r.status === 'o' && r.detail.booking
+                  ? r.detail.booking.user_name
+                  : r.status === 'o' && r.detail.report
+                    ? 'Dilaporkan terpakai'
+                    : SLOT_LABELS[r.status];
+
           return (
             <button
               key={r.code}
               type="button"
               title={`${r.code} · ${(r.facilities || []).join(', ')} · ${formatPriceBadge(r.price_per_hour)}`}
               onClick={() => openRoomDetail(r.code, filters.day)}
-              className={`group flex flex-col justify-between rounded-xl p-4 text-left transition-all duration-150 active:scale-[0.99] ${TILE_STYLES[r.status]}`}
+              className={`group flex flex-col justify-between rounded-xl border p-4 text-left transition-all duration-150 active:scale-[0.99] ${TILE_ACCENTS[r.status]}`}
             >
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <span
-                    className={`text-[15px] font-bold tracking-tight ${
-                      isAvailable
-                        ? 'text-[#101828] dark:text-[#F5F7FA]'
-                        : 'text-[#475467] dark:text-[#98A2B3]'
-                    }`}
-                  >
+                  <span className="text-[15px] font-bold tracking-tight text-[#101828] dark:text-[#F5F7FA]">
                     {r.code}
                   </span>
 
                   {isLab ? (
-                    <span className="rounded-md bg-[#FEF8E6] px-2 py-0.5 text-[10px] font-semibold text-[#92400E] dark:bg-[#2F2817] dark:text-unnes-gold">
+                    <span className="rounded-md border border-[#FDE68A] bg-[#FEF8E6] px-2 py-0.5 text-[10px] font-semibold text-[#92400E] dark:border-unnes-gold/35 dark:bg-[#2F2817] dark:text-unnes-gold">
                       Lab
                     </span>
                   ) : (
                     <ArrowUpRight className="h-3.5 w-3.5 text-[#98A2B3] opacity-0 transition-all group-hover:opacity-100 dark:text-[#8A93A6]" />
                   )}
                 </div>
-                <div className="mt-0.5 text-xs text-[#667085] dark:text-[#8A93A6]">{r.capacity} kursi</div>
+                <div className="mt-0.5 text-xs text-[#667085] dark:text-[#B0B8C9]">{r.capacity} kursi</div>
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-2 border-t border-[#ECEFF4] pt-2.5 dark:border-white/[0.06]">
+              <div className="mt-3.5">
                 <span
-                  className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
-                    r.status === 'f'
-                      ? 'text-[#067647] dark:text-[#F5F7FA]'
-                      : r.status === 'm'
-                        ? 'text-[#92400E] dark:text-unnes-gold'
-                        : 'text-[#667085] dark:text-[#8A93A6]'
-                  }`}
+                  className={`inline-flex max-w-full items-center gap-1.5 rounded-lg border px-2 py-1 text-[11px] font-semibold ${badge.className}`}
                 >
-                  <span className={`h-2 w-2 rounded-full ${DOT_COLORS[r.status]}`} />
-                  {r.status === 'f' ? `Kosong s.d. ${formatHour(r.freeUntil)}` : SLOT_LABELS[r.status]}
+                  <StatusIcon className="h-3 w-3 flex-none stroke-[2.25]" />
+                  <span className="truncate">{statusText}</span>
                 </span>
               </div>
             </button>
@@ -206,7 +232,7 @@ export default function FloorPlanView() {
             Denah lantai
           </h1>
           <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
-            Peta tata ruang per lantai. Klik ruang mana saja untuk melihat foto, tarif, dan booking.
+            Peta tata ruang per lantai dengan indikator status & pemakai. Klik ruang untuk detail & booking.
           </p>
         </div>
 
@@ -279,7 +305,7 @@ export default function FloorPlanView() {
           </span>
           <span>
             <strong className="tabular-nums font-bold text-[#101828] dark:text-[#F5F7FA]">{summary.used}</strong>{' '}
-            dibooking
+            terpakai
           </span>
         </div>
       </div>

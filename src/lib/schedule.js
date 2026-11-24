@@ -26,15 +26,9 @@ export function isDemoClassHour(roomCode, dateKey, weekday, hour) {
 }
 
 /**
- * Status slot tanpa memotong jam yang sudah lewat hari ini.
- * Prioritas:
- * 1. Booking confirmed milik user saat ini ('m')
- * 2. Booking confirmed milik user lain ('o')
- * 3. Laporan ruang sedang terpakai ('o')
- * 4. Jadwal kuliah contoh ('k')
- * 5. Kosong ('f')
+ * Mencari detail objek booking atau laporan pada suatu slot jam (untuk ditampilkan label/tooltip kaya informasi).
  */
-export function getRawSlotStatus({
+export function getSlotDetail({
   roomCode,
   dateKey,
   weekday,
@@ -53,10 +47,12 @@ export function getRawSlotStatus({
       hour >= b.start_hour &&
       hour < b.start_hour + b.duration
     ) {
-      if (normalizedUser && (b.user_email || '').toLowerCase() === normalizedUser) {
-        return 'm';
-      }
-      return 'o';
+      const isMine = Boolean(normalizedUser) && (b.user_email || '').toLowerCase() === normalizedUser;
+      return {
+        status: isMine ? 'm' : 'o',
+        booking: b,
+        report: null,
+      };
     }
   }
 
@@ -66,15 +62,26 @@ export function getRawSlotStatus({
       rep.report_date === dateKey &&
       rep.report_hour === hour
     ) {
-      return 'o';
+      return {
+        status: 'o',
+        booking: null,
+        report: rep,
+      };
     }
   }
 
   if (isDemoClassHour(roomCode, dateKey, weekday, hour)) {
-    return 'k';
+    return { status: 'k', booking: null, report: null };
   }
 
-  return 'f';
+  return { status: 'f', booking: null, report: null };
+}
+
+/**
+ * Status slot tanpa memotong jam yang sudah lewat hari ini.
+ */
+export function getRawSlotStatus(params) {
+  return getSlotDetail(params).status;
 }
 
 /**
@@ -91,10 +98,12 @@ export function getSlotStatus(params) {
 /**
  * Validasi jendela waktu booking: seluruh jam [startHour, startHour + duration)
  * wajib berstatus 'f' (Kosong) — otomatis memblokir 'k' (Ada kelas), 'o', 'm', dan 'p'.
+ * Mendukung startHour 7..16 (dengan startHour + duration <= 17).
  */
 export function isWindowFree(params) {
   const { startHour, duration } = params;
-  if (startHour < 7 || startHour > 15 || duration < 1 || duration > 3) return false;
+  if (startHour < 7 || startHour > 16 || duration < 1 || duration > 3) return false;
+  if (startHour + duration > 17) return false;
   for (let h = startHour; h < startHour + duration; h += 1) {
     if (h > 16) return false;
     if (getSlotStatus({ ...params, hour: h }) !== 'f') return false;

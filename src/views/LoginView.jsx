@@ -48,27 +48,47 @@ export default function LoginView() {
 
   return (
     <div className="grid min-h-screen bg-[#F8F9FB] dark:bg-ink-canvas lg:grid-cols-2">
-      <div className="relative flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16">
-        <button
-          type="button"
-          onClick={toggleTheme}
-          aria-label="Ubah tema"
-          className="sh-btn-secondary absolute right-5 top-5 h-9 w-9 px-0"
-        >
-          {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
-        </button>
-
-        <div className="animate-view-in mx-auto w-full max-w-sm">
+      <div className="flex flex-col justify-between px-6 py-8 sm:px-12 lg:px-16">
+        {/* Top Bar: Brand + Prominent Theme Switcher Button */}
+        <div className="mx-auto flex w-full max-w-sm items-center justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-extrabold leading-none tracking-[-0.03em] text-unnes-navy dark:text-white">
+            <div className="text-2xl font-extrabold leading-none tracking-[-0.03em] text-unnes-navy dark:text-white">
               Space<span className="text-unnes-gold">Hub</span>
+            </div>
+            <div className="mt-1 text-xs font-medium text-[#667085] dark:text-[#8A93A6]">FEB UNNES</div>
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="sh-btn-secondary h-9 px-3 text-xs"
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun className="h-4 w-4 text-unnes-gold" />
+                Mode Terang
+              </>
+            ) : (
+              <>
+                <Moon className="h-4 w-4 text-unnes-navy" />
+                Mode Gelap
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Center Auth Form */}
+        <div className="animate-view-in mx-auto my-8 w-full max-w-sm">
+          <div>
+            <h1 className="text-2xl font-bold tracking-[-0.025em] text-[#101828] dark:text-[#F5F7FA]">
+              Selamat datang
             </h1>
-            <p className="mt-1.5 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
-              Pencarian & booking ruang kelas kosong · FEB UNNES
+            <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
+              Cari & booking ruang kelas kosong di Gedung L2, L4, dan L5.
             </p>
           </div>
 
-          <div className="mt-7 grid grid-cols-2 rounded-xl border border-[#DCE2EC] bg-[#EEF1F6] p-1 dark:border-ink-line dark:bg-ink-card">
+          <div className="mt-6 grid grid-cols-2 rounded-xl border border-[#DCE2EC] bg-[#EEF1F6] p-1 dark:border-ink-line dark:bg-ink-card">
             <button
               type="button"
               onClick={() => {
@@ -102,10 +122,10 @@ export default function LoginView() {
           </div>
 
           {portal === 'student' ? (
-            <div className="sh-panel mt-5 p-6">
+            <div className="sh-panel mt-4 p-6">
               <div className="flex items-baseline justify-between">
-                <h2 className="text-lg font-bold text-[#101828] dark:text-[#F5F7FA]">
-                  {mode === 'login' ? 'Masuk akun' : 'Buat akun'}
+                <h2 className="text-base font-bold text-[#101828] dark:text-[#F5F7FA]">
+                  {mode === 'login' ? 'Masuk akun mahasiswa' : 'Daftar akun mahasiswa'}
                 </h2>
                 <button
                   type="button"
@@ -120,7 +140,7 @@ export default function LoginView() {
                   }}
                   className="text-xs font-semibold text-unnes-navy hover:underline dark:text-unnes-gold"
                 >
-                  {mode === 'login' ? 'Daftar akun baru' : 'Sudah punya akun'}
+                  {mode === 'login' ? 'Buat akun' : 'Masuk'}
                 </button>
               </div>
 
@@ -199,7 +219,7 @@ export default function LoginView() {
               </form>
 
               <div className="mt-5 flex items-center justify-between border-t border-[#ECEFF4] pt-4 text-xs text-[#667085] dark:border-ink-line dark:text-[#8A93A6]">
-                <span>Akun demo: contoh123</span>
+                <span>Demo: mahasiswa@student.unnes.ac.id</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -215,11 +235,11 @@ export default function LoginView() {
               </div>
             </div>
           ) : (
-            <div className="sh-panel mt-5 p-6">
+            <div className="sh-panel mt-4 p-6">
               <div>
-                <h2 className="text-lg font-bold text-[#101828] dark:text-[#F5F7FA]">Portal pengelola</h2>
+                <h2 className="text-base font-bold text-[#101828] dark:text-[#F5F7FA]">Portal pengelola</h2>
                 <p className="mt-1 text-xs text-[#475467] dark:text-[#B0B8C9]">
-                  Akses ringkasan keterisian gedung & riwayat pemakaian.
+                  Kelola ruangan, tarif sewa, blokir jadwal fakultas, dan laporan lapangan.
                 </p>
               </div>
 
@@ -268,6 +288,10 @@ export default function LoginView() {
             </div>
           )}
         </div>
+
+        <p className="mx-auto w-full max-w-sm text-center text-xs text-[#98A2B3] dark:text-[#667085]">
+          Fakultas Ekonomika dan Bisnis · Universitas Negeri Semarang
+        </p>
       </div>
 
       {/* Campus Photo */}

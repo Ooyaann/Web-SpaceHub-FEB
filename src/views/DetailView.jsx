@@ -92,7 +92,7 @@ export default function DetailView() {
     );
   }, [room, detailDay, bookings, reports, user, nowWib]);
 
-  const hasBookableSlot = freeHoursOnDetailDay.some((h) => h <= 15);
+  const hasBookableSlot = freeHoursOnDetailDay.some((h) => h <= 16);
 
   const alternatives = useMemo(() => {
     if (!room) return [];

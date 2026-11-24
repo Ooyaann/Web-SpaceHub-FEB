@@ -4,7 +4,7 @@ export const MAX_ACTIVE_BOOKINGS = 3;
 export const ADMIN_PIN = 'feb2026';
 
 export const OPERATIONAL_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
-export const START_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15];
+export const START_HOURS = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16];
 
 export const FACILITY_OPTIONS = ['AC', 'Proyektor', 'Whiteboard', 'WiFi', 'Colokan'];
 
@@ -21,6 +21,13 @@ export const BOOKING_RULE_PILLS = [
   'Durasi 1–3 jam',
   'Maks. 3 aktif',
   'Batal < jam mulai',
+];
+
+export const ROOM_IMAGES = [
+  '/images/feb-hero.jpg',
+  '/images/room-1.jpg',
+  '/images/room-2.jpg',
+  '/images/login-bg.jpg',
 ];
 
 const ROOM_LAYOUT = {
@@ -49,13 +56,6 @@ const FACILITY_PRESETS = [
   ['AC', 'Proyektor', 'Whiteboard'],
   ['Whiteboard', 'WiFi'],
   ['AC', 'Whiteboard', 'WiFi', 'Colokan'],
-];
-
-const ROOM_IMAGES = [
-  '/images/feb-hero.jpg',
-  '/images/room-1.jpg',
-  '/images/room-2.jpg',
-  '/images/login-bg.jpg',
 ];
 
 export const FALLBACK_ROOMS = (() => {

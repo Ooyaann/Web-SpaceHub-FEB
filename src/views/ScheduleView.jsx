@@ -1,8 +1,16 @@
 import { useEffect, useMemo } from 'react';
-import { Building2, Clock, Plus, Search } from 'lucide-react';
+import {
+  Building2,
+  CheckCircle2,
+  Clock,
+  GraduationCap,
+  Plus,
+  Search,
+  Users,
+} from 'lucide-react';
 import { OPERATIONAL_HOURS, SLOT_LABELS } from '../lib/constants';
 import { formatHour, pad2 } from '../lib/dateWib';
-import { getSlotStatus } from '../lib/schedule';
+import { getSlotDetail } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
 import DatePickerPopover from '../components/DatePickerPopover';
 import SelectPopover from '../components/SelectPopover';
@@ -10,7 +18,11 @@ import Legend from '../components/Legend';
 
 function buildTimetableSegments({ roomCode, dateKey, weekday, bookings, reports, userEmail, todayWib, nowHourWib }) {
   const raw = OPERATIONAL_HOURS.map((hour) => {
-    const status = getSlotStatus({
+    const isPast = dateKey === todayWib && hour < nowHourWib;
+    if (isPast) {
+      return { hour, status: 'p', groupKey: 'past', detailLabel: 'Lewat' };
+    }
+    const detail = getSlotDetail({
       roomCode,
       dateKey,
       weekday,
@@ -18,22 +30,41 @@ function buildTimetableSegments({ roomCode, dateKey, weekday, bookings, reports,
       bookings,
       reports,
       userEmail,
-      todayWib,
-      nowHourWib,
     });
-    const myBooking =
-      status === 'm'
-        ? bookings.find(
-            (b) =>
-              b.status === 'confirmed' &&
-              b.room_code === roomCode &&
-              b.booking_date === dateKey &&
-              hour >= b.start_hour &&
-              hour < b.start_hour + b.duration &&
-              (b.user_email || '').toLowerCase() === (userEmail || '').toLowerCase()
-          )
-        : null;
-    return { hour, status, bookingId: myBooking?.id || null };
+    if (detail.status === 'm' && detail.booking) {
+      return {
+        hour,
+        status: 'm',
+        groupKey: `m:${detail.booking.id}`,
+        detailLabel: detail.booking.id,
+        tooltipExtra: `${detail.booking.id} · ${detail.booking.purpose}`,
+      };
+    }
+    if (detail.status === 'o' && detail.booking) {
+      return {
+        hour,
+        status: 'o',
+        groupKey: `o:${detail.booking.id}`,
+        detailLabel: detail.booking.user_name,
+        tooltipExtra: `${detail.booking.user_name} · ${detail.booking.purpose}`,
+      };
+    }
+    if (detail.status === 'o' && detail.report) {
+      return {
+        hour,
+        status: 'o',
+        groupKey: `rep:${detail.report.id}`,
+        detailLabel: 'Dilaporkan',
+        tooltipExtra: `Dilaporkan dipakai (${detail.report.reported_by})`,
+      };
+    }
+    return {
+      hour,
+      status: detail.status,
+      groupKey: detail.status,
+      detailLabel: detail.status === 'k' ? 'Kuliah' : 'Kosong',
+      tooltipExtra: '',
+    };
   });
 
   const segments = [];
@@ -41,7 +72,7 @@ function buildTimetableSegments({ roomCode, dateKey, weekday, bookings, reports,
   while (i < raw.length) {
     const cur = raw[i];
     if (cur.status === 'f') {
-      segments.push({ startHour: cur.hour, span: 1, status: 'f', bookingId: null });
+      segments.push({ startHour: cur.hour, span: 1, status: 'f', detailLabel: 'Kosong', tooltipExtra: '' });
       i += 1;
       continue;
     }
@@ -49,11 +80,17 @@ function buildTimetableSegments({ roomCode, dateKey, weekday, bookings, reports,
     while (
       i + span < raw.length &&
       raw[i + span].status === cur.status &&
-      raw[i + span].bookingId === cur.bookingId
+      raw[i + span].groupKey === cur.groupKey
     ) {
       span += 1;
     }
-    segments.push({ startHour: cur.hour, span, status: cur.status, bookingId: cur.bookingId });
+    segments.push({
+      startHour: cur.hour,
+      span,
+      status: cur.status,
+      detailLabel: cur.detailLabel,
+      tooltipExtra: cur.tooltipExtra,
+    });
     i += span;
   }
 
@@ -71,12 +108,18 @@ function buildTimetableSegments({ roomCode, dateKey, weekday, bookings, reports,
   return { segments, maxConsecutiveFree };
 }
 
-/* Calm, high-contrast neutral/brand blocks — ZERO murky dark-green cells */
 const BLOCK_STYLES = {
-  k: 'border border-[#DCE2EC] bg-[#EEF1F6] text-[#475467] dark:border-ink-line dark:bg-[#171A21] dark:text-[#8A93A6]',
-  o: 'border border-[#FCD34D]/60 bg-[#FEF3C7] text-[#92400E] dark:border-[#4D3D22] dark:bg-[#2B2418] dark:text-[#FBBF24]',
-  m: 'border border-unnes-gold bg-unnes-gold font-bold text-unnes-gold-ink shadow-sm',
-  p: 'border border-transparent bg-[#F2F4F7] text-[#98A2B3] dark:bg-[#14171D] dark:text-[#4F5769]',
+  k: 'border border-[#93C5FD] bg-[#DBEAFE] text-[#1E40AF] dark:border-[#60A5FA]/40 dark:bg-[#1E3A8A]/80 dark:text-[#DBEAFE]',
+  o: 'border border-[#FDBA74] bg-[#FFEDD5] text-[#9A3412] dark:border-[#FB923C]/45 dark:bg-[#7C2D12]/85 dark:text-[#FFEDD5]',
+  m: 'border border-[#D99B00] bg-unnes-gold font-bold text-unnes-gold-ink shadow-sm',
+  p: 'border border-[#E2E6EE] bg-[#F1F3F7] text-[#98A2B3] dark:border-ink-line/60 dark:bg-[#181B22] dark:text-[#586175]',
+};
+
+const BLOCK_ICONS = {
+  k: GraduationCap,
+  o: Users,
+  m: CheckCircle2,
+  p: Clock,
 };
 
 export default function ScheduleView() {
@@ -160,8 +203,8 @@ export default function ScheduleView() {
             Jadwal ruang
           </h1>
           <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
-            Klik slot <strong className="font-semibold text-[#101828] dark:text-[#F5F7FA]">+</strong> untuk langsung
-            booking, atau klik kode ruang untuk melihat foto & detail.
+            Klik kotak hijau <strong className="font-semibold text-[#166534] dark:text-[#4ADE80]">+</strong> untuk
+            langsung booking, atau klik kode ruang untuk melihat foto & detail.
           </p>
         </div>
 
@@ -239,7 +282,7 @@ export default function ScheduleView() {
       {/* Timetable Grid Panel */}
       <div className="sh-panel overflow-hidden">
         <div className="overflow-x-auto p-4 sm:p-5">
-          <div className="min-w-[780px]">
+          <div className="min-w-[820px]">
             <div className="grid grid-cols-[152px_1fr_84px] items-center gap-4 border-b border-[#E4E7EE] pb-3 dark:border-ink-line">
               <span className="text-xs font-semibold text-[#475467] dark:text-[#B0B8C9]">Ruang</span>
               <div className="grid grid-cols-10 gap-1.5 text-center">
@@ -289,52 +332,57 @@ export default function ScheduleView() {
                     <div className="grid grid-cols-10 gap-1.5">
                       {segments.map((seg) => {
                         if (seg.status === 'f') {
-                          const canBook = !isAdmin && seg.startHour <= 15;
+                          const canBook = !isAdmin && seg.startHour <= 16;
                           return canBook ? (
                             <button
                               key={seg.startHour}
                               type="button"
                               onClick={() => openBookingForm(room.code, filters.day, seg.startHour)}
                               title={`Booking ${room.code} mulai ${formatHour(seg.startHour)}`}
-                              className="group/slot relative flex h-8 items-center justify-center rounded-lg border border-[#D4DCE8] bg-white text-[#475467] shadow-[0_1px_1px_rgba(16,24,40,0.03)] transition-all duration-150 hover:-translate-y-0.5 hover:border-unnes-navy hover:bg-unnes-navy hover:text-white active:scale-95 dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#D0D7E6] dark:hover:border-unnes-gold dark:hover:bg-unnes-gold dark:hover:text-unnes-gold-ink"
+                              className="group/slot flex h-9 items-center justify-center rounded-lg border border-[#86EFAC] bg-[#DCFCE7] text-[#166534] transition-all duration-150 hover:-translate-y-0.5 hover:border-[#16A34A] hover:bg-[#16A34A] hover:text-white active:scale-95 dark:border-[#22C55E]/45 dark:bg-[#14532D] dark:text-[#ECFDF5] dark:hover:border-[#22C55E] dark:hover:bg-[#22C55E] dark:hover:text-[#052E16]"
                             >
-                              <Plus className="h-3.5 w-3.5 transition-transform duration-150 group-hover/slot:scale-110" />
-                              <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#10B981] group-hover/slot:opacity-0" />
+                              <Plus className="h-4 w-4 stroke-[2.5] transition-transform duration-150 group-hover/slot:scale-110" />
                             </button>
                           ) : (
                             <div
                               key={seg.startHour}
-                              title={`${formatHour(seg.startHour)} · Kosong (akhir jam operasional)`}
-                              className="relative flex h-8 items-center justify-center rounded-lg border border-[#E4E7EC] bg-white dark:border-ink-line dark:bg-ink-subtle/60"
+                              title={`${formatHour(seg.startHour)} · Kosong`}
+                              className="flex h-9 items-center justify-center rounded-lg border border-[#86EFAC] bg-[#DCFCE7] text-[#166534] dark:border-[#22C55E]/45 dark:bg-[#14532D] dark:text-[#ECFDF5]"
                             >
-                              <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+                              <Plus className="h-3.5 w-3.5 opacity-60" />
                             </div>
                           );
                         }
 
+                        const Icon = BLOCK_ICONS[seg.status];
                         const label =
                           seg.status === 'k'
                             ? seg.span >= 2
                               ? `Kuliah · ${seg.span}j`
-                              : 'Kuliah'
+                              : ''
                             : seg.status === 'm'
-                              ? seg.span >= 2 && seg.bookingId
-                                ? seg.bookingId
+                              ? seg.span >= 2
+                                ? `${seg.detailLabel} · Milikmu`
                                 : 'Milikmu'
                               : seg.status === 'o'
                                 ? seg.span >= 2
-                                  ? `Terpakai · ${seg.span}j`
+                                  ? seg.detailLabel
                                   : 'Isi'
-                                : 'Lewat';
+                                : seg.span >= 2
+                                  ? 'Lewat'
+                                  : '';
 
                         return (
                           <div
                             key={seg.startHour}
                             style={{ gridColumn: `span ${seg.span} / span ${seg.span}` }}
-                            title={`${formatHour(seg.startHour)}–${formatHour(seg.startHour + seg.span)} · ${SLOT_LABELS[seg.status]}`}
-                            className={`flex h-8 items-center justify-center truncate rounded-lg px-2 text-[11px] font-medium ${BLOCK_STYLES[seg.status]}`}
+                            title={`${formatHour(seg.startHour)}–${formatHour(seg.startHour + seg.span)} · ${SLOT_LABELS[seg.status]}${
+                              seg.tooltipExtra ? ` (${seg.tooltipExtra})` : ''
+                            }`}
+                            className={`flex h-9 items-center justify-center gap-1.5 truncate rounded-lg px-2 text-[11px] font-semibold ${BLOCK_STYLES[seg.status]}`}
                           >
-                            <span className="truncate">{label}</span>
+                            <Icon className="h-3.5 w-3.5 flex-none" />
+                            {label && <span className="truncate">{label}</span>}
                           </div>
                         );
                       })}
@@ -342,8 +390,7 @@ export default function ScheduleView() {
 
                     <div className="text-right text-xs font-semibold tabular-nums">
                       {maxConsecutiveFree > 0 ? (
-                        <span className="inline-flex items-center gap-1 rounded-md bg-[#F2F4F8] px-2 py-1 text-[#101828] dark:bg-ink-subtle dark:text-[#F5F7FA]">
-                          <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+                        <span className="inline-flex items-center gap-1 rounded-md border border-[#86EFAC] bg-[#DCFCE7] px-2 py-1 text-[#166534] dark:border-[#22C55E]/40 dark:bg-[#14532D] dark:text-[#ECFDF5]">
                           Maks {Math.min(3, maxConsecutiveFree)}j
                         </span>
                       ) : (

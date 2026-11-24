@@ -1,14 +1,22 @@
+import { CheckCircle2, Clock, GraduationCap, Plus, Users } from 'lucide-react';
 import { OPERATIONAL_HOURS, SLOT_LABELS } from '../lib/constants';
 import { formatHour, pad2 } from '../lib/dateWib';
-import { getSlotStatus } from '../lib/schedule';
+import { getSlotDetail } from '../lib/schedule';
 
-/* Crisp high-contrast neutral/brand slot styling — NO murky dark-green backgrounds */
 const BAR_STYLES = {
-  f: 'border border-[#CFE8DA] bg-white text-[#067647] dark:border-ink-line-strong dark:bg-ink-subtle dark:text-[#F5F7FA]',
-  k: 'border border-[#DCE2EC] bg-[#EBEEF4] text-[#667085] dark:border-ink-line dark:bg-[#181B22] dark:text-[#7F889B]',
-  o: 'border border-[#FCD34D]/60 bg-[#FEF3C7] text-[#92400E] dark:border-[#4D3D22] dark:bg-[#2B2418] dark:text-[#FBBF24]',
-  m: 'border border-unnes-gold bg-unnes-gold font-bold text-unnes-gold-ink',
-  p: 'border border-transparent bg-[#F1F3F7] text-[#A0AAB8] dark:bg-[#14171D] dark:text-[#4F5769]',
+  f: 'border border-[#86EFAC] bg-[#DCFCE7] text-[#166534] dark:border-[#22C55E]/45 dark:bg-[#14532D] dark:text-[#ECFDF5]',
+  k: 'border border-[#93C5FD] bg-[#DBEAFE] text-[#1E40AF] dark:border-[#60A5FA]/40 dark:bg-[#1E3A8A]/80 dark:text-[#DBEAFE]',
+  o: 'border border-[#FDBA74] bg-[#FFEDD5] text-[#9A3412] dark:border-[#FB923C]/45 dark:bg-[#7C2D12]/85 dark:text-[#FFEDD5]',
+  m: 'border border-[#D99B00] bg-unnes-gold font-bold text-unnes-gold-ink shadow-sm',
+  p: 'border border-[#E2E6EE] bg-[#F1F3F7] text-[#98A2B3] dark:border-ink-line/60 dark:bg-[#181B22] dark:text-[#586175]',
+};
+
+const STATUS_ICONS = {
+  f: Plus,
+  k: GraduationCap,
+  o: Users,
+  m: CheckCircle2,
+  p: Clock,
 };
 
 export default function HourBar({
@@ -30,7 +38,8 @@ export default function HourBar({
     <div className="w-full">
       <div className="grid grid-cols-10 gap-1.5">
         {OPERATIONAL_HOURS.map((h) => {
-          const status = getSlotStatus({
+          const isPast = dateKey === todayWib && h < nowHourWib;
+          const detail = getSlotDetail({
             roomCode,
             dateKey,
             weekday,
@@ -38,13 +47,22 @@ export default function HourBar({
             bookings,
             reports,
             userEmail,
-            todayWib,
-            nowHourWib,
           });
+          const status = isPast ? 'p' : detail.status;
+          const Icon = STATUS_ICONS[status];
           const highlighted = highlightStart >= 0 && h >= highlightStart && h < highlightStart + highlightDur;
-          const clickable = Boolean(onSelectHour) && status === 'f' && h <= 15;
+          const clickable = Boolean(onSelectHour) && status === 'f' && h <= 16;
 
-          const baseClass = `relative flex ${compact ? 'h-6' : 'h-9'} items-center justify-center rounded-lg text-[11px] font-semibold tabular-nums transition-all duration-150 ${BAR_STYLES[status]} ${
+          const extraTooltip =
+            status === 'o' && detail.booking
+              ? ` (${detail.booking.user_name}: ${detail.booking.purpose})`
+              : status === 'o' && detail.report
+                ? ' (Dilaporkan sedang terpakai)'
+                : status === 'm' && detail.booking
+                  ? ` (${detail.booking.id} · ${detail.booking.purpose})`
+                  : '';
+
+          const baseClass = `flex flex-col ${compact ? 'h-8' : 'h-11'} items-center justify-center gap-0.5 rounded-lg text-[10px] font-bold tabular-nums transition-all duration-150 ${BAR_STYLES[status]} ${
             highlighted
               ? 'ring-2 ring-unnes-navy ring-offset-1 ring-offset-white dark:ring-unnes-gold dark:ring-offset-ink-card'
               : ''
@@ -57,17 +75,22 @@ export default function HourBar({
                 type="button"
                 onClick={() => onSelectHour(h)}
                 title={`Klik untuk booking mulai ${formatHour(h)}`}
-                className={`${baseClass} cursor-pointer hover:-translate-y-0.5 hover:border-unnes-navy hover:bg-unnes-navy hover:text-white active:scale-95 dark:hover:border-unnes-gold dark:hover:bg-unnes-gold dark:hover:text-unnes-gold-ink`}
+                className={`${baseClass} cursor-pointer hover:-translate-y-0.5 hover:border-[#16A34A] hover:bg-[#16A34A] hover:text-white active:scale-95 dark:hover:border-[#22C55E] dark:hover:bg-[#22C55E] dark:hover:text-[#052E16]`}
               >
-                {showLabels ? pad2(h) : ''}
-                <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+                <Icon className="h-3 w-3 stroke-[2.5]" />
+                {showLabels && <span>{pad2(h)}</span>}
               </button>
             );
           }
 
           return (
-            <div key={h} title={`${formatHour(h)} · ${SLOT_LABELS[status]}`} className={baseClass}>
-              {showLabels ? pad2(h) : ''}
+            <div
+              key={h}
+              title={`${formatHour(h)} · ${SLOT_LABELS[status]}${extraTooltip}`}
+              className={baseClass}
+            >
+              <Icon className="h-3 w-3 opacity-85" />
+              {showLabels && <span>{pad2(h)}</span>}
             </div>
           );
         })}
