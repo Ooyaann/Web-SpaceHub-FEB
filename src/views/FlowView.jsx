@@ -22,11 +22,11 @@ export default function FlowView() {
   const { navigate } = useSpaceHub();
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#EAECEF] pb-6 dark:border-white/[0.08]">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-[-0.02em] text-[#141923] dark:text-[#EEF2F7]">Alur sistem</h1>
-          <p className="mt-1 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+          <h1 className="text-2xl font-bold tracking-[-0.025em] text-[#101828] dark:text-[#F5F7FA]">Alur sistem</h1>
+          <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
             Enam langkah singkat penggunaan SpaceHub FEB UNNES.
           </p>
         </div>
@@ -36,21 +36,18 @@ export default function FlowView() {
         </button>
       </div>
 
-      <ol className="grid gap-x-8 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
+      <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, desc }, idx) => (
-          <li
-            key={title}
-            className="flex items-start gap-3.5 border-b border-[#EAECEF] pb-6 dark:border-white/[0.08]"
-          >
-            <div className="flex h-9 w-9 flex-none items-center justify-center rounded-lg bg-[#F1F3F7] text-unnes-navy dark:bg-ink-card dark:text-unnes-gold">
+          <li key={title} className="sh-panel flex items-start gap-3.5 p-5">
+            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-[#EEF3FC] text-unnes-navy dark:bg-ink-subtle dark:text-unnes-gold">
               <Icon className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <span className="font-mono text-xs font-semibold tabular-nums text-[#7B869B] dark:text-[#8693AA]">
+              <span className="font-mono text-xs font-semibold tabular-nums text-[#667085] dark:text-[#8A93A6]">
                 0{idx + 1}
               </span>
-              <h2 className="mt-0.5 text-[14px] font-bold text-[#141923] dark:text-[#EEF2F7]">{title}</h2>
-              <p className="mt-1 text-[13px] leading-relaxed text-[#5B667B] dark:text-[#9AA7BE]">{desc}</p>
+              <h2 className="mt-0.5 text-[14px] font-bold text-[#101828] dark:text-[#F5F7FA]">{title}</h2>
+              <p className="mt-1 text-[13px] leading-relaxed text-[#475467] dark:text-[#B0B8C9]">{desc}</p>
             </div>
           </li>
         ))}

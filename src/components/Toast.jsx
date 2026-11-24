@@ -10,14 +10,15 @@ export default function Toast() {
 
   return (
     <div
+      key={toast.id}
       role="status"
       aria-live="polite"
-      className="fixed bottom-5 left-1/2 z-50 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-lg bg-[#141923] px-4 py-3 text-[13px] font-medium text-white shadow-popover dark:border dark:border-white/10 dark:bg-ink-subtle"
+      className="animate-toast-in fixed bottom-5 left-1/2 z-50 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-xl bg-[#101828] px-4 py-3 text-[13px] font-medium text-white shadow-popover dark:border dark:border-ink-line-strong dark:bg-ink-subtle"
     >
       <Icon
         className={`h-4 w-4 flex-none ${
           toast.type === 'success'
-            ? 'text-emerald-400'
+            ? 'text-[#10B981]'
             : toast.type === 'error'
               ? 'text-rose-400'
               : 'text-unnes-gold'

@@ -47,38 +47,38 @@ export default function LoginView() {
   };
 
   return (
-    <div className="grid min-h-screen bg-white dark:bg-ink-canvas lg:grid-cols-2">
+    <div className="grid min-h-screen bg-[#F8F9FB] dark:bg-ink-canvas lg:grid-cols-2">
       <div className="relative flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16">
         <button
           type="button"
           onClick={toggleTheme}
           aria-label="Ubah tema"
-          className="absolute right-5 top-5 rounded-lg border border-[#E2E6EE] p-2 text-[#5B667B] transition hover:bg-[#F4F6F9] dark:border-white/10 dark:text-[#9AA7BE] dark:hover:bg-ink-card"
+          className="sh-btn-secondary absolute right-5 top-5 h-9 w-9 px-0"
         >
           {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
         </button>
 
-        <div className="mx-auto w-full max-w-sm">
+        <div className="animate-view-in mx-auto w-full max-w-sm">
           <div>
             <h1 className="text-3xl font-extrabold leading-none tracking-[-0.03em] text-unnes-navy dark:text-white">
               Space<span className="text-unnes-gold">Hub</span>
             </h1>
-            <p className="mt-1.5 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
-              Ruang kelas kosong · FEB UNNES
+            <p className="mt-1.5 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
+              Pencarian & booking ruang kelas kosong · FEB UNNES
             </p>
           </div>
 
-          <div className="mt-7 grid grid-cols-2 rounded-lg bg-[#F1F3F7] p-1 dark:bg-ink-card">
+          <div className="mt-7 grid grid-cols-2 rounded-xl border border-[#DCE2EC] bg-[#EEF1F6] p-1 dark:border-ink-line dark:bg-ink-card">
             <button
               type="button"
               onClick={() => {
                 setPortal('student');
                 setError('');
               }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
                 portal === 'student'
-                  ? 'bg-white text-[#141923] shadow-sm dark:bg-ink-subtle dark:text-[#EEF2F7]'
-                  : 'text-[#5B667B] dark:text-[#9AA7BE]'
+                  ? 'bg-white text-[#101828] shadow-sm dark:bg-ink-subtle dark:text-[#F5F7FA]'
+                  : 'text-[#475467] dark:text-[#B0B8C9]'
               }`}
             >
               <GraduationCap className="h-3.5 w-3.5" />
@@ -90,10 +90,10 @@ export default function LoginView() {
                 setPortal('admin');
                 setError('');
               }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-semibold transition-all ${
                 portal === 'admin'
-                  ? 'bg-white text-[#141923] shadow-sm dark:bg-ink-subtle dark:text-[#EEF2F7]'
-                  : 'text-[#5B667B] dark:text-[#9AA7BE]'
+                  ? 'bg-white text-[#101828] shadow-sm dark:bg-ink-subtle dark:text-[#F5F7FA]'
+                  : 'text-[#475467] dark:text-[#B0B8C9]'
               }`}
             >
               <ShieldCheck className="h-3.5 w-3.5" />
@@ -102,9 +102,9 @@ export default function LoginView() {
           </div>
 
           {portal === 'student' ? (
-            <>
-              <div className="mt-6 flex items-baseline justify-between">
-                <h2 className="text-lg font-bold text-[#141923] dark:text-[#EEF2F7]">
+            <div className="sh-panel mt-5 p-6">
+              <div className="flex items-baseline justify-between">
+                <h2 className="text-lg font-bold text-[#101828] dark:text-[#F5F7FA]">
                   {mode === 'login' ? 'Masuk akun' : 'Buat akun'}
                 </h2>
                 <button
@@ -127,11 +127,11 @@ export default function LoginView() {
               <form onSubmit={handleStudentSubmit} className="mt-4 space-y-3.5">
                 {mode === 'register' && (
                   <label className="block">
-                    <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+                    <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                       Nama lengkap
                     </span>
                     <div className="relative">
-                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7B869B]" />
+                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#667085] dark:text-[#8F98AD]" />
                       <input
                         type="text"
                         value={fullName}
@@ -144,11 +144,11 @@ export default function LoginView() {
                 )}
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                     Email UNNES
                   </span>
                   <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7B869B]" />
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#667085] dark:text-[#8F98AD]" />
                     <input
                       type="email"
                       autoComplete="username"
@@ -162,11 +162,11 @@ export default function LoginView() {
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                     Password
                   </span>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7B869B]" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#667085] dark:text-[#8F98AD]" />
                     <input
                       type={showPass ? 'text' : 'password'}
                       autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -180,7 +180,7 @@ export default function LoginView() {
                       type="button"
                       onClick={() => setShowPass((v) => !v)}
                       aria-label="Toggle password"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-[#7B869B] hover:text-[#141923] dark:hover:text-[#EEF2F7]"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-[#667085] hover:text-[#101828] dark:text-[#8F98AD] dark:hover:text-[#F5F7FA]"
                     >
                       {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -188,7 +188,7 @@ export default function LoginView() {
                 </label>
 
                 {error && (
-                  <p role="alert" className="text-xs font-medium text-rose-600 dark:text-rose-400">
+                  <p role="alert" className="text-xs font-semibold text-rose-600 dark:text-rose-400">
                     {error}
                   </p>
                 )}
@@ -198,7 +198,7 @@ export default function LoginView() {
                 </button>
               </form>
 
-              <div className="mt-5 flex items-center justify-between border-t border-[#EAECEF] pt-4 text-xs text-[#6B768C] dark:border-white/[0.08] dark:text-[#8E9BB3]">
+              <div className="mt-5 flex items-center justify-between border-t border-[#ECEFF4] pt-4 text-xs text-[#667085] dark:border-ink-line dark:text-[#8A93A6]">
                 <span>Akun demo: contoh123</span>
                 <button
                   type="button"
@@ -213,23 +213,23 @@ export default function LoginView() {
                   Isi otomatis
                 </button>
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="mt-6">
-                <h2 className="text-lg font-bold text-[#141923] dark:text-[#EEF2F7]">Portal pengelola</h2>
-                <p className="mt-1 text-xs text-[#5B667B] dark:text-[#9AA7BE]">
+            <div className="sh-panel mt-5 p-6">
+              <div>
+                <h2 className="text-lg font-bold text-[#101828] dark:text-[#F5F7FA]">Portal pengelola</h2>
+                <p className="mt-1 text-xs text-[#475467] dark:text-[#B0B8C9]">
                   Akses ringkasan keterisian gedung & riwayat pemakaian.
                 </p>
               </div>
 
               <form onSubmit={handleAdminSubmit} className="mt-4 space-y-3.5">
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+                  <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
                     PIN pengelola
                   </span>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7B869B]" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#667085] dark:text-[#8F98AD]" />
                     <input
                       type="password"
                       required
@@ -242,7 +242,7 @@ export default function LoginView() {
                 </label>
 
                 {error && (
-                  <p role="alert" className="text-xs font-medium text-rose-600 dark:text-rose-400">
+                  <p role="alert" className="text-xs font-semibold text-rose-600 dark:text-rose-400">
                     {error}
                   </p>
                 )}
@@ -252,7 +252,7 @@ export default function LoginView() {
                 </button>
               </form>
 
-              <div className="mt-5 flex items-center justify-between border-t border-[#EAECEF] pt-4 text-xs text-[#6B768C] dark:border-white/[0.08] dark:text-[#8E9BB3]">
+              <div className="mt-5 flex items-center justify-between border-t border-[#ECEFF4] pt-4 text-xs text-[#667085] dark:border-ink-line dark:text-[#8A93A6]">
                 <span>PIN demo: {ADMIN_PIN}</span>
                 <button
                   type="button"
@@ -265,12 +265,12 @@ export default function LoginView() {
                   Isi otomatis
                 </button>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Clean Full-Bleed Campus Photo */}
+      {/* Campus Photo */}
       <div className="relative hidden overflow-hidden bg-unnes-navy lg:block">
         <img
           src="/images/login-bg.jpg"

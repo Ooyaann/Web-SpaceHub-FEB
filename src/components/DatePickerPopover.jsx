@@ -86,7 +86,7 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
   return (
     <div ref={containerRef} className="relative">
       {label && (
-        <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">{label}</span>
+        <span className="mb-1.5 block text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">{label}</span>
       )}
 
       <button
@@ -94,15 +94,15 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className={`sh-control flex items-center justify-between gap-2 text-left ${
-          open ? 'border-unnes-navy bg-white dark:border-unnes-gold dark:bg-ink-subtle' : ''
+          open ? 'border-unnes-navy ring-2 ring-unnes-navy/10 dark:border-unnes-gold dark:ring-unnes-gold/15' : ''
         }`}
       >
         <span className="flex min-w-0 items-center gap-2 truncate">
-          <CalendarDays className="h-4 w-4 flex-none text-[#7B869B] dark:text-[#8693AA]" />
+          <CalendarDays className="h-4 w-4 flex-none text-[#667085] dark:text-[#8F98AD]" />
           <span className="truncate font-medium">{selectedDay.label}</span>
         </span>
         <ChevronDown
-          className={`h-4 w-4 flex-none text-[#7B869B] transition-transform duration-150 dark:text-[#8693AA] ${
+          className={`h-4 w-4 flex-none text-[#667085] transition-transform duration-150 dark:text-[#8F98AD] ${
             open ? 'rotate-180 text-unnes-navy dark:text-unnes-gold' : ''
           }`}
         />
@@ -110,7 +110,7 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
 
       {open && (
         <div
-          className={`absolute z-50 mt-1.5 w-[292px] rounded-xl border border-[#E2E6EE] bg-white p-3.5 shadow-popover dark:border-white/[0.1] dark:bg-ink-card dark:shadow-popover-dark ${
+          className={`animate-popover-in absolute z-50 mt-1.5 w-[296px] rounded-2xl border border-[#E2E6EE] bg-white p-3.5 shadow-popover dark:border-ink-line-strong dark:bg-ink-card dark:shadow-popover-dark ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
@@ -124,10 +124,10 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
                 key={s.idx}
                 type="button"
                 onClick={() => handleSelect(s.idx)}
-                className={`flex-1 rounded-md py-1.5 text-xs font-semibold transition ${
+                className={`flex-1 rounded-lg py-1.5 text-xs font-semibold transition-all active:scale-95 ${
                   value === s.idx
                     ? 'bg-unnes-navy text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
-                    : 'bg-[#F2F4F8] text-[#434E63] hover:bg-[#E7EBF2] dark:bg-ink-subtle dark:text-[#C8D2E3] dark:hover:bg-ink-hover'
+                    : 'bg-[#F2F4F8] text-[#475467] hover:bg-[#E7EBF2] dark:bg-ink-subtle dark:text-[#D0D7E6] dark:hover:bg-ink-hover'
                 }`}
               >
                 {s.text}
@@ -141,11 +141,11 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
               disabled={!canPrev}
               onClick={() => shiftMonth(-1)}
               aria-label="Bulan sebelumnya"
-              className="rounded-md p-1.5 text-[#5B667B] transition hover:bg-[#F2F4F8] disabled:opacity-30 dark:text-[#9AA7BE] dark:hover:bg-ink-subtle"
+              className="rounded-lg p-1.5 text-[#475467] transition hover:bg-[#F2F4F8] disabled:opacity-30 dark:text-[#B0B8C9] dark:hover:bg-ink-subtle"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="text-[13px] font-bold text-[#141923] dark:text-[#EEF2F7]">
+            <div className="text-[13px] font-bold text-[#101828] dark:text-[#F5F7FA]">
               {MONTH_NAMES[cursor.month]} {cursor.year}
             </div>
             <button
@@ -153,13 +153,13 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
               disabled={!canNext}
               onClick={() => shiftMonth(1)}
               aria-label="Bulan berikutnya"
-              className="rounded-md p-1.5 text-[#5B667B] transition hover:bg-[#F2F4F8] disabled:opacity-30 dark:text-[#9AA7BE] dark:hover:bg-ink-subtle"
+              className="rounded-lg p-1.5 text-[#475467] transition hover:bg-[#F2F4F8] disabled:opacity-30 dark:text-[#B0B8C9] dark:hover:bg-ink-subtle"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-[#8A94A6]">
+          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[11px] font-medium text-[#7F889B]">
             {WEEKDAYS.map((w) => (
               <div key={w} className="py-1">
                 {w}
@@ -179,12 +179,12 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
                   type="button"
                   disabled={disabled}
                   onClick={() => handleSelect(cell.idx)}
-                  className={`relative flex h-9 items-center justify-center rounded-md text-xs font-medium tabular-nums transition ${
+                  className={`relative flex h-9 items-center justify-center rounded-lg text-xs font-medium tabular-nums transition-all ${
                     isSelected
-                      ? 'bg-unnes-navy font-bold text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                      ? 'bg-unnes-navy font-bold text-white shadow-sm dark:bg-unnes-gold dark:text-unnes-gold-ink'
                       : disabled
-                        ? 'cursor-not-allowed text-[#CBD2DF] dark:text-[#404B63]'
-                        : 'text-[#1E2636] hover:bg-[#F2F4F8] dark:text-[#DCE3F0] dark:hover:bg-ink-subtle'
+                        ? 'cursor-not-allowed text-[#CBD2DF] dark:text-[#444C5E]'
+                        : 'text-[#1E2636] hover:bg-[#F2F4F8] dark:text-[#E2E7F1] dark:hover:bg-ink-subtle'
                   }`}
                 >
                   {cell.dt}

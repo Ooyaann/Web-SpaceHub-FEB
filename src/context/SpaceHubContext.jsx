@@ -17,6 +17,20 @@ const SpaceHubContext = createContext(null);
 const USER_SESSION_KEY = 'spacehub_session_user_v2';
 const NOTIF_STORAGE_KEY = 'spacehub_notifications_v1';
 
+export const VIEW_LABELS = {
+  find: 'Cari Ruang',
+  plan: 'Denah Lantai',
+  sched: 'Jadwal Ruang',
+  cal: 'Kalender',
+  mine: 'Booking Saya',
+  favs: 'Ruang Favorit',
+  notif: 'Notifikasi',
+  flow: 'Alur Sistem',
+  admin: 'Dashboard Pengelola',
+  det: 'Detail Ruang',
+  bk: 'Form Booking',
+};
+
 function loadSessionUser() {
   try {
     const raw = localStorage.getItem(USER_SESSION_KEY);
@@ -51,6 +65,7 @@ export function SpaceHubProvider({ children }) {
   const isAfterHours = nowWib.hour >= 16;
 
   const [activeView, setActiveView] = useState(() => (loadSessionUser()?.role === 'admin' ? 'admin' : 'find'));
+  const [navHistory, setNavHistory] = useState([]);
   const [selectedRoomCode, setSelectedRoomCode] = useState(null);
   const [detailDayIndex, setDetailDayIndex] = useState(() => (isAfterHours ? 1 : 0));
   const [bookingPresetDay, setBookingPresetDay] = useState(() => (isAfterHours ? 1 : 0));
@@ -70,6 +85,26 @@ export function SpaceHubProvider({ children }) {
     facilities: [],
     favOnly: false,
     search: '',
+  }));
+
+  // Persisted sub-view preferences so returning via Back keeps exact selections
+  const [planPrefs, setPlanPrefs] = useState({
+    building: 'L4',
+    floor: 2,
+  });
+
+  const [schedPrefs, setSchedPrefs] = useState({
+    building: 'L4',
+    floorFilter: 'ALL',
+    minConsecutive: 0,
+    query: '',
+  });
+
+  const [calPrefs, setCalPrefs] = useState(() => ({
+    selectedDayIdx: isAfterHours ? 1 : 0,
+    scope: 'ALL',
+    panelTab: 'idle',
+    monthIdx: 0,
   }));
 
   const showToast = useCallback((message, type = 'info') => {
@@ -150,6 +185,7 @@ export function SpaceHubProvider({ children }) {
       } catch {
         // ignore
       }
+      setNavHistory([]);
       setActiveView('find');
       showToast(`Halo, ${sessionUser.name}!`, 'success');
       return res;
@@ -174,6 +210,7 @@ export function SpaceHubProvider({ children }) {
       } catch {
         // ignore
       }
+      setNavHistory([]);
       setActiveView('admin');
       showToast('Masuk sebagai Pengelola FEB.', 'success');
       return { ok: true, user: adminUser };
@@ -184,6 +221,7 @@ export function SpaceHubProvider({ children }) {
   const logout = useCallback(() => {
     setUser(null);
     setSelectedRoomCode(null);
+    setNavHistory([]);
     setActiveView('find');
     try {
       localStorage.removeItem(USER_SESSION_KEY);
@@ -226,23 +264,58 @@ export function SpaceHubProvider({ children }) {
     });
   }, []);
 
+  // Navigate to a top-level menu view (clears sub-view history)
+  const navigate = useCallback((view) => {
+    setNavHistory([]);
+    setActiveView(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Open Detail View while remembering exact origin view (Find, Denah, Jadwal, Kalender, Favorit, Booking Saya)
   const openRoomDetail = useCallback(
     (roomCode, dayIdx = filters.day) => {
       setSelectedRoomCode(roomCode);
       setDetailDayIndex(dayIdx);
+      setNavHistory((prev) => {
+        if (activeView === 'det') return prev;
+        // If user clicked "Lihat detail ruang" while inside BookingView, keep their original menu root
+        if (activeView === 'bk') return prev.length > 0 ? prev.filter((v) => v !== 'det') : ['find'];
+        return [...prev, activeView];
+      });
       setActiveView('det');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
-    [filters.day]
+    [filters.day, activeView]
   );
 
-  const openBookingForm = useCallback((roomCode, dayIdx, presetHour = null) => {
-    setSelectedRoomCode(roomCode);
-    setBookingPresetDay(dayIdx);
-    setBookingPresetHour(presetHour);
-    setActiveView('bk');
+  // Open Booking Form while remembering exact previous screen (e.g. Jadwal Ruang '+' directly, or DetailView)
+  const openBookingForm = useCallback(
+    (roomCode, dayIdx, presetHour = null) => {
+      setSelectedRoomCode(roomCode);
+      setBookingPresetDay(dayIdx);
+      setBookingPresetHour(presetHour);
+      setNavHistory((prev) => {
+        if (activeView === 'bk') return prev;
+        return [...prev, activeView];
+      });
+      setActiveView('bk');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    [activeView]
+  );
+
+  // Contextual Back action: pops the exact previous view
+  const goBack = useCallback(() => {
+    const defaultHome = user?.role === 'admin' ? 'admin' : 'find';
+    if (navHistory.length === 0) {
+      setActiveView(defaultHome);
+    } else {
+      const target = navHistory[navHistory.length - 1];
+      setNavHistory((prev) => prev.slice(0, -1));
+      setActiveView(target);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  }, [navHistory, user]);
 
   const goToFindWithDate = useCallback((dayIdx) => {
     setFilters((prev) => ({
@@ -250,12 +323,8 @@ export function SpaceHubProvider({ children }) {
       day: dayIdx,
       start: dayIdx === 0 ? clampStartHour(getNowWib().hour) : 8,
     }));
+    setNavHistory([]);
     setActiveView('find');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
-
-  const navigate = useCallback((view) => {
-    setActiveView(view);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
@@ -377,6 +446,7 @@ export function SpaceHubProvider({ children }) {
       showToast(`Booking dikonfirmasi (${code})`, 'success');
       pushNotification('Booking Disetujui', detailMsg, 'booking');
       setBookingPresetHour(null);
+      setNavHistory([]);
       setActiveView(user.role === 'admin' ? 'admin' : 'mine');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return res;
@@ -421,6 +491,14 @@ export function SpaceHubProvider({ children }) {
   }, [myBookings]);
 
   const isAdmin = user?.role === 'admin';
+  const defaultRoot = isAdmin ? 'admin' : 'find';
+  const rootNavView = navHistory.length > 0 ? navHistory[0] : activeView;
+  const previousView = navHistory.length > 0 ? navHistory[navHistory.length - 1] : defaultRoot;
+  const backLabel =
+    previousView === 'det' && selectedRoomCode
+      ? `Detail ${selectedRoomCode}`
+      : VIEW_LABELS[previousView] || 'Cari Ruang';
+  const rootNavLabel = VIEW_LABELS[rootNavView] || 'Cari Ruang';
 
   const value = {
     user,
@@ -436,6 +514,10 @@ export function SpaceHubProvider({ children }) {
     days,
     nowWib,
     activeView,
+    rootNavView,
+    rootNavLabel,
+    previousView,
+    backLabel,
     selectedRoomCode,
     detailDayIndex,
     setDetailDayIndex,
@@ -445,6 +527,12 @@ export function SpaceHubProvider({ children }) {
     updateFilter,
     toggleFacilityFilter,
     resetFilters,
+    planPrefs,
+    setPlanPrefs,
+    schedPrefs,
+    setSchedPrefs,
+    calPrefs,
+    setCalPrefs,
     toast,
     showToast,
     clearNotifications,
@@ -455,6 +543,7 @@ export function SpaceHubProvider({ children }) {
     navigate,
     openRoomDetail,
     openBookingForm,
+    goBack,
     goToFindWithDate,
     toggleFavorite,
     reportRoomUsed,

@@ -95,13 +95,13 @@ export default function AdminView() {
   }, [bookings, statusFilter, searchQuery]);
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#EAECEF] pb-6 dark:border-white/[0.08]">
+    <div className="space-y-7">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-[-0.02em] text-[#141923] dark:text-[#EEF2F7]">
+          <h1 className="text-2xl font-bold tracking-[-0.025em] text-[#101828] dark:text-[#F5F7FA]">
             Dashboard pengelola
           </h1>
-          <p className="mt-1 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+          <p className="mt-1 text-[13px] text-[#475467] dark:text-[#B0B8C9]">
             Keterisian ruang & riwayat pemakaian FEB UNNES.
           </p>
         </div>
@@ -116,75 +116,75 @@ export default function AdminView() {
         </div>
       </div>
 
-      {/* KPI Metrics — clean hairline grid, zero box-in-box clutter */}
+      {/* KPI Metrics */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="sh-panel p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+          <div className="flex items-center justify-between text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
             <span>Total ruang</span>
-            <Building2 className="h-4 w-4 text-[#7B869B]" />
+            <Building2 className="h-4 w-4 text-[#667085] dark:text-[#8A93A6]" />
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#101828] dark:text-[#F5F7FA]">
             {stats.totalRooms}
           </div>
         </div>
 
         <div className="sh-panel p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+          <div className="flex items-center justify-between text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
             <span>Booking aktif</span>
-            <CalendarCheck2 className="h-4 w-4 text-[#22A06B]" />
+            <CalendarCheck2 className="h-4 w-4 text-[#10B981]" />
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#101828] dark:text-[#F5F7FA]">
             {stats.activeBookingsCount}
           </div>
         </div>
 
         <div className="sh-panel p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+          <div className="flex items-center justify-between text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
             <span>Keterisian</span>
             <BarChart3 className="h-4 w-4 text-unnes-navy dark:text-unnes-gold" />
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#101828] dark:text-[#F5F7FA]">
             {stats.occupancyPct}%
           </div>
         </div>
 
         <div className="sh-panel p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+          <div className="flex items-center justify-between text-xs font-medium text-[#475467] dark:text-[#B0B8C9]">
             <span>Laporan lapangan</span>
-            <AlertTriangle className="h-4 w-4 text-[#D97706]" />
+            <AlertTriangle className="h-4 w-4 text-[#F59E0B]" />
           </div>
-          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
+          <div className="mt-2 font-mono text-2xl font-bold tabular-nums text-[#101828] dark:text-[#F5F7FA]">
             {stats.totalReports}
           </div>
         </div>
       </div>
 
       {/* Building Occupancy */}
-      <section className="space-y-4">
+      <section className="space-y-3.5">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-[15px] font-bold text-[#141923] dark:text-[#EEF2F7]">Keterisian per gedung</h2>
-          <span className="text-xs font-medium text-[#6B768C] dark:text-[#8E9BB3]">{targetDay.label}</span>
+          <h2 className="text-[15px] font-bold text-[#101828] dark:text-[#F5F7FA]">Keterisian per gedung</h2>
+          <span className="text-xs font-medium text-[#667085] dark:text-[#8A93A6]">{targetDay.label}</span>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           {stats.buildings.map((b) => (
             <div key={b.building} className="sh-panel p-4">
               <div className="flex items-baseline justify-between text-[13px]">
-                <span className="font-semibold text-[#141923] dark:text-[#EEF2F7]">
+                <span className="font-semibold text-[#101828] dark:text-[#F5F7FA]">
                   Gedung {b.building}{' '}
-                  <span className="font-normal text-[#6B768C] dark:text-[#8E9BB3]">({b.roomCount} ruang)</span>
+                  <span className="font-normal text-[#667085] dark:text-[#8A93A6]">({b.roomCount} ruang)</span>
                 </span>
                 <span className="font-mono font-bold tabular-nums text-unnes-navy dark:text-unnes-gold">
                   {b.pct}%
                 </span>
               </div>
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#EAEEF5] dark:bg-ink-subtle">
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#EAEEF4] dark:bg-ink-subtle">
                 <div
                   className="h-full rounded-full bg-unnes-navy transition-all dark:bg-unnes-gold"
                   style={{ width: `${b.pct}%` }}
                 />
               </div>
-              <div className="mt-2.5 flex justify-between text-xs tabular-nums text-[#5B667B] dark:text-[#9AA7BE]">
+              <div className="mt-2.5 flex justify-between text-xs tabular-nums text-[#475467] dark:text-[#B0B8C9]">
                 <span>Kuliah: {b.classSlots} slot</span>
                 <span>Booking: {b.bookedSlots} slot</span>
               </div>
@@ -195,7 +195,7 @@ export default function AdminView() {
 
       {/* Bookings & Reports Table */}
       <section className="sh-panel overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#EAECEF] px-5 py-4 dark:border-white/[0.08]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ECEFF4] px-5 py-4 dark:border-ink-line">
           <div className="flex gap-1.5">
             <button
               type="button"
@@ -216,7 +216,7 @@ export default function AdminView() {
           {tab === 'bookings' && (
             <div className="flex flex-wrap items-center gap-2.5">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7B869B]" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#667085] dark:text-[#8F98AD]" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -240,13 +240,13 @@ export default function AdminView() {
 
         {tab === 'bookings' ? (
           filteredBookings.length === 0 ? (
-            <div className="p-10 text-center text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+            <div className="p-10 text-center text-[13px] text-[#475467] dark:text-[#B0B8C9]">
               Belum ada data booking.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] text-left text-[13px]">
-                <thead className="border-b border-[#EAECEF] bg-[#F8F9FB] text-xs font-semibold text-[#5B667B] dark:border-white/[0.08] dark:bg-ink-subtle dark:text-[#9AA7BE]">
+                <thead className="border-b border-[#ECEFF4] bg-[#F8F9FB] text-xs font-semibold text-[#475467] dark:border-ink-line dark:bg-ink-subtle dark:text-[#B0B8C9]">
                   <tr>
                     <th className="px-5 py-3">Kode</th>
                     <th className="px-4 py-3">Ruang</th>
@@ -256,37 +256,37 @@ export default function AdminView() {
                     <th className="px-5 py-3 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#EAECEF] dark:divide-white/[0.06]">
+                <tbody className="divide-y divide-[#ECEFF4] dark:divide-ink-line/70">
                   {filteredBookings.map((b) => (
-                    <tr key={b.id} className="hover:bg-[#F8F9FB] dark:hover:bg-ink-subtle/60">
+                    <tr key={b.id} className="hover:bg-[#F8F9FB] dark:hover:bg-ink-subtle/40">
                       <td className="px-5 py-3 font-mono text-xs font-semibold tabular-nums text-unnes-navy dark:text-unnes-gold">
                         {b.id}
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs font-semibold text-[#141923] dark:text-[#EEF2F7]">
+                      <td className="px-4 py-3 font-mono text-xs font-semibold text-[#101828] dark:text-[#F5F7FA]">
                         {b.room_code}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="font-medium text-[#141923] dark:text-[#EEF2F7]">
+                        <span className="font-medium text-[#101828] dark:text-[#F5F7FA]">
                           {formatDateKeyLabel(b.booking_date, days)}
                         </span>
-                        <span className="ml-1.5 font-mono text-xs tabular-nums text-[#6B768C] dark:text-[#8E9BB3]">
+                        <span className="ml-1.5 font-mono text-xs tabular-nums text-[#667085] dark:text-[#8A93A6]">
                           {formatHourRange(b.start_hour, b.duration)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="font-medium text-[#141923] dark:text-[#EEF2F7]">{b.user_name}</span>
-                        <span className="ml-1.5 font-mono text-xs tabular-nums text-[#6B768C] dark:text-[#8E9BB3]">
+                        <span className="font-medium text-[#101828] dark:text-[#F5F7FA]">{b.user_name}</span>
+                        <span className="ml-1.5 font-mono text-xs tabular-nums text-[#667085] dark:text-[#8A93A6]">
                           {b.nim}
                         </span>
                       </td>
-                      <td className="max-w-[180px] truncate px-4 py-3 text-[#434E63] dark:text-[#B8C3D9]">
+                      <td className="max-w-[180px] truncate px-4 py-3 text-[#475467] dark:text-[#B0B8C9]">
                         {b.purpose}
                       </td>
                       <td className="px-5 py-3 text-right">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#434E63] dark:text-[#C4CFE2]">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#344054] dark:text-[#D0D7E6]">
                           <span
                             className={`h-2 w-2 rounded-full ${
-                              b.status === 'confirmed' ? 'bg-[#22A06B]' : 'bg-[#E11D48]'
+                              b.status === 'confirmed' ? 'bg-[#10B981]' : 'bg-rose-500'
                             }`}
                           />
                           {b.status === 'confirmed' ? 'Confirmed' : 'Cancelled'}
@@ -299,11 +299,11 @@ export default function AdminView() {
             </div>
           )
         ) : reports.length === 0 ? (
-          <div className="p-10 text-center text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">Belum ada laporan.</div>
+          <div className="p-10 text-center text-[13px] text-[#475467] dark:text-[#B0B8C9]">Belum ada laporan.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] text-left text-[13px]">
-              <thead className="border-b border-[#EAECEF] bg-[#F8F9FB] text-xs font-semibold text-[#5B667B] dark:border-white/[0.08] dark:bg-ink-subtle dark:text-[#9AA7BE]">
+              <thead className="border-b border-[#ECEFF4] bg-[#F8F9FB] text-xs font-semibold text-[#475467] dark:border-ink-line dark:bg-ink-subtle dark:text-[#B0B8C9]">
                 <tr>
                   <th className="px-5 py-3">Ruang</th>
                   <th className="px-4 py-3">Tanggal</th>
@@ -311,19 +311,19 @@ export default function AdminView() {
                   <th className="px-5 py-3">Pelapor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#EAECEF] dark:divide-white/[0.06]">
+              <tbody className="divide-y divide-[#ECEFF4] dark:divide-ink-line/70">
                 {reports.map((r) => (
-                  <tr key={r.id} className="hover:bg-[#F8F9FB] dark:hover:bg-ink-subtle/60">
-                    <td className="px-5 py-3 font-mono text-xs font-semibold text-[#141923] dark:text-[#EEF2F7]">
+                  <tr key={r.id} className="hover:bg-[#F8F9FB] dark:hover:bg-ink-subtle/40">
+                    <td className="px-5 py-3 font-mono text-xs font-semibold text-[#101828] dark:text-[#F5F7FA]">
                       {r.room_code}
                     </td>
-                    <td className="px-4 py-3 text-[#141923] dark:text-[#EEF2F7]">
+                    <td className="px-4 py-3 text-[#101828] dark:text-[#F5F7FA]">
                       {formatDateKeyLabel(r.report_date, days)}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs font-semibold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
+                    <td className="px-4 py-3 font-mono text-xs font-semibold tabular-nums text-[#101828] dark:text-[#F5F7FA]">
                       {formatHour(r.report_hour)} WIB
                     </td>
-                    <td className="px-5 py-3 text-[#5B667B] dark:text-[#9AA7BE]">{r.reported_by}</td>
+                    <td className="px-5 py-3 text-[#475467] dark:text-[#B0B8C9]">{r.reported_by}</td>
                   </tr>
                 ))}
               </tbody>
