@@ -40,7 +40,7 @@ export default function FindView() {
 
   const floorOptions = useMemo(
     () => [
-      { value: '', label: `Semua Gedung (${rooms.length})` },
+      { value: '', label: `Semua gedung (${rooms.length})` },
       ...getFloorOptions(rooms).map(([key, label]) => ({ value: key, label })),
     ],
     [rooms]
@@ -52,14 +52,14 @@ export default function FindView() {
   );
 
   const capOptions = [
-    { value: 0, label: 'Semua Kapasitas' },
+    { value: 0, label: 'Semua kapasitas' },
     { value: 30, label: '30+ kursi' },
     { value: 45, label: '45+ kursi' },
     { value: 60, label: '60+ kursi' },
   ];
 
   const priceOptions = [
-    { value: 'all', label: 'Semua Tarif' },
+    { value: 'all', label: 'Semua tarif' },
     { value: 'free', label: 'Gratis Mahasiswa FEB' },
     { value: 'paid', label: 'Lab / Berbayar' },
   ];
@@ -155,36 +155,36 @@ export default function FindView() {
     Boolean(filters.search.trim());
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
-            Cari Ruang Kosong
-          </h1>
-          <p className="mt-1 font-mono text-xs text-[#526382] dark:text-unnes-night-muted">
-            {selectedDay.label} · {formatHour(filters.start)} ({filters.dur}j) · {nowWib.timeLabel}
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Header + Filter duduk langsung di kanvas bersih (tanpa box-in-box) */}
+      <div className="space-y-6 border-b border-[#EAECEF] pb-6 dark:border-white/[0.08]">
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-[-0.02em] text-[#141923] dark:text-[#EEF2F7]">
+              Cari ruang
+            </h1>
+            <p className="mt-1 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+              {selectedDay.label}, {formatHour(filters.start)} ({filters.dur} jam) · {nowWib.timeLabel}
+            </p>
+          </div>
 
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-[#0F1B33] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-[#F1F5FB]">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <strong className="font-mono">{filteredRooms.length}</strong> tersedia
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-medium text-[#526382] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-unnes-night-muted">
-            Kosong kini: <strong className="font-mono text-[#0F1B33] dark:text-[#F1F5FB]">{freeNowCount}</strong>
-          </span>
-          {!isAdmin && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-medium text-[#526382] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-unnes-night-muted">
-              <Star className="h-3.5 w-3.5 fill-unnes-gold text-unnes-gold" />
-              <strong className="font-mono text-[#0F1B33] dark:text-[#F1F5FB]">{favorites.size}</strong>
+          <div className="flex items-center gap-5 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+            <span>
+              <strong className="tabular-nums font-semibold text-[#141923] dark:text-[#EEF2F7]">
+                {filteredRooms.length}
+              </strong>{' '}
+              tersedia
             </span>
-          )}
+            <span>
+              <strong className="tabular-nums font-semibold text-[#141923] dark:text-[#EEF2F7]">
+                {freeNowCount}
+              </strong>{' '}
+              kosong kini
+            </span>
+          </div>
         </div>
-      </div>
 
-      {/* Symmetrical 2-Row Filter Bar */}
-      <section className="sh-card space-y-4 p-4 sm:p-5">
+        {/* Row 1 */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-3">
             <DatePickerPopover
@@ -197,7 +197,7 @@ export default function FindView() {
 
           <div className="lg:col-span-3">
             <SelectPopover
-              label="Jam Mulai"
+              label="Jam mulai"
               icon={Clock}
               value={filters.start}
               onChange={(v) => updateFilter('start', Number(v))}
@@ -206,19 +206,17 @@ export default function FindView() {
           </div>
 
           <div className="lg:col-span-2">
-            <span className="mb-1.5 block text-[11px] font-semibold text-[#526382] dark:text-unnes-night-muted">
-              Durasi
-            </span>
-            <div className="grid h-10 grid-cols-3 rounded-lg border border-line-light bg-surface-subtle p-1 dark:border-unnes-night-line dark:bg-unnes-night-input">
+            <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">Durasi</span>
+            <div className="grid h-10 grid-cols-3 rounded-lg bg-[#F1F3F7] p-1 dark:bg-ink-card">
               {[1, 2, 3].map((d) => (
                 <button
                   key={d}
                   type="button"
                   onClick={() => updateFilter('dur', d)}
-                  className={`rounded-md font-mono text-xs font-bold transition ${
+                  className={`rounded-md text-xs font-semibold tabular-nums transition ${
                     filters.dur === d
-                      ? 'bg-unnes-royal text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
-                      : 'text-[#4B5E82] hover:text-[#0F1B33] dark:text-unnes-night-muted dark:hover:text-white'
+                      ? 'bg-unnes-navy text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                      : 'text-[#5B667B] hover:text-[#141923] dark:text-[#9AA7BE] dark:hover:text-[#EEF2F7]'
                   }`}
                 >
                   {d}j
@@ -228,11 +226,11 @@ export default function FindView() {
           </div>
 
           <div className="lg:col-span-4">
-            <span className="mb-1.5 block text-[11px] font-semibold text-[#526382] dark:text-unnes-night-muted">
-              Cari Kode Ruang
+            <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">
+              Cari kode ruang
             </span>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7B869B]" />
               <input
                 type="text"
                 value={filters.search}
@@ -244,7 +242,8 @@ export default function FindView() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 border-t border-line-light pt-3.5 dark:border-unnes-night-line sm:grid-cols-2 lg:grid-cols-5">
+        {/* Row 2 */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <SelectPopover
             icon={Building2}
             value={filters.floorKey}
@@ -279,28 +278,22 @@ export default function FindView() {
             onClick={() => setShowFacilities((s) => !s)}
             className={`sh-control flex items-center justify-between gap-2 ${
               showFacilities || activeFacCount > 0
-                ? 'border-unnes-royal text-unnes-royal dark:border-unnes-gold dark:text-unnes-gold'
+                ? 'border-unnes-navy text-unnes-navy dark:border-unnes-gold dark:text-unnes-gold'
                 : ''
             }`}
           >
-            <span className="flex items-center gap-2 font-semibold">
+            <span className="flex items-center gap-2 font-medium">
               <SlidersHorizontal className="h-4 w-4" />
               Fasilitas
             </span>
-            {activeFacCount > 0 ? (
-              <span className="rounded bg-unnes-royal px-1.5 py-0.5 font-mono text-[10px] font-bold text-white dark:bg-unnes-gold dark:text-unnes-gold-ink">
-                {activeFacCount}
-              </span>
-            ) : (
-              <span className="text-xs text-[#6A7B9C] dark:text-unnes-night-muted">
-                {showFacilities ? 'Tutup' : 'Pilih'}
-              </span>
-            )}
+            <span className="tabular-nums text-xs text-[#7B869B] dark:text-[#9AA7BE]">
+              {activeFacCount > 0 ? `${activeFacCount} aktif` : showFacilities ? 'Tutup' : 'Pilih'}
+            </span>
           </button>
         </div>
 
         {(showFacilities || activeFacCount > 0) && (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface-subtle px-3.5 py-2.5 dark:bg-unnes-night-input">
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
             <div className="flex flex-wrap items-center gap-1.5">
               {FACILITY_OPTIONS.map((fac) => {
                 const active = filters.facilities.includes(fac);
@@ -332,36 +325,39 @@ export default function FindView() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[#526382] transition hover:text-unnes-royal dark:text-unnes-night-muted dark:hover:text-unnes-gold"
+                className="inline-flex items-center gap-1 text-xs font-medium text-[#5B667B] hover:text-[#141923] dark:text-[#9AA7BE] dark:hover:text-[#EEF2F7]"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
-                Reset
+                Reset filter
               </button>
             )}
           </div>
         )}
-      </section>
+      </div>
 
+      {/* Airbnb-style 3-column Room Grid */}
       {loading ? (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, idx) => (
             <SkeletonCard key={idx} />
           ))}
         </div>
       ) : filteredRooms.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
           {filteredRooms.map((room) => (
             <RoomCard key={room.code} room={room} dayIndex={filters.day} />
           ))}
         </div>
       ) : (
-        <div className="sh-card border-dashed px-6 py-14 text-center">
-          <p className="text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">Tidak ada ruang kosong di slot ini.</p>
-          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">
-            Ubah tanggal, jam mulai, atau reset filter untuk melihat ruang lain.
+        <div className="py-16 text-center">
+          <p className="text-[15px] font-semibold text-[#141923] dark:text-[#EEF2F7]">
+            Tidak ada ruang kosong di slot ini
+          </p>
+          <p className="mt-1 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+            Coba pilih tanggal atau jam mulai lain.
           </p>
           <button type="button" onClick={resetFilters} className="sh-btn-secondary mt-4">
-            Reset Filter
+            Reset filter
           </button>
         </div>
       )}

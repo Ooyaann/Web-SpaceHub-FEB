@@ -34,9 +34,7 @@ export default function SelectPopover({
   return (
     <div ref={ref} className={`relative ${className}`}>
       {label && (
-        <span className="mb-1.5 block text-[11px] font-semibold text-[#526382] dark:text-unnes-night-muted">
-          {label}
-        </span>
+        <span className="mb-1.5 block text-xs font-medium text-[#5B667B] dark:text-[#9AA7BE]">{label}</span>
       )}
 
       <button
@@ -44,16 +42,16 @@ export default function SelectPopover({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={`sh-control flex items-center justify-between gap-2 text-left ${
-          open ? 'border-unnes-royal ring-2 ring-unnes-royal/15 dark:border-unnes-gold dark:ring-unnes-gold/20' : ''
+          open ? 'border-unnes-navy bg-white dark:border-unnes-gold dark:bg-ink-subtle' : ''
         }`}
       >
         <span className="flex min-w-0 items-center gap-2 truncate">
-          {Icon && <Icon className="h-4 w-4 flex-none text-[#6A7B9C] dark:text-[#6E82AA]" />}
-          <span className="truncate font-semibold">{selected ? selected.label : placeholder}</span>
+          {Icon && <Icon className="h-4 w-4 flex-none text-[#7B869B] dark:text-[#8693AA]" />}
+          <span className="truncate font-medium">{selected ? selected.label : placeholder}</span>
         </span>
         <ChevronDown
-          className={`h-4 w-4 flex-none text-[#6A7B9C] transition-transform duration-150 dark:text-[#6E82AA] ${
-            open ? 'rotate-180 text-unnes-royal dark:text-unnes-gold' : ''
+          className={`h-4 w-4 flex-none text-[#7B869B] transition-transform duration-150 dark:text-[#8693AA] ${
+            open ? 'rotate-180 text-unnes-navy dark:text-unnes-gold' : ''
           }`}
         />
       </button>
@@ -61,7 +59,7 @@ export default function SelectPopover({
       {open && (
         <div
           role="listbox"
-          className={`absolute z-50 mt-1.5 max-h-64 min-w-full overflow-y-auto rounded-lg border border-line-light bg-white p-1 shadow-popover dark:border-unnes-night-line dark:bg-[#13203A] ${
+          className={`absolute z-50 mt-1.5 max-h-64 min-w-full overflow-y-auto rounded-lg border border-[#E2E6EE] bg-white p-1 shadow-popover dark:border-white/[0.1] dark:bg-ink-card dark:shadow-popover-dark ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
@@ -77,10 +75,10 @@ export default function SelectPopover({
                   onChange(opt.value);
                   setOpen(false);
                 }}
-                className={`flex w-full items-center justify-between gap-3 rounded-md px-2.5 py-2 text-left text-xs transition ${
+                className={`flex w-full items-center justify-between gap-3 rounded-md px-2.5 py-2 text-left text-[13px] transition ${
                   active
-                    ? 'bg-unnes-royal/10 font-bold text-unnes-royal dark:bg-unnes-gold/15 dark:text-unnes-gold'
-                    : 'font-medium text-[#243452] hover:bg-surface-subtle dark:text-[#D9E3F5] dark:hover:bg-[#1B2B4B]'
+                    ? 'bg-[#EEF2FA] font-semibold text-unnes-navy dark:bg-ink-subtle dark:text-unnes-gold'
+                    : 'font-normal text-[#2D3648] hover:bg-[#F5F7FA] dark:text-[#DCE3F0] dark:hover:bg-ink-subtle/70'
                 }`}
               >
                 <span className="truncate">{opt.label}</span>

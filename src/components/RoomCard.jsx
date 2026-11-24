@@ -1,8 +1,13 @@
-import { ArrowUpRight, Star, Users } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { formatHour, formatPriceBadge } from '../lib/dateWib';
 import { getFreeUntilHour } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
 
+/**
+ * RoomCard — Gaya Airbnb/PeerSpace yang bersih:
+ * - Foto 100% utuh tanpa teks/gradient menutupi gambar.
+ * - Tipografi tenang & rapi di bawah foto, fasilitas dipisah middot (tanpa spam kotak pill).
+ */
 export default function RoomCard({ room, dayIndex }) {
   const { days, bookings, reports, user, isAdmin, nowWib, filters, favorites, openRoomDetail, toggleFavorite } =
     useSpaceHub();
@@ -36,26 +41,16 @@ export default function RoomCard({ room, dayIndex }) {
           openRoomDetail(room.code, targetDayIdx);
         }
       }}
-      className="sh-card group flex cursor-pointer flex-col overflow-hidden text-left transition duration-150 hover:border-[#A8B8D8] dark:hover:border-[#344A75]"
+      className="group flex cursor-pointer flex-col text-left"
     >
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface-subtle dark:bg-unnes-night-input">
+      {/* Foto Bersih 100% (tanpa teks / scrim hitam) */}
+      <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-[#EEF0F4] dark:bg-ink-card">
         <img
           src={room.image_url}
           alt={`Ruang ${room.code}`}
           loading="lazy"
           className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#070D1A]/80 via-[#070D1A]/15 to-transparent" />
-
-        <span
-          className={`absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-bold ${
-            isFreeStart
-              ? 'bg-emerald-700/95 text-white'
-              : 'bg-[#070D1A]/75 text-slate-200 backdrop-blur-sm'
-          }`}
-        >
-          {isFreeStart ? `Kosong s.d. ${formatHour(freeUntil)}` : `Terisi ${formatHour(filters.start)}`}
-        </span>
 
         {!isAdmin && (
           <button
@@ -65,51 +60,39 @@ export default function RoomCard({ room, dayIndex }) {
               e.stopPropagation();
               toggleFavorite(room.code);
             }}
-            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[#070D1A]/50 text-white backdrop-blur-sm transition hover:bg-[#070D1A]/75"
+            className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#141923] shadow-sm transition hover:scale-105 hover:bg-white dark:bg-ink-rail/85 dark:text-[#EEF2F7]"
           >
-            <Star className={`h-4 w-4 ${isFav ? 'fill-unnes-gold text-unnes-gold' : 'text-white/90'}`} />
+            <Star className={`h-4 w-4 ${isFav ? 'fill-unnes-gold text-unnes-gold' : ''}`} />
           </button>
         )}
-
-        <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between text-white">
-          <div>
-            <h3 className="font-mono text-base font-bold leading-tight tracking-tight">{room.code}</h3>
-            <span className="text-[11px] font-medium text-[#D5E0F5]">
-              Gedung {room.building} · Lt. {room.floor}
-            </span>
-          </div>
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/15 text-white opacity-0 transition group-hover:opacity-100">
-            <ArrowUpRight className="h-4 w-4" />
-          </span>
-        </div>
       </div>
 
-      <div className="flex flex-1 flex-col justify-between gap-3 p-3.5">
-        <div className="flex items-center justify-between gap-2">
-          <span
-            className={`text-xs font-bold ${
-              isPaid
-                ? 'text-amber-700 dark:text-unnes-gold'
-                : 'text-emerald-700 dark:text-emerald-400'
-            }`}
-          >
-            {formatPriceBadge(room.price_per_hour)}
-          </span>
-          <span className="inline-flex items-center gap-1 font-mono text-xs font-semibold text-[#526382] dark:text-unnes-night-muted">
-            <Users className="h-3.5 w-3.5" />
-            {room.capacity}
+      {/* Konten Tipografi Bersih di Bawah Foto */}
+      <div className="mt-3 space-y-1">
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="text-[15px] font-bold tracking-tight text-[#141923] group-hover:text-unnes-navy dark:text-[#EEF2F7] dark:group-hover:text-unnes-gold">
+            {room.code}
+          </h3>
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2E384D] dark:text-[#C8D2E3]">
+            <span
+              className={`h-2 w-2 rounded-full ${isFreeStart ? 'bg-[#22A06B]' : 'bg-[#9CA6BA]'}`}
+            />
+            {isFreeStart ? `Kosong s.d. ${formatHour(freeUntil)}` : `Terisi ${formatHour(filters.start)}`}
           </span>
         </div>
 
-        <div className="flex flex-wrap gap-1 border-t border-line-light pt-2.5 dark:border-unnes-night-line">
-          {(room.facilities || []).map((f) => (
-            <span
-              key={f}
-              className="rounded bg-surface-subtle px-1.5 py-0.5 text-[10px] font-semibold text-[#3C4E70] dark:bg-[#192746] dark:text-[#B9C8E4]"
-            >
-              {f}
-            </span>
-          ))}
+        <p className="text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+          Gedung {room.building} · Lantai {room.floor} · {room.capacity} kursi
+        </p>
+
+        <p className="truncate text-xs text-[#7B869B] dark:text-[#7E8CA6]">
+          {(room.facilities || []).join(' · ')}
+        </p>
+
+        <div className="pt-1 text-[13px] font-semibold text-[#141923] dark:text-[#EEF2F7]">
+          <span className={isPaid ? 'text-[#9A5B00] dark:text-unnes-gold' : ''}>
+            {formatPriceBadge(room.price_per_hour)}
+          </span>
         </div>
       </div>
     </article>

@@ -16,13 +16,13 @@ export default function FavoritesView() {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#EAECEF] pb-6 dark:border-white/[0.08]">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
-            Ruang Favorit
+          <h1 className="text-2xl font-bold tracking-[-0.02em] text-[#141923] dark:text-[#EEF2F7]">
+            Ruang favorit
           </h1>
-          <p className="mt-1 font-mono text-xs text-[#526382] dark:text-unnes-night-muted">
+          <p className="mt-1 text-[13px] tabular-nums text-[#5B667B] dark:text-[#9AA7BE]">
             {favRooms.length} ruang tersimpan.
           </p>
         </div>
@@ -46,16 +46,19 @@ export default function FavoritesView() {
       </div>
 
       {favRooms.length > 0 ? (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
           {favRooms.map((r) => (
             <RoomCard key={r.code} room={r} dayIndex={filters.day} />
           ))}
         </div>
       ) : (
-        <div className="sh-card border-dashed px-6 py-14 text-center">
-          <p className="text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">Belum ada ruang favorit.</p>
-          <button type="button" onClick={() => navigate('find')} className="sh-btn-primary mt-4">
-            Cari Ruang
+        <div className="py-16 text-center">
+          <p className="text-[15px] font-semibold text-[#141923] dark:text-[#EEF2F7]">Belum ada ruang favorit</p>
+          <p className="mt-1 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+            Simpan ruang yang sering dipakai agar cepat ditemukan kembali.
+          </p>
+          <button type="button" onClick={() => navigate('find')} className="sh-btn-primary mt-5">
+            Cari ruang
           </button>
         </div>
       )}

@@ -58,22 +58,22 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas-light text-[#0F1B33] dark:bg-canvas-dark dark:text-[#F1F5FB] lg:flex">
+    <div className="min-h-screen bg-white text-[#141923] dark:bg-ink-canvas dark:text-[#EEF2F7] lg:flex">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />
         {!isSupabaseConfigured && (
-          <div className="border-b border-unnes-gold/40 bg-[#FFFBEB] px-4 py-1.5 text-[11px] font-medium text-[#78350F] dark:border-unnes-gold/25 dark:bg-unnes-gold/10 dark:text-[#FDE68A]">
-            <div className="mx-auto flex max-w-6xl items-center gap-1.5">
-              <Database className="h-3.5 w-3.5 flex-none" />
+          <div className="border-b border-[#EAECEF] bg-[#F8F9FB] px-4 py-2 text-xs text-[#59647A] dark:border-white/[0.07] dark:bg-ink-card dark:text-[#9AA7BE]">
+            <div className="mx-auto flex max-w-6xl items-center gap-2">
+              <Database className="h-3.5 w-3.5 flex-none text-unnes-navy dark:text-unnes-gold" />
               <span>
-                <strong>Mode Demo Lokal</strong> — isi <code className="font-mono">.env</code> Supabase untuk sinkronisasi
+                Mode demo lokal aktif. Isi <code className="font-mono text-[11px]">.env</code> Supabase untuk sinkronisasi
                 lintas perangkat.
               </span>
             </div>
           </div>
         )}
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-7 sm:px-8 lg:px-10 lg:py-9">
           {renderView()}
         </main>
       </div>

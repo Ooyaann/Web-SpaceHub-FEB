@@ -2,12 +2,13 @@ import { OPERATIONAL_HOURS, SLOT_LABELS } from '../lib/constants';
 import { formatHour, pad2 } from '../lib/dateWib';
 import { getSlotStatus } from '../lib/schedule';
 
+/* Solid, opaque, low-chroma colors — ZERO translucent neon borders */
 const BAR_COLORS = {
-  f: 'bg-emerald-100 border border-emerald-300 dark:bg-emerald-500/20 dark:border-emerald-500/45',
-  k: 'bg-blue-100 border border-blue-200 dark:bg-[#25458A]/55 dark:border-[#3A65BF]/60',
-  o: 'bg-amber-100 border border-amber-200 dark:bg-amber-500/20 dark:border-amber-500/45',
-  m: 'bg-unnes-gold/75 border border-unnes-gold dark:bg-unnes-gold/80 dark:border-unnes-gold',
-  p: 'bg-slate-100 border border-slate-200/80 dark:bg-[#17223B] dark:border-[#223152]',
+  f: 'bg-[#DFF3E8] dark:bg-[#1E3B30]',
+  k: 'bg-[#E3ECFC] dark:bg-[#233252]',
+  o: 'bg-[#FCECD7] dark:bg-[#3B2E20]',
+  m: 'bg-[#FDEBA3] dark:bg-[#473B1A]',
+  p: 'bg-[#F0F2F6] dark:bg-[#1D2331]',
 };
 
 export default function HourBar({
@@ -43,9 +44,9 @@ export default function HourBar({
           const highlighted = highlightStart >= 0 && h >= highlightStart && h < highlightStart + highlightDur;
           const clickable = Boolean(onSelectHour) && status === 'f' && h <= 15;
 
-          const baseClass = `${compact ? 'h-5' : 'h-7'} rounded-[5px] transition ${BAR_COLORS[status]} ${
+          const baseClass = `${compact ? 'h-5' : 'h-7'} rounded-md transition ${BAR_COLORS[status]} ${
             highlighted
-              ? 'ring-2 ring-unnes-royal ring-offset-1 ring-offset-white dark:ring-unnes-gold dark:ring-offset-unnes-night-card'
+              ? 'ring-2 ring-unnes-navy ring-offset-1 ring-offset-white dark:ring-unnes-gold dark:ring-offset-ink-card'
               : ''
           }`;
 
@@ -55,8 +56,8 @@ export default function HourBar({
                 key={h}
                 type="button"
                 onClick={() => onSelectHour(h)}
-                title={`Klik untuk booking ${formatHour(h)}`}
-                className={`${baseClass} cursor-pointer hover:border-emerald-600 hover:bg-emerald-200 dark:hover:border-emerald-300 dark:hover:bg-emerald-500/35`}
+                title={`Booking mulai ${formatHour(h)}`}
+                className={`${baseClass} cursor-pointer hover:bg-[#BFE7D2] dark:hover:bg-[#295242]`}
               />
             );
           }
@@ -69,7 +70,7 @@ export default function HourBar({
           {OPERATIONAL_HOURS.map((h) => (
             <span
               key={h}
-              className="text-center font-mono text-[10px] font-medium tabular-nums text-[#6A7B9C] dark:text-[#6E82AA]"
+              className="text-center text-[11px] font-medium tabular-nums text-[#7B869B] dark:text-[#7E8CA6]"
             >
               {pad2(h)}
             </span>

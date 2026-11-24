@@ -12,7 +12,7 @@ export default function Toast() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-5 left-1/2 z-50 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-lg border border-unnes-gold/40 bg-unnes-navy px-4 py-3 text-xs font-semibold text-white shadow-popover dark:bg-[#162340]"
+      className="fixed bottom-5 left-1/2 z-50 flex max-w-[92vw] -translate-x-1/2 items-center gap-2.5 rounded-lg bg-[#141923] px-4 py-3 text-[13px] font-medium text-white shadow-popover dark:border dark:border-white/10 dark:bg-ink-subtle"
     >
       <Icon
         className={`h-4 w-4 flex-none ${

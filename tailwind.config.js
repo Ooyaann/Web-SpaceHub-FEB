@@ -10,38 +10,24 @@ export default {
       },
       colors: {
         unnes: {
-          navy: '#0B2459',
-          royal: '#0B2A6F',
-          'royal-hover': '#081E52',
-          gold: '#FFC72C',
-          'gold-hover': '#F0B400',
-          'gold-ink': '#0B1221',
-          // Dark mode: composed UNNES midnight navy ramp
-          'night-rail': '#070D1A',
-          'night-bg': '#0B1221',
-          'night-card': '#111B30',
-          'night-input': '#0E172A',
-          'night-line': '#1E2C4A',
-          'night-muted': '#94A6C8',
+          navy: '#0F2A5E',
+          'navy-hover': '#0B204A',
+          gold: '#F4B918',
+          'gold-hover': '#E0A80D',
+          'gold-ink': '#111622',
         },
-        canvas: {
-          light: '#F6F7F9',
-          dark: '#0B1221',
-        },
-        surface: {
-          light: '#FFFFFF',
-          dark: '#111B30',
-          subtle: '#EFF2F7',
-          'subtle-dark': '#0E172A',
-        },
-        line: {
-          light: '#DFE4EE',
-          dark: '#1E2C4A',
+        // Elevated, comfortable dark mode (NOT pitch black)
+        ink: {
+          canvas: '#161B26',
+          rail: '#111622',
+          card: '#1E2534',
+          subtle: '#252E40',
+          hover: '#2B354A',
         },
       },
       boxShadow: {
-        subtle: '0 1px 2px rgba(11, 36, 89, 0.05)',
-        popover: '0 14px 36px -8px rgba(7, 13, 26, 0.28), 0 2px 6px rgba(7, 13, 26, 0.08)',
+        popover: '0 12px 32px -8px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.06)',
+        'popover-dark': '0 16px 40px -8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08)',
       },
     },
   },

@@ -28,22 +28,22 @@ export default function MobileNav() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-unnes-navy/80 bg-unnes-navy text-white dark:border-unnes-night-line dark:bg-unnes-night-rail lg:hidden">
+    <header className="sticky top-0 z-30 bg-unnes-navy text-white dark:border-b dark:border-white/[0.06] dark:bg-ink-rail lg:hidden">
       <div className="flex items-center justify-between px-4 py-3">
         <button type="button" onClick={() => navigate(isAdmin ? 'admin' : 'find')} className="text-left">
           <span className="text-lg font-extrabold tracking-[-0.03em] text-white">
             Space<span className="text-unnes-gold">Hub</span>
           </span>
-          <span className="ml-2 text-[10px] font-semibold tracking-wider text-[#9BB2DF]">FEB UNNES</span>
+          <span className="ml-2 text-xs font-medium text-[#A8BCE2] dark:text-[#7D8DA8]">FEB UNNES</span>
         </button>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => refreshData(true)}
             disabled={syncing}
             aria-label="Muat ulang"
-            className="rounded-lg border border-white/15 p-1.5 text-[#C7D7F5]"
+            className="rounded-lg p-1.5 text-[#C2D3F2]"
           >
             <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
           </button>
@@ -51,7 +51,7 @@ export default function MobileNav() {
             type="button"
             onClick={toggleTheme}
             aria-label="Ubah tema"
-            className="rounded-lg border border-white/15 p-1.5 text-[#C7D7F5]"
+            className="rounded-lg p-1.5 text-[#C2D3F2]"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -59,14 +59,14 @@ export default function MobileNav() {
             type="button"
             onClick={logout}
             aria-label="Keluar"
-            className="rounded-lg border border-white/15 p-1.5 text-[#C7D7F5]"
+            className="rounded-lg p-1.5 text-[#C2D3F2]"
           >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      <nav aria-label="Navigasi mobile" className="no-scrollbar flex gap-1.5 overflow-x-auto px-3 pb-2.5">
+      <nav aria-label="Navigasi mobile" className="no-scrollbar flex gap-1 overflow-x-auto px-3 pb-2.5">
         {items.map(({ id, label, icon: Icon }) => {
           const isActive = currentNav === id;
           const badge = getBadge(id);
@@ -75,23 +75,15 @@ export default function MobileNav() {
               key={id}
               type="button"
               onClick={() => navigate(id)}
-              className={`flex flex-none items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+              className={`flex flex-none items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition ${
                 isActive
-                  ? 'bg-unnes-gold font-bold text-unnes-gold-ink'
-                  : 'bg-white/10 text-[#DCE7FA]'
+                  ? 'bg-unnes-gold font-semibold text-unnes-gold-ink'
+                  : 'text-[#C8D7F2] hover:bg-white/10'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
               {label}
-              {badge > 0 && (
-                <span
-                  className={`rounded px-1 font-mono text-[10px] font-bold ${
-                    isActive ? 'bg-unnes-navy text-white' : 'bg-white/15 text-unnes-gold'
-                  }`}
-                >
-                  {badge}
-                </span>
-              )}
+              {badge > 0 && <span className="tabular-nums opacity-80">({badge})</span>}
             </button>
           );
         })}

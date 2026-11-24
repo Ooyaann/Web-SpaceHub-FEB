@@ -9,39 +9,38 @@
   }
 
   ::selection {
-    @apply bg-unnes-gold/35 text-unnes-navy dark:bg-unnes-gold/30 dark:text-unnes-gold;
+    @apply bg-unnes-gold/30 text-unnes-navy dark:bg-unnes-gold/30 dark:text-unnes-gold;
   }
 
   :focus-visible {
-    @apply outline-none ring-2 ring-unnes-gold ring-offset-2 ring-offset-white dark:ring-offset-unnes-night-bg;
+    @apply outline-none ring-2 ring-unnes-navy/40 ring-offset-2 ring-offset-white dark:ring-unnes-gold/60 dark:ring-offset-ink-canvas;
   }
 }
 
 @layer components {
-  /* Swiss architectural hairline surface — no generic blurry SaaS drop shadows */
-  .sh-card {
-    @apply rounded-xl border border-line-light bg-surface-light shadow-subtle dark:border-unnes-night-line dark:bg-unnes-night-card;
+  /* Solid, calm surface with whisper-quiet border — no blurred shadows, no neon tints */
+  .sh-panel {
+    @apply rounded-xl border border-[#E6E9F0] bg-white dark:border-white/[0.08] dark:bg-ink-card;
   }
 
   .sh-control {
-    @apply h-10 w-full rounded-lg border border-line-light bg-white px-3 text-sm font-medium text-[#0F1B33] transition placeholder:text-slate-400 hover:border-[#B8C4DA] focus:border-unnes-royal focus:outline-none focus:ring-2 focus:ring-unnes-royal/15 dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-[#F1F5FB] dark:placeholder:text-[#5B6E94] dark:hover:border-[#32466F] dark:focus:border-unnes-gold dark:focus:ring-unnes-gold/20;
+    @apply h-10 w-full rounded-lg border border-[#DCE1EA] bg-[#F8F9FB] px-3 text-[13px] font-medium text-[#141923] transition placeholder:text-[#8A94A6] hover:border-[#BFC7D6] focus:border-unnes-navy focus:bg-white focus:outline-none dark:border-white/[0.1] dark:bg-ink-card dark:text-[#EEF2F7] dark:placeholder:text-[#738099] dark:hover:border-white/[0.18] dark:focus:border-unnes-gold dark:focus:bg-ink-subtle;
   }
 
-  /* Light: UNNES Royal Navy primary; Dark: UNNES Gold with Midnight Ink (WCAG AAA) */
   .sh-btn-primary {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-unnes-royal px-4 text-sm font-bold text-white transition hover:bg-unnes-royal-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-45 dark:bg-unnes-gold dark:text-unnes-gold-ink dark:hover:bg-unnes-gold-hover;
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-unnes-navy px-4 text-[13px] font-semibold text-white transition hover:bg-unnes-navy-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-45 dark:bg-unnes-gold dark:text-unnes-gold-ink dark:hover:bg-unnes-gold-hover;
   }
 
   .sh-btn-secondary {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-line-light bg-white px-4 text-sm font-semibold text-[#1B2B4B] transition hover:border-[#B8C4DA] hover:bg-surface-subtle active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-45 dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-[#D9E3F5] dark:hover:border-[#32466F] dark:hover:bg-[#16223C];
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-[#DCE1EA] bg-white px-4 text-[13px] font-semibold text-[#1E2636] transition hover:bg-[#F4F6F9] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/[0.1] dark:bg-ink-card dark:text-[#E2E8F2] dark:hover:bg-ink-subtle;
   }
 
   .sh-chip {
-    @apply inline-flex h-8 items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 text-xs font-semibold text-[#334463] transition hover:border-[#B8C4DA] hover:text-[#0F1B33] dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-unnes-night-muted dark:hover:border-[#32466F] dark:hover:text-[#F1F5FB];
+    @apply inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E6EE] bg-white px-3 text-xs font-medium text-[#434E63] transition hover:border-[#C2CAD8] hover:text-[#141923] dark:border-white/[0.1] dark:bg-ink-card dark:text-[#A9B4C9] dark:hover:border-white/[0.2] dark:hover:text-[#EEF2F7];
   }
 
   .sh-chip-active {
-    @apply border-unnes-royal bg-unnes-royal text-white hover:border-unnes-royal hover:text-white dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink dark:hover:border-unnes-gold dark:hover:text-unnes-gold-ink;
+    @apply border-unnes-navy bg-unnes-navy font-semibold text-white hover:border-unnes-navy hover:text-white dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink dark:hover:border-unnes-gold dark:hover:text-unnes-gold-ink;
   }
 }
 

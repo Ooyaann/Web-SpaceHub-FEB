@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   ChevronRight,
   DoorOpen,
-  Users,
 } from 'lucide-react';
 import { OPERATIONAL_HOURS } from '../lib/constants';
 import { formatHourRange, pad2 } from '../lib/dateWib';
@@ -47,13 +46,12 @@ export default function CalendarView() {
   } = useSpaceHub();
 
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
-  const [scope, setScope] = useState('ALL'); // 'ALL' | 'B:L2' | 'B:L4' | 'B:L5' | 'R:L4 512'
+  const [scope, setScope] = useState('ALL');
   const [panelTab, setPanelTab] = useState('idle');
 
   const dayByKey = useMemo(() => new Map(days.map((d) => [d.key, d])), [days]);
   const roomByCode = useMemo(() => new Map(rooms.map((r) => [r.code, r])), [rooms]);
 
-  // Daftar bulan unik dalam rentang 31 hari WIB (mis. Nov 2026 & Des 2026)
   const availableMonths = useMemo(() => {
     const seen = [];
     for (const d of days) {
@@ -71,7 +69,7 @@ export default function CalendarView() {
 
   const scopeOptions = useMemo(() => {
     const base = [
-      { value: 'ALL', label: `Semua Ruang (${rooms.length})` },
+      { value: 'ALL', label: `Semua ruang (${rooms.length})` },
       { value: 'B:L2', label: 'Gedung L2 (8 ruang)' },
       { value: 'B:L4', label: 'Gedung L4 (41 ruang)' },
       { value: 'B:L5', label: 'Gedung L5 (15 ruang)' },
@@ -88,14 +86,10 @@ export default function CalendarView() {
 
   const scopedRooms = useMemo(() => {
     if (scope === 'ALL') return rooms;
-    if (scope.startsWith('B:')) {
-      const b = scope.slice(2);
-      return rooms.filter((r) => r.building === b);
-    }
+    if (scope.startsWith('B:')) return rooms.filter((r) => r.building === scope.slice(2));
     return singleRoom ? [singleRoom] : rooms;
   }, [rooms, scope, singleRoom]);
 
-  // Hitung booking milik user per tanggal agar tampil sebagai penanda emas di kalender
   const myBookingsByDate = useMemo(() => {
     const map = new Map();
     const email = (user?.email || '').toLowerCase();
@@ -109,7 +103,6 @@ export default function CalendarView() {
     return map;
   }, [bookings, user]);
 
-  // Grid sel bulan aktif (Senin–Minggu)
   const monthCells = useMemo(() => {
     const firstUtc = new Date(Date.UTC(activeMonth.year, activeMonth.month, 1));
     const offset = (firstUtc.getUTCDay() + 6) % 7;
@@ -191,26 +184,21 @@ export default function CalendarView() {
         ? activeSummary.withBooking
         : activeSummary.withClass;
 
-  const handleSelectDay = (dayObj) => {
-    setSelectedDayIdx(dayObj.index);
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Header + Scope Filter */}
-      <div className="flex flex-wrap items-end justify-between gap-4">
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#EAECEF] pb-6 dark:border-white/[0.08]">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
-            Kalender Ketersediaan
+          <h1 className="text-2xl font-bold tracking-[-0.02em] text-[#141923] dark:text-[#EEF2F7]">
+            Kalender
           </h1>
-          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">
-            Cek ketersediaan 30 hari ke depan untuk seluruh FEB, per gedung, atau satu ruangan spesifik.
+          <p className="mt-1 text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+            Lihat hari paling longgar untuk seluruh FEB, per gedung, atau satu ruangan.
           </p>
         </div>
 
         <div className="w-64">
           <SelectPopover
-            label="Cakupan Kalender"
+            label="Cakupan"
             icon={isSingleRoomMode ? DoorOpen : Building2}
             value={scope}
             onChange={(v) => setScope(v)}
@@ -220,9 +208,9 @@ export default function CalendarView() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left: Real Monthly Calendar */}
-        <section className="sh-card p-5 lg:col-span-7">
+      <div className="grid gap-8 lg:grid-cols-12">
+        {/* Left: Clean Monthly Grid */}
+        <section className="lg:col-span-7">
           <div className="mb-4 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <button
@@ -230,11 +218,11 @@ export default function CalendarView() {
                 disabled={monthIdx <= 0}
                 onClick={() => setMonthIdx((i) => Math.max(0, i - 1))}
                 aria-label="Bulan sebelumnya"
-                className="rounded-lg border border-line-light p-1.5 text-[#3C4E70] transition hover:bg-surface-subtle disabled:opacity-30 dark:border-unnes-night-line dark:text-unnes-night-muted dark:hover:bg-[#192746]"
+                className="rounded-lg p-1.5 text-[#5B667B] transition hover:bg-[#F1F3F7] disabled:opacity-30 dark:text-[#9AA7BE] dark:hover:bg-ink-card"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <h2 className="min-w-[140px] text-center text-sm font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">
+              <h2 className="min-w-[140px] text-center text-[15px] font-bold text-[#141923] dark:text-[#EEF2F7]">
                 {activeMonth.label}
               </h2>
               <button
@@ -242,29 +230,29 @@ export default function CalendarView() {
                 disabled={monthIdx >= availableMonths.length - 1}
                 onClick={() => setMonthIdx((i) => Math.min(availableMonths.length - 1, i + 1))}
                 aria-label="Bulan berikutnya"
-                className="rounded-lg border border-line-light p-1.5 text-[#3C4E70] transition hover:bg-surface-subtle disabled:opacity-30 dark:border-unnes-night-line dark:text-unnes-night-muted dark:hover:bg-[#192746]"
+                className="rounded-lg p-1.5 text-[#5B667B] transition hover:bg-[#F1F3F7] disabled:opacity-30 dark:text-[#9AA7BE] dark:hover:bg-ink-card"
               >
                 <ChevronRight className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px] font-medium text-[#526382] dark:text-unnes-night-muted">
+            <div className="flex items-center gap-3 text-xs text-[#6B768C] dark:text-[#8E9BB3]">
               <span className="inline-flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-sm bg-emerald-500" />
+                <span className="h-2 w-2 rounded-full bg-[#22A06B]" />
                 Lega
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-sm bg-amber-500" />
+                <span className="h-2 w-2 rounded-full bg-[#D97706]" />
                 Sedang
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-sm bg-unnes-gold" />
+                <span className="h-2 w-2 rounded-full bg-unnes-gold" />
                 Bookingmu
               </span>
             </div>
           </div>
 
-          <div className="mb-2 grid grid-cols-7 gap-1.5 text-center text-[11px] font-bold uppercase text-[#6A7B9C] dark:text-[#6E82AA]">
+          <div className="mb-2 grid grid-cols-7 gap-1.5 text-center text-xs font-medium text-[#7B869B] dark:text-[#8693AA]">
             {WEEKDAYS.map((w) => (
               <div key={w} className="py-1">
                 {w}
@@ -279,9 +267,9 @@ export default function CalendarView() {
                 return (
                   <div
                     key={cell.key}
-                    className="flex min-h-[76px] flex-col justify-between rounded-lg border border-transparent bg-surface-subtle/40 p-2 text-slate-300 dark:bg-unnes-night-input/40 dark:text-[#2A395B]"
+                    className="flex min-h-[76px] flex-col justify-between rounded-lg bg-[#F7F8FA] p-2.5 text-[#C5CCD9] dark:bg-ink-card/40 dark:text-[#444F66]"
                   >
-                    <span className="font-mono text-xs font-semibold">{cell.dt}</span>
+                    <span className="text-xs font-medium tabular-nums">{cell.dt}</span>
                   </div>
                 );
               }
@@ -293,7 +281,7 @@ export default function CalendarView() {
               let metricText = '';
               if (isSingleRoomMode) {
                 ratio = cell.freeHours / 10;
-                metricText = cell.freeHours > 0 ? `${cell.freeHours}j kosong` : 'Penuh';
+                metricText = cell.freeHours > 0 ? `${cell.freeHours}j` : 'Penuh';
               } else {
                 const total = scopedRooms.length || 1;
                 ratio = cell.summary.idleRooms.length / total;
@@ -301,51 +289,49 @@ export default function CalendarView() {
               }
 
               const barColor =
-                ratio >= 0.45 ? 'bg-emerald-500' : ratio >= 0.2 ? 'bg-amber-500' : 'bg-[#2563EB]';
+                ratio >= 0.45 ? 'bg-[#22A06B]' : ratio >= 0.2 ? 'bg-[#D97706]' : 'bg-[#3B6DD8]';
 
               return (
                 <button
                   key={cell.key}
                   type="button"
-                  onClick={() => handleSelectDay(cell.dayObj)}
-                  className={`flex min-h-[76px] flex-col justify-between rounded-lg border p-2 text-left transition ${
+                  onClick={() => setSelectedDayIdx(cell.dayObj.index)}
+                  className={`flex min-h-[76px] flex-col justify-between rounded-lg p-2.5 text-left transition ${
                     isSelected
-                      ? 'border-unnes-royal bg-unnes-royal/[0.06] ring-1 ring-unnes-royal dark:border-unnes-gold dark:bg-unnes-gold/10 dark:ring-unnes-gold'
-                      : 'border-line-light bg-white hover:border-[#A8B8D8] dark:border-unnes-night-line dark:bg-unnes-night-input dark:hover:border-[#344A75]'
+                      ? 'bg-unnes-navy text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                      : 'bg-[#F6F7FA] text-[#141923] hover:bg-[#ECEFF5] dark:bg-ink-card dark:text-[#EEF2F7] dark:hover:bg-ink-subtle'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span
-                      className={`font-mono text-xs font-bold ${
-                        isSelected
-                          ? 'text-unnes-royal dark:text-unnes-gold'
-                          : 'text-[#0F1B33] dark:text-[#F1F5FB]'
-                      }`}
-                    >
-                      {cell.dt}
-                    </span>
+                    <span className="text-xs font-bold tabular-nums">{cell.dt}</span>
                     <div className="flex items-center gap-1">
-                      {isToday && (
-                        <span className="rounded bg-unnes-royal px-1 py-0.2 text-[8px] font-bold text-white dark:bg-unnes-gold dark:text-unnes-gold-ink">
-                          INI
-                        </span>
+                      {isToday && !isSelected && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-unnes-navy dark:bg-unnes-gold" />
                       )}
                       {cell.myCount > 0 && (
                         <span
                           title={`${cell.myCount} booking milikmu`}
-                          className="h-2 w-2 rounded-full bg-unnes-gold"
+                          className={`h-2 w-2 rounded-full ${isSelected ? 'bg-unnes-gold dark:bg-unnes-navy' : 'bg-unnes-gold'}`}
                         />
                       )}
                     </div>
                   </div>
 
                   <div>
-                    <div className="font-mono text-[10px] font-semibold text-[#526382] dark:text-unnes-night-muted">
+                    <div
+                      className={`text-[11px] font-medium tabular-nums ${
+                        isSelected ? 'opacity-85' : 'text-[#5B667B] dark:text-[#9AA7BE]'
+                      }`}
+                    >
                       {metricText}
                     </div>
-                    <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-surface-subtle dark:bg-[#1B2B4B]">
+                    <div
+                      className={`mt-1 h-1 w-full overflow-hidden rounded-full ${
+                        isSelected ? 'bg-white/25 dark:bg-black/20' : 'bg-[#E2E6EE] dark:bg-ink-subtle'
+                      }`}
+                    >
                       <div
-                        className={`h-full rounded-full ${barColor}`}
+                        className={`h-full rounded-full ${isSelected ? 'bg-unnes-gold dark:bg-unnes-navy' : barColor}`}
                         style={{ width: `${Math.max(10, Math.round(ratio * 100))}%` }}
                       />
                     </div>
@@ -356,34 +342,33 @@ export default function CalendarView() {
           </div>
         </section>
 
-        {/* Right: Inspector Panel */}
-        <aside className="sh-card flex flex-col justify-between gap-5 p-5 lg:col-span-5">
-          <div className="space-y-4">
-            <div className="border-b border-line-light pb-3.5 dark:border-unnes-night-line">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#6A7B9C] dark:text-[#6E82AA]">
-                {isSingleRoomMode && singleRoom ? `Jadwal ${singleRoom.code}` : 'Ringkasan Tanggal'}
-              </div>
-              <h2 className="mt-0.5 text-lg font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">
+        {/* Right: Calm Solid Inspector */}
+        <aside className="sh-panel flex flex-col justify-between gap-5 p-5 lg:col-span-5">
+          <div className="space-y-5">
+            <div className="border-b border-[#EAECEF] pb-4 dark:border-white/[0.08]">
+              <p className="text-xs text-[#6B768C] dark:text-[#8E9BB3]">
+                {isSingleRoomMode && singleRoom ? `Jadwal ${singleRoom.code}` : 'Ringkasan tanggal'}
+              </p>
+              <h2 className="mt-0.5 text-lg font-bold text-[#141923] dark:text-[#EEF2F7]">
                 {activeDay.label}
-                {activeDay.weekday === 0 ? ' · Minggu' : ''}
+                {activeDay.weekday === 0 ? ' (Minggu)' : ''}
               </h2>
             </div>
 
-            {/* Personal Bookings Highlight on Selected Date */}
             {activeDayMyBookings.length > 0 && (
-              <div className="rounded-lg border border-unnes-gold/60 bg-[#FEF9C3]/70 p-3 dark:border-unnes-gold/40 dark:bg-unnes-gold/10">
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#713F12] dark:text-unnes-gold">
+              <div className="rounded-lg bg-[#FEF7DB] p-3.5 dark:bg-[#3A311B]">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-[#713F12] dark:text-unnes-gold">
                   <CalendarCheck2 className="h-3.5 w-3.5" />
-                  Bookingmu di Tanggal Ini ({activeDayMyBookings.length})
+                  Bookingmu di tanggal ini ({activeDayMyBookings.length})
                 </div>
                 <div className="mt-2 space-y-1.5">
                   {activeDayMyBookings.map((b) => (
                     <div
                       key={b.id}
-                      className="flex items-center justify-between text-xs font-semibold text-[#0F1B33] dark:text-[#F1F5FB]"
+                      className="flex items-center justify-between text-xs font-medium text-[#141923] dark:text-[#EEF2F7]"
                     >
-                      <span className="font-mono font-bold">{b.room_code}</span>
-                      <span className="font-mono text-[11px] text-[#526382] dark:text-unnes-night-muted">
+                      <span className="font-semibold">{b.room_code}</span>
+                      <span className="font-mono text-[11px] opacity-80">
                         {formatHourRange(b.start_hour, b.duration)} · {b.id}
                       </span>
                     </div>
@@ -392,16 +377,11 @@ export default function CalendarView() {
               </div>
             )}
 
-            {/* Single Room Mode Inspector vs Campus/Building Mode Inspector */}
             {isSingleRoomMode && singleRoom ? (
               <div className="space-y-4">
-                <div className="rounded-lg bg-surface-subtle p-3.5 dark:bg-unnes-night-input">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm font-bold">{singleRoom.code}</span>
-                    <span className="text-xs text-[#526382] dark:text-unnes-night-muted">
-                      {singleRoom.capacity} kursi · {singleRoom.location_label}
-                    </span>
-                  </div>
+                <div className="text-[13px] text-[#5B667B] dark:text-[#9AA7BE]">
+                  <strong className="text-[#141923] dark:text-[#EEF2F7]">{singleRoom.code}</strong> ·{' '}
+                  {singleRoom.capacity} kursi · {singleRoom.location_label}
                 </div>
 
                 <HourBar
@@ -420,35 +400,28 @@ export default function CalendarView() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="rounded-lg border border-emerald-200/80 bg-emerald-50/70 p-2.5 text-center dark:border-emerald-500/30 dark:bg-emerald-500/10">
-                    <div className="font-mono text-lg font-bold text-emerald-700 dark:text-emerald-300">
+                <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="rounded-lg bg-[#F6F7FA] p-3 dark:bg-ink-subtle">
+                    <div className="text-lg font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
                       {activeSummary.idleRooms.length}
                     </div>
-                    <div className="text-[10px] font-semibold text-emerald-800/80 dark:text-emerald-300/80">
-                      Kosong penuh
-                    </div>
+                    <div className="text-xs text-[#6B768C] dark:text-[#8E9BB3]">Kosong</div>
                   </div>
-                  <div className="rounded-lg border border-amber-200/80 bg-amber-50/70 p-2.5 text-center dark:border-amber-500/30 dark:bg-amber-500/10">
-                    <div className="font-mono text-lg font-bold text-amber-700 dark:text-amber-300">
+                  <div className="rounded-lg bg-[#F6F7FA] p-3 dark:bg-ink-subtle">
+                    <div className="text-lg font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
                       {activeSummary.withBooking.length}
                     </div>
-                    <div className="text-[10px] font-semibold text-amber-800/80 dark:text-amber-300/80">
-                      Dibooking
-                    </div>
+                    <div className="text-xs text-[#6B768C] dark:text-[#8E9BB3]">Dibooking</div>
                   </div>
-                  <div className="rounded-lg border border-blue-200/80 bg-blue-50/70 p-2.5 text-center dark:border-blue-500/30 dark:bg-blue-500/10">
-                    <div className="font-mono text-lg font-bold text-blue-700 dark:text-blue-300">
+                  <div className="rounded-lg bg-[#F6F7FA] p-3 dark:bg-ink-subtle">
+                    <div className="text-lg font-bold tabular-nums text-[#141923] dark:text-[#EEF2F7]">
                       {activeSummary.withClass.length}
                     </div>
-                    <div className="text-[10px] font-semibold text-blue-800/80 dark:text-blue-300/80">
-                      Ada kelas
-                    </div>
+                    <div className="text-xs text-[#6B768C] dark:text-[#8E9BB3]">Kuliah</div>
                   </div>
                 </div>
 
-                {/* Segmented Filter */}
-                <div className="grid grid-cols-3 rounded-lg border border-line-light bg-surface-subtle p-1 dark:border-unnes-night-line dark:bg-unnes-night-input">
+                <div className="grid grid-cols-3 rounded-lg bg-[#F1F3F7] p-1 dark:bg-ink-subtle">
                   {[
                     { id: 'idle', label: 'Kosong' },
                     { id: 'booked', label: 'Dibooking' },
@@ -458,10 +431,10 @@ export default function CalendarView() {
                       key={t.id}
                       type="button"
                       onClick={() => setPanelTab(t.id)}
-                      className={`rounded-md py-1.5 text-xs font-bold transition ${
+                      className={`rounded-md py-1.5 text-xs font-semibold transition ${
                         panelTab === t.id
-                          ? 'bg-white text-[#0F1B33] shadow-subtle dark:bg-unnes-night-card dark:text-unnes-gold'
-                          : 'text-[#526382] hover:text-[#0F1B33] dark:text-unnes-night-muted dark:hover:text-white'
+                          ? 'bg-white text-[#141923] shadow-sm dark:bg-ink-card dark:text-[#EEF2F7]'
+                          : 'text-[#5B667B] hover:text-[#141923] dark:text-[#9AA7BE] dark:hover:text-[#EEF2F7]'
                       }`}
                     >
                       {t.label}
@@ -469,10 +442,9 @@ export default function CalendarView() {
                   ))}
                 </div>
 
-                {/* Room list with mini 10-hour spark-bar */}
-                <div className="max-h-64 space-y-1.5 overflow-y-auto pr-1">
+                <div className="max-h-64 divide-y divide-[#EEF0F4] overflow-y-auto pr-1 dark:divide-white/[0.06]">
                   {activeListCodes.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-line-light py-8 text-center text-xs text-[#6A7B9C] dark:border-unnes-night-line">
+                    <div className="py-8 text-center text-xs text-[#7B869B] dark:text-[#8693AA]">
                       Tidak ada ruangan di kategori ini.
                     </div>
                   ) : (
@@ -483,21 +455,17 @@ export default function CalendarView() {
                           key={code}
                           type="button"
                           onClick={() => openRoomDetail(code, selectedDayIdx)}
-                          className="flex w-full items-center justify-between gap-3 rounded-lg border border-line-light px-3 py-2 text-left transition hover:border-unnes-royal/50 hover:bg-surface-subtle/60 dark:border-unnes-night-line dark:hover:border-unnes-gold/50 dark:hover:bg-[#172442]"
+                          className="flex w-full items-center justify-between gap-3 py-2.5 text-left transition hover:opacity-80"
                         >
                           <div className="min-w-0">
-                            <div className="font-mono text-xs font-bold text-[#0F1B33] dark:text-[#F1F5FB]">
-                              {code}
-                            </div>
+                            <div className="text-[13px] font-semibold text-[#141923] dark:text-[#EEF2F7]">{code}</div>
                             {r && (
-                              <div className="flex items-center gap-1 text-[10px] text-[#6A7B9C] dark:text-unnes-night-muted">
-                                <Users className="h-3 w-3" />
-                                {r.capacity} · Lt. {r.floor}
+                              <div className="text-xs text-[#7B869B] dark:text-[#8693AA]">
+                                {r.capacity} kursi · Lt. {r.floor}
                               </div>
                             )}
                           </div>
 
-                          {/* Mini 10-hour rhythm spark-bar */}
                           <div className="grid w-24 flex-none grid-cols-10 gap-0.5">
                             {OPERATIONAL_HOURS.map((h) => {
                               const st = getRawSlotStatus({
@@ -511,13 +479,13 @@ export default function CalendarView() {
                               });
                               const c =
                                 st === 'f'
-                                  ? 'bg-emerald-400/80'
+                                  ? 'bg-[#22A06B]'
                                   : st === 'k'
-                                    ? 'bg-blue-500/75'
+                                    ? 'bg-[#3B6DD8]'
                                     : st === 'm'
                                       ? 'bg-unnes-gold'
-                                      : 'bg-amber-500/80';
-                              return <span key={h} className={`h-2.5 rounded-[2px] ${c}`} />;
+                                      : 'bg-[#D97706]';
+                              return <span key={h} className={`h-2 rounded-[2px] ${c}`} />;
                             })}
                           </div>
                         </button>
@@ -535,7 +503,7 @@ export default function CalendarView() {
               onClick={() => openRoomDetail(singleRoom.code, selectedDayIdx)}
               className="sh-btn-primary w-full"
             >
-              Lihat Detail & Booking {singleRoom.code}
+              Detail & booking {singleRoom.code}
               <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
@@ -544,7 +512,7 @@ export default function CalendarView() {
               onClick={() => goToFindWithDate(selectedDayIdx)}
               className="sh-btn-primary w-full"
             >
-              Cari Ruang di Tanggal Ini
+              Cari ruang di tanggal ini
               <ArrowRight className="h-4 w-4" />
             </button>
           )}
