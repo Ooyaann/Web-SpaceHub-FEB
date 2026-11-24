@@ -46,14 +46,15 @@ export function SpaceHubProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
-  const [activeView, setActiveView] = useState('find');
-  const [selectedRoomCode, setSelectedRoomCode] = useState(null);
   const nowWib = getNowWib();
   const days = useMemo(() => getNext31DaysWib(), [nowWib.dateKey]);
   const isAfterHours = nowWib.hour >= 16;
 
+  const [activeView, setActiveView] = useState('find');
+  const [selectedRoomCode, setSelectedRoomCode] = useState(null);
   const [detailDayIndex, setDetailDayIndex] = useState(() => (isAfterHours ? 1 : 0));
   const [bookingPresetDay, setBookingPresetDay] = useState(() => (isAfterHours ? 1 : 0));
+  const [bookingPresetHour, setBookingPresetHour] = useState(null);
   const [adminUnlocked, setAdminUnlocked] = useState(false);
 
   const [toast, setToast] = useState(null);
@@ -66,6 +67,7 @@ export function SpaceHubProvider({ children }) {
     floorKey: '',
     cap: 0,
     sort: 'cap',
+    priceType: 'all', // 'all' | 'free' | 'paid'
     facilities: [],
     favOnly: false,
     search: '',
@@ -76,7 +78,7 @@ export function SpaceHubProvider({ children }) {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     toastTimerRef.current = setTimeout(() => {
       setToast(null);
-    }, 3400);
+    }, 3000);
   }, []);
 
   const pushNotification = useCallback((title, body, category = 'info') => {
@@ -122,7 +124,7 @@ export function SpaceHubProvider({ children }) {
         setReports(data.reports);
         setFavorites(data.favorites);
       } catch (err) {
-        showToast(err?.message || 'Gagal memuat data dari server.', 'error');
+        showToast(err?.message || 'Gagal memuat data.', 'error');
       } finally {
         setLoading(false);
         setSyncing(false);
@@ -149,12 +151,7 @@ export function SpaceHubProvider({ children }) {
         // ignore
       }
       setActiveView('find');
-      showToast(
-        mode === 'register'
-          ? `Akun berhasil dibuat. Selamat datang, ${res.user.name}!`
-          : `Selamat datang kembali, ${res.user.name}!`,
-        'success'
-      );
+      showToast(`Halo, ${res.user.name}!`, 'success');
       return res;
     },
     [showToast]
@@ -170,7 +167,7 @@ export function SpaceHubProvider({ children }) {
     } catch {
       // ignore
     }
-    showToast('Kamu telah keluar dari SpaceHub.');
+    showToast('Berhasil keluar.');
   }, [showToast]);
 
   const updateFilter = useCallback((key, value) => {
@@ -199,6 +196,7 @@ export function SpaceHubProvider({ children }) {
       floorKey: '',
       cap: 0,
       sort: 'cap',
+      priceType: 'all',
       facilities: [],
       favOnly: false,
       search: '',
@@ -215,9 +213,10 @@ export function SpaceHubProvider({ children }) {
     [filters.day]
   );
 
-  const openBookingForm = useCallback((roomCode, dayIdx) => {
+  const openBookingForm = useCallback((roomCode, dayIdx, presetHour = null) => {
     setSelectedRoomCode(roomCode);
     setBookingPresetDay(dayIdx);
+    setBookingPresetHour(presetHour);
     setActiveView('bk');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -232,7 +231,7 @@ export function SpaceHubProvider({ children }) {
       if (!user) return;
       const res = await toggleFavoriteSafe({ userEmail: user.email, roomCode });
       if (!res?.ok) {
-        showToast(res?.error || 'Gagal mengubah favorit.', 'error');
+        showToast(res?.error || 'Gagal memperbarui favorit.', 'error');
         return;
       }
 
@@ -243,21 +242,19 @@ export function SpaceHubProvider({ children }) {
         return next;
       });
 
-      const msg = res.favorited
-        ? `Ruang ${roomCode} disimpan ke Favorit.`
-        : `Ruang ${roomCode} dihapus dari Favorit.`;
+      const msg = res.favorited ? `${roomCode} disimpan ke Favorit` : `${roomCode} dihapus dari Favorit`;
       showToast(msg, 'success');
-      pushNotification(res.favorited ? 'Ruang Disimpan ke Favorit' : 'Ruang Dihapus dari Favorit', msg, 'favorite');
+      pushNotification(res.favorited ? 'Favorit Ditambahkan' : 'Favorit Dihapus', msg, 'favorite');
     },
     [user, showToast, pushNotification]
   );
 
   const reportRoomUsed = useCallback(
     async (roomCode) => {
-      if (!user) return { ok: false, error: 'Silakan login terlebih dahulu.' };
+      if (!user) return { ok: false, error: 'Silakan login.' };
       const current = getNowWib();
       if (current.hour < 7 || current.hour > 16) {
-        const errMsg = 'Pelaporan ruang terpakai hanya berlaku pada jam operasional 07.00–17.00 WIB.';
+        const errMsg = 'Pelaporan hanya tersedia pukul 07.00–17.00 WIB.';
         showToast(errMsg, 'error');
         return { ok: false, error: errMsg };
       }
@@ -275,9 +272,9 @@ export function SpaceHubProvider({ children }) {
       }
 
       await refreshData(true);
-      const msg = `Terima kasih, ruang ${roomCode} ditandai sedang terpakai untuk jam ${String(current.hour).padStart(2, '0')}.00 WIB.`;
+      const msg = `${roomCode} ditandai terpakai pukul ${String(current.hour).padStart(2, '0')}.00 WIB.`;
       showToast(msg, 'success');
-      pushNotification('Laporan Ruang Terpakai', msg, 'report');
+      pushNotification('Laporan Terpakai', msg, 'report');
       return { ok: true };
     },
     [user, refreshData, showToast, pushNotification]
@@ -285,12 +282,11 @@ export function SpaceHubProvider({ children }) {
 
   const submitBooking = useCallback(
     async ({ roomCode, dayIndex, startHour, duration, nim, purpose, participants }) => {
-      if (!user) return { ok: false, error: 'Silakan login terlebih dahulu.' };
+      if (!user) return { ok: false, error: 'Silakan login.' };
       const targetDay = days[dayIndex];
       if (!targetDay) return { ok: false, error: 'Tanggal tidak valid.' };
 
       const current = getNowWib();
-      // Guard Frontend Wajib: memblokir slot "Ada kelas" (jadwal kuliah contoh), bentrok, maupun jam lewat sebelum memanggil RPC
       const slotFree = isWindowFree({
         roomCode,
         dateKey: targetDay.key,
@@ -307,7 +303,7 @@ export function SpaceHubProvider({ children }) {
       if (!slotFree) {
         return {
           ok: false,
-          error: 'Slot waktu ini tidak kosong (ada jadwal kuliah, sudah dipesan, atau jam sudah lewat). Pilih jam lain.',
+          error: 'Slot tidak kosong (ada jadwal kuliah, terisi, atau sudah lewat).',
         };
       }
 
@@ -328,7 +324,6 @@ export function SpaceHubProvider({ children }) {
         return res;
       }
 
-      // Simpan NIM terakhir di sesi agar tidak perlu mengetik ulang di booking berikutnya
       if (user.nim !== String(nim).trim()) {
         const updatedUser = { ...user, nim: String(nim).trim() };
         setUser(updatedUser);
@@ -341,9 +336,10 @@ export function SpaceHubProvider({ children }) {
 
       await refreshData(true);
       const code = res.booking?.id || 'SH-BOOK';
-      const detailMsg = `Booking ruang ${roomCode} (${targetDay.label}, ${formatHourRange(startHour, duration)}) berhasil dikonfirmasi dengan kode ${code}.`;
-      showToast(`Booking berhasil! Kode: ${code}`, 'success');
-      pushNotification('Booking Disetujui Otomatis', detailMsg, 'booking');
+      const detailMsg = `${roomCode} · ${targetDay.label}, ${formatHourRange(startHour, duration)} · Kode ${code}`;
+      showToast(`Booking dikonfirmasi (${code})`, 'success');
+      pushNotification('Booking Disetujui', detailMsg, 'booking');
+      setBookingPresetHour(null);
       setActiveView('mine');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return res;
@@ -353,7 +349,7 @@ export function SpaceHubProvider({ children }) {
 
   const cancelBooking = useCallback(
     async (booking) => {
-      if (!user) return { ok: false, error: 'Silakan login terlebih dahulu.' };
+      if (!user) return { ok: false, error: 'Silakan login.' };
       const res = await cancelBookingSafe({ bookingId: booking.id, userEmail: user.email });
       if (!res?.ok) {
         showToast(res?.error || 'Gagal membatalkan booking.', 'error');
@@ -361,8 +357,8 @@ export function SpaceHubProvider({ children }) {
       }
 
       await refreshData(true);
-      const msg = `Booking ruang ${booking.room_code} (kode ${booking.id}) dibatalkan. Slot kini terbuka kembali untuk pengguna lain.`;
-      showToast('Booking berhasil dibatalkan.', 'success');
+      const msg = `${booking.room_code} (${booking.id}) dibatalkan.`;
+      showToast('Booking dibatalkan.', 'success');
       pushNotification('Booking Dibatalkan', msg, 'cancel');
       return res;
     },
@@ -373,7 +369,7 @@ export function SpaceHubProvider({ children }) {
     (pin) => {
       if (String(pin || '').trim().toLowerCase() === ADMIN_PIN) {
         setAdminUnlocked(true);
-        showToast('Akses Halaman Pengelola dibuka.', 'success');
+        showToast('Mode Pengelola aktif.', 'success');
         return true;
       }
       return false;
@@ -416,6 +412,7 @@ export function SpaceHubProvider({ children }) {
     detailDayIndex,
     setDetailDayIndex,
     bookingPresetDay,
+    bookingPresetHour,
     filters,
     updateFilter,
     toggleFacilityFilter,

@@ -1,6 +1,7 @@
 import { START_HOURS } from '../lib/constants';
 import { formatHour } from '../lib/dateWib';
 import { useSpaceHub } from '../context/SpaceHubContext';
+import DatePickerPopover from '../components/DatePickerPopover';
 import RoomCard from '../components/RoomCard';
 
 export default function FavoritesView() {
@@ -9,58 +10,47 @@ export default function FavoritesView() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-2xl font-extrabold text-[#0f1d3d] dark:text-white">Ruangan Favorit</h2>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Daftar ruangan yang sering kamu gunakan, lengkap dengan status ketersediaan pada waktu yang dipilih.
-        </p>
-      </div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-extrabold text-[#0f1d3d] dark:text-white">Ruang Favorit</h2>
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{favRooms.length} ruang tersimpan.</p>
+        </div>
 
-      <div className="grid max-w-md grid-cols-2 gap-3">
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tanggal</span>
-          <select
+        <div className="grid w-full max-w-sm grid-cols-2 gap-2.5">
+          <DatePickerPopover
+            label="Tanggal"
+            days={days}
             value={filters.day}
-            onChange={(e) => updateFilter('day', Number(e.target.value))}
-            className="sh-input"
-          >
-            {days.map((d) => (
-              <option key={d.key} value={d.index}>
-                {d.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jam Mulai</span>
-          <select
-            value={filters.start}
-            onChange={(e) => updateFilter('start', Number(e.target.value))}
-            className="sh-input"
-          >
-            {START_HOURS.map((h) => (
-              <option key={h} value={h}>
-                {formatHour(h)} WIB
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(idx) => updateFilter('day', idx)}
+          />
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jam</span>
+            <select
+              value={filters.start}
+              onChange={(e) => updateFilter('start', Number(e.target.value))}
+              className="sh-input font-semibold"
+            >
+              {START_HOURS.map((h) => (
+                <option key={h} value={h}>
+                  {formatHour(h)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
 
       {favRooms.length > 0 ? (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {favRooms.map((r) => (
             <RoomCard key={r.code} room={r} dayIndex={filters.day} />
           ))}
         </div>
       ) : (
         <div className="sh-card border-dashed px-6 py-12 text-center">
-          <p className="text-sm font-bold text-[#0f1d3d] dark:text-white">Belum ada ruangan favorit.</p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Ketuk ikon bintang pada kartu ruang atau halaman detail untuk menyimpannya di sini.
-          </p>
+          <p className="text-sm font-bold">Belum ada favorit.</p>
           <button type="button" onClick={() => navigate('find')} className="sh-btn-primary mt-4">
-            Jelajahi Ruangan
+            Cari Ruang
           </button>
         </div>
       )}

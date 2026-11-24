@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { START_HOURS, getFloorOptions } from '../lib/constants';
-import { formatHour } from '../lib/dateWib';
+import { formatHour, formatPriceBadge } from '../lib/dateWib';
 import { getFreeUntilHour, isWindowFree } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
+import DatePickerPopover from '../components/DatePickerPopover';
 
 export default function FloorPlanView() {
   const { rooms, bookings, reports, user, days, nowWib, filters, updateFilter, openRoomDetail } =
@@ -12,6 +13,30 @@ export default function FloorPlanView() {
   const [selectedFloor, setSelectedFloor] = useState(floorOptions[0]?.[0] || 'L2-3');
 
   const selectedDay = days[filters.day] || days[0];
+
+  const floorStats = useMemo(() => {
+    const map = new Map();
+    for (const [key] of floorOptions) {
+      const list = rooms.filter((r) => `${r.building}-${r.floor}` === key);
+      const freeCount = list.filter((r) =>
+        isWindowFree({
+          roomCode: r.code,
+          dateKey: selectedDay.key,
+          weekday: selectedDay.weekday,
+          startHour: filters.start,
+          duration: 1,
+          bookings,
+          reports,
+          userEmail: user?.email,
+          todayWib: nowWib.dateKey,
+          nowHourWib: nowWib.hour,
+        })
+      ).length;
+      map.set(key, { freeCount, total: list.length });
+    }
+    return map;
+  }, [floorOptions, rooms, selectedDay, filters.start, bookings, reports, user, nowWib]);
+
   const floorRooms = useMemo(
     () => rooms.filter((r) => `${r.building}-${r.floor}` === selectedFloor),
     [rooms, selectedFloor]
@@ -52,23 +77,26 @@ export default function FloorPlanView() {
           <button
             key={r.code}
             type="button"
+            title={`${r.code} · ${(r.facilities || []).join(', ')} · ${formatPriceBadge(r.price_per_hour)}`}
             onClick={() => openRoomDetail(r.code, filters.day)}
             className={`rounded-xl border-2 p-3 text-left transition hover:-translate-y-0.5 ${
               free
                 ? 'border-unnes-gold bg-white text-[#0f1d3d] shadow-sm dark:bg-unnes-card-dark dark:text-white'
-                : 'border-unnes-border bg-[#e6eeff]/60 text-slate-500 dark:border-unnes-border-dark dark:bg-[#172344] dark:text-slate-400'
+                : 'border-unnes-border bg-unnes-surface/80 text-slate-500 dark:border-unnes-border-dark dark:bg-[#142040] dark:text-slate-400'
             }`}
           >
-            <div className="text-sm font-extrabold">{r.code}</div>
-            <div className="mt-0.5 text-[11px] opacity-80">{r.capacity} orang</div>
+            <div className="flex items-center justify-between gap-1">
+              <span className="text-sm font-extrabold">{r.code}</span>
+              <span className="text-[10px] font-semibold opacity-75">{r.capacity}k</span>
+            </div>
             <div className="mt-2">
               {free ? (
                 <span className="inline-block rounded-full bg-unnes-gold px-2 py-0.5 text-[10px] font-extrabold text-unnes-gold-ink">
-                  Kosong s.d. {formatHour(until)}
+                  s.d. {formatHour(until)}
                 </span>
               ) : (
                 <span className="inline-block rounded-full bg-slate-200/80 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                  Terpakai
+                  Terisi
                 </span>
               )}
             </div>
@@ -80,79 +108,79 @@ export default function FloorPlanView() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-2xl font-extrabold text-[#0f1d3d] dark:text-white">Denah Lantai</h2>
-        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Lihat posisi & status ruang kosong per gedung (L2, L4, L5) dan lantai pada waktu yang dipilih. Klik ruang
-          untuk melihat detail & tarif.
-        </p>
-      </div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-2xl font-extrabold text-[#0f1d3d] dark:text-white">Denah Lantai</h2>
+          <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+            Bingkai kuning = kosong · klik ruang untuk detail & booking.
+          </p>
+        </div>
 
-      {/* Floor Tabs */}
-      <div className="flex flex-wrap gap-1.5">
-        {floorOptions.map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => setSelectedFloor(key)}
-            className={`sh-chip ${selectedFloor === key ? 'sh-chip-active' : ''}`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Time Filter */}
-      <div className="grid max-w-md grid-cols-2 gap-3">
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tanggal</span>
-          <select
+        <div className="grid w-full max-w-sm grid-cols-2 gap-2.5">
+          <DatePickerPopover
+            label="Tanggal"
+            days={days}
             value={filters.day}
-            onChange={(e) => updateFilter('day', Number(e.target.value))}
-            className="sh-input"
-          >
-            {days.map((d) => (
-              <option key={d.key} value={d.index}>
-                {d.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block">
-          <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jam</span>
-          <select
-            value={filters.start}
-            onChange={(e) => updateFilter('start', Number(e.target.value))}
-            className="sh-input"
-          >
-            {START_HOURS.map((h) => (
-              <option key={h} value={h}>
-                {formatHour(h)} WIB
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(idx) => updateFilter('day', idx)}
+          />
+          <label className="block">
+            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jam</span>
+            <select
+              value={filters.start}
+              onChange={(e) => updateFilter('start', Number(e.target.value))}
+              className="sh-input font-semibold"
+            >
+              {START_HOURS.map((h) => (
+                <option key={h} value={h}>
+                  {formatHour(h)}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
+
+      {/* Floor Tabs with Free/Total Count */}
+      <div className="flex flex-wrap gap-1.5">
+        {floorOptions.map(([key, label]) => {
+          const st = floorStats.get(key) || { freeCount: 0, total: 0 };
+          const active = selectedFloor === key;
+          return (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setSelectedFloor(key)}
+              className={`sh-chip ${active ? 'sh-chip-active' : ''}`}
+            >
+              <span>{label.replace('Gedung ', '').replace(' · Lantai ', ' Lt.')}</span>
+              <span
+                className={`rounded-full px-1.5 py-0.2 text-[10px] font-extrabold ${
+                  active
+                    ? 'bg-unnes-navy text-white'
+                    : 'bg-unnes-surface text-unnes-blue dark:bg-[#19264a] dark:text-unnes-gold'
+                }`}
+              >
+                {st.freeCount}/{st.total}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Denah Card */}
       <div className="sh-card space-y-4 p-5">
         {renderRow(topRow)}
         <div
-          className="rounded-lg py-2 text-center text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+          className="rounded-lg py-2 text-center text-[10px] font-bold uppercase tracking-widest text-slate-400"
           style={{
             backgroundImage:
-              'repeating-linear-gradient(90deg, rgba(29,78,216,0.12) 0 16px, transparent 16px 24px)',
+              'repeating-linear-gradient(90deg, rgba(29,78,216,0.12) 0 14px, transparent 14px 22px)',
           }}
         >
-          Lorong Koridor
+          Koridor
         </div>
         {bottomRow.length > 0 && renderRow(bottomRow)}
       </div>
-
-      <p className="text-xs text-slate-500 dark:text-slate-400">
-        Keterangan: <strong className="text-amber-600 dark:text-unnes-gold">Bingkai kuning</strong> menandakan ruang
-        kosong; abu-abu menandakan sedang terpakai atau ada kelas.
-      </p>
     </div>
   );
 }

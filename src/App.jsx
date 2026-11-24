@@ -63,18 +63,17 @@ export default function App() {
       <div className="flex min-w-0 flex-1 flex-col">
         <MobileNav />
         {!isSupabaseConfigured && (
-          <div className="border-b border-amber-300/70 bg-amber-50 px-4 py-2 text-xs text-amber-950 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
-            <div className="mx-auto flex max-w-5xl items-center gap-2">
+          <div className="border-b border-amber-300/60 bg-amber-50/90 px-4 py-1.5 text-[11px] font-medium text-amber-900 dark:border-amber-500/25 dark:bg-amber-500/10 dark:text-amber-200">
+            <div className="mx-auto flex max-w-6xl items-center gap-1.5">
               <Database className="h-3.5 w-3.5 flex-none" />
               <span>
-                <strong>Mode Demo Lokal:</strong> Variabel <code className="font-mono">.env</code> Supabase belum
-                diisi. Data disimpan sementara di browser ini — lihat <code className="font-mono">SETUP_DEPLOY.md</code>{' '}
-                untuk aktivasi lintas perangkat.
+                <strong>Demo Lokal</strong> — isi <code className="font-mono">.env</code> Supabase untuk sinkronisasi
+                lintas perangkat.
               </span>
             </div>
           </div>
         )}
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-5 sm:px-6 lg:py-7">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-5 sm:px-6 lg:py-7">
           {renderView()}
         </main>
       </div>

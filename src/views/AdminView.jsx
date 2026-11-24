@@ -5,12 +5,14 @@ import {
   Building2,
   CalendarCheck2,
   Lock,
+  Search,
   ShieldCheck,
 } from 'lucide-react';
 import { ADMIN_PIN, OPERATIONAL_HOURS } from '../lib/constants';
 import { formatDateKeyLabel, formatHour, formatHourRange } from '../lib/dateWib';
 import { getRawSlotStatus, isBookingActive } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
+import DatePickerPopover from '../components/DatePickerPopover';
 
 export default function AdminView() {
   const { rooms, bookings, reports, days, nowWib, user, adminUnlocked, unlockAdmin } = useSpaceHub();
@@ -19,6 +21,7 @@ export default function AdminView() {
   const [pinError, setPinError] = useState('');
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [tab, setTab] = useState('bookings');
 
   const targetDay = days[selectedDayIdx] || days[0];
@@ -78,69 +81,65 @@ export default function AdminView() {
   }, [rooms, bookings, reports, targetDay, nowWib, user]);
 
   const filteredBookings = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
     return bookings.filter((b) => {
       if (statusFilter !== 'all' && b.status !== statusFilter) return false;
+      if (
+        q &&
+        !(b.id || '').toLowerCase().includes(q) &&
+        !(b.room_code || '').toLowerCase().includes(q) &&
+        !(b.nim || '').toLowerCase().includes(q) &&
+        !(b.user_name || '').toLowerCase().includes(q)
+      ) {
+        return false;
+      }
       return true;
     });
-  }, [bookings, statusFilter]);
+  }, [bookings, statusFilter, searchQuery]);
 
   const handlePinSubmit = (e) => {
     e.preventDefault();
     setPinError('');
     if (!unlockAdmin(pinInput)) {
-      setPinError('PIN Pengelola salah. Coba masukkan PIN demo yang tertera.');
+      setPinError('PIN salah.');
     }
   };
 
   if (!adminUnlocked) {
     return (
-      <div className="mx-auto max-w-md py-8">
+      <div className="mx-auto max-w-sm py-10">
         <form onSubmit={handlePinSubmit} className="sh-card space-y-4 p-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-unnes-navy text-unnes-gold">
-              <ShieldCheck className="h-6 w-6" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-unnes-navy text-unnes-gold">
+              <ShieldCheck className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-lg font-extrabold text-[#0f1d3d] dark:text-white">
-                Halaman Pengelola (Ringkas)
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Masukkan PIN pengelola untuk melihat riwayat pemakaian & keterisian ruang.
-              </p>
+              <h2 className="text-base font-extrabold text-[#0f1d3d] dark:text-white">Akses Pengelola</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">PIN demo: {ADMIN_PIN}</p>
             </div>
           </div>
 
-          <label className="block">
-            <span className="mb-1 block text-xs font-semibold text-slate-600 dark:text-slate-300">PIN Pengelola</span>
-            <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="password"
-                required
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                placeholder="Masukkan PIN..."
-                className="sh-input pl-9"
-              />
-            </div>
-          </label>
+          <div className="relative">
+            <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <input
+              type="password"
+              required
+              value={pinInput}
+              onChange={(e) => setPinInput(e.target.value)}
+              placeholder="Masukkan PIN pengelola"
+              className="sh-input pl-9"
+            />
+          </div>
 
           {pinError && (
-            <div
-              role="alert"
-              className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
-            >
+            <div role="alert" className="text-xs font-semibold text-rose-600 dark:text-rose-400">
               {pinError}
             </div>
           )}
 
           <button type="submit" className="sh-btn-primary w-full">
-            Buka Dashboard Pengelola
+            Masuk Pengelola
           </button>
-
-          <p className="rounded-lg bg-unnes-surface px-3 py-2 text-center text-[11px] text-slate-500 dark:bg-[#0d1730] dark:text-slate-400">
-            Info demo presentasi — PIN default: <strong className="font-mono text-unnes-navy dark:text-unnes-gold">{ADMIN_PIN}</strong>
-          </p>
         </form>
       </div>
     );
@@ -149,44 +148,26 @@ export default function AdminView() {
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-2xl font-extrabold text-[#0f1d3d] dark:text-white">
-            Dashboard Pengelola (Ringkas)
-          </h2>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Ringkasan tingkat keterisian ruangan dan riwayat pemakaian FEB UNNES.
-          </p>
-        </div>
-
-        <label className="block min-w-[200px]">
-          <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-            Tanggal Analitik Keterisian
-          </span>
-          <select
+        <h2 className="text-2xl font-extrabold text-[#0f1d3d] dark:text-white">Dashboard Pengelola</h2>
+        <div className="w-56">
+          <DatePickerPopover
+            label="Tanggal Analitik"
+            days={days}
             value={selectedDayIdx}
-            onChange={(e) => setSelectedDayIdx(Number(e.target.value))}
-            className="sh-input"
-          >
-            {days.map((d) => (
-              <option key={d.key} value={d.index}>
-                {d.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={(idx) => setSelectedDayIdx(idx)}
+            align="right"
+          />
+        </div>
       </div>
 
-      {/* 4 KPI Cards */}
+      {/* 4 KPI */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <div className="sh-card p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Total Ruangan</span>
+            <span>Total Ruang</span>
             <Building2 className="h-4 w-4 text-unnes-blue dark:text-unnes-blue-light" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-[#0f1d3d] dark:text-white tabular-nums">
-            {stats.totalRooms}
-          </div>
-          <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">Gedung L2, L4, L5</div>
+          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.totalRooms}</div>
         </div>
 
         <div className="sh-card p-4">
@@ -194,151 +175,148 @@ export default function AdminView() {
             <span>Booking Aktif</span>
             <CalendarCheck2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-[#0f1d3d] dark:text-white tabular-nums">
-            {stats.activeBookingsCount}
-          </div>
-          <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">Tersimpan di server</div>
+          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.activeBookingsCount}</div>
         </div>
 
         <div className="sh-card p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Tingkat Keterisian</span>
+            <span>Keterisian</span>
             <BarChart3 className="h-4 w-4 text-unnes-blue dark:text-unnes-blue-light" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-[#0f1d3d] dark:text-white tabular-nums">
-            {stats.occupancyPct}%
-          </div>
-          <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{targetDay.label}</div>
+          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.occupancyPct}%</div>
         </div>
 
         <div className="sh-card p-4">
           <div className="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <span>Laporan Terpakai</span>
+            <span>Laporan</span>
             <AlertTriangle className="h-4 w-4 text-amber-500" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold text-[#0f1d3d] dark:text-white tabular-nums">
-            {stats.totalReports}
-          </div>
-          <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">Laporan lapangan</div>
+          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.totalReports}</div>
         </div>
       </div>
 
-      {/* Tingkat Keterisian per Gedung */}
+      {/* Keterisian per Gedung */}
       <section className="sh-card p-5">
-        <h3 className="text-sm font-extrabold text-[#0f1d3d] dark:text-white">
-          Tingkat Keterisian per Gedung — {targetDay.label}
-        </h3>
-        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-          Gabungan slot kuliah contoh + booking mahasiswa + laporan terpakai (dari total 10 jam/ruang per hari).
-        </p>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-extrabold">Keterisian per Gedung</h3>
+          <span className="text-xs font-semibold text-slate-400">{targetDay.label}</span>
+        </div>
 
-        <div className="mt-4 space-y-3.5">
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
           {stats.buildings.map((b) => (
-            <div key={b.building}>
-              <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="font-bold text-[#0f1d3d] dark:text-white">
+            <div key={b.building} className="rounded-xl bg-unnes-surface p-3.5 dark:bg-[#0d1730]">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-extrabold">
                   Gedung {b.building}{' '}
-                  <span className="font-normal text-slate-500 dark:text-slate-400">({b.roomCount} ruang)</span>
+                  <span className="font-medium text-slate-500">({b.roomCount})</span>
                 </span>
                 <span className="font-extrabold tabular-nums text-unnes-blue dark:text-unnes-gold">
-                  {b.pct}% ({b.occupiedSlots}/{b.totalSlots} slot)
+                  {b.pct}%
                 </span>
               </div>
-              <div className="h-3 w-full overflow-hidden rounded-full bg-unnes-surface dark:bg-[#0d1730]">
+              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-white dark:bg-[#1a274c]">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-unnes-navy to-unnes-blue transition-all dark:from-unnes-blue dark:to-unnes-gold"
+                  className="h-full rounded-full bg-unnes-navy transition-all dark:bg-unnes-gold"
                   style={{ width: `${b.pct}%` }}
                 />
               </div>
-              <div className="mt-1 flex gap-4 text-[11px] text-slate-500 dark:text-slate-400">
-                <span>Kuliah (contoh): {b.classSlots} slot</span>
-                <span>Booking & laporan: {b.bookedSlots} slot</span>
+              <div className="mt-2 flex justify-between text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                <span>Kuliah: {b.classSlots}</span>
+                <span>Booking/Lapor: {b.bookedSlots}</span>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Riwayat Pemakaian & Laporan */}
+      {/* Tabel Riwayat */}
       <section className="sh-card overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-unnes-border p-4 dark:border-unnes-border-dark">
-          <div className="flex gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-unnes-border p-4 dark:border-unnes-border-dark">
+          <div className="flex gap-1.5">
             <button
               type="button"
               onClick={() => setTab('bookings')}
               className={`sh-chip ${tab === 'bookings' ? 'sh-chip-active' : ''}`}
             >
-              Riwayat Booking ({bookings.length})
+              Booking ({bookings.length})
             </button>
             <button
               type="button"
               onClick={() => setTab('reports')}
               className={`sh-chip ${tab === 'reports' ? 'sh-chip-active' : ''}`}
             >
-              Laporan Lapangan ({reports.length})
+              Laporan ({reports.length})
             </button>
           </div>
 
           {tab === 'bookings' && (
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="sh-input w-auto py-1.5 text-xs"
-            >
-              <option value="all">Semua Status</option>
-              <option value="confirmed">Disetujui (Confirmed)</option>
-              <option value="cancelled">Dibatalkan (Cancelled)</option>
-            </select>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari kode / NIM / ruang..."
+                  className="sh-input w-48 py-1.5 pl-8 text-xs"
+                />
+              </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="sh-input w-auto py-1.5 text-xs"
+              >
+                <option value="all">Semua</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
           )}
         </div>
 
         {tab === 'bookings' ? (
           filteredBookings.length === 0 ? (
-            <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
-              Belum ada riwayat booking ruangan untuk filter ini.
-            </div>
+            <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">Belum ada data.</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px] text-left text-xs">
-                <thead className="bg-unnes-surface text-[11px] uppercase tracking-wider text-slate-500 dark:bg-[#0d1730] dark:text-slate-400">
+              <table className="w-full min-w-[640px] text-left text-xs">
+                <thead className="bg-unnes-surface text-[10px] uppercase tracking-wider text-slate-500 dark:bg-[#0d1730] dark:text-slate-400">
                   <tr>
-                    <th className="px-4 py-3">Kode</th>
-                    <th className="px-4 py-3">Ruang</th>
-                    <th className="px-4 py-3">Jadwal</th>
-                    <th className="px-4 py-3">Peminjam</th>
-                    <th className="px-4 py-3">Keperluan</th>
-                    <th className="px-4 py-3 text-right">Status</th>
+                    <th className="px-4 py-2.5">Kode</th>
+                    <th className="px-4 py-2.5">Ruang</th>
+                    <th className="px-4 py-2.5">Jadwal</th>
+                    <th className="px-4 py-2.5">Peminjam</th>
+                    <th className="px-4 py-2.5">Keperluan</th>
+                    <th className="px-4 py-2.5 text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-unnes-border dark:divide-unnes-border-dark">
                   {filteredBookings.map((b) => (
                     <tr key={b.id} className="hover:bg-unnes-surface/50 dark:hover:bg-[#162347]">
-                      <td className="px-4 py-3 font-mono font-bold text-unnes-blue dark:text-unnes-blue-light">
-                        {b.id}
+                      <td className="px-4 py-2.5 font-mono font-bold text-unnes-blue dark:text-unnes-gold">{b.id}</td>
+                      <td className="px-4 py-2.5 font-bold">{b.room_code}</td>
+                      <td className="px-4 py-2.5">
+                        <span className="font-semibold">{formatDateKeyLabel(b.booking_date, days)}</span>
+                        <span className="ml-1.5 text-[11px] text-slate-500">
+                          {formatHourRange(b.start_hour, b.duration)}
+                        </span>
                       </td>
-                      <td className="px-4 py-3 font-bold text-[#0f1d3d] dark:text-white">{b.room_code}</td>
-                      <td className="px-4 py-3">
-                        <div className="font-semibold">{formatDateKeyLabel(b.booking_date, days)}</div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                          {formatHourRange(b.start_hour, b.duration)} ({b.participants} org)
-                        </div>
+                      <td className="px-4 py-2.5">
+                        <span className="font-semibold">{b.user_name}</span>
+                        <span className="ml-1.5 text-[11px] text-slate-400">{b.nim}</span>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="font-semibold">{b.user_name}</div>
-                        <div className="text-[11px] text-slate-500 dark:text-slate-400">NIM {b.nim}</div>
-                      </td>
-                      <td className="max-w-[200px] truncate px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="max-w-[180px] truncate px-4 py-2.5 text-slate-600 dark:text-slate-300">
                         {b.purpose}
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-2.5 text-right">
                         <span
-                          className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+                          className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${
                             b.status === 'confirmed'
                               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300'
                               : 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300'
                           }`}
                         >
-                          {b.status === 'confirmed' ? 'Confirmed' : 'Cancelled'}
+                          {b.status}
                         </span>
                       </td>
                     </tr>
@@ -348,27 +326,25 @@ export default function AdminView() {
             </div>
           )
         ) : reports.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">
-            Belum ada laporan ruang terpakai dari pengguna.
-          </div>
+          <div className="p-8 text-center text-xs text-slate-500 dark:text-slate-400">Belum ada laporan.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[540px] text-left text-xs">
-              <thead className="bg-unnes-surface text-[11px] uppercase tracking-wider text-slate-500 dark:bg-[#0d1730] dark:text-slate-400">
+            <table className="w-full min-w-[500px] text-left text-xs">
+              <thead className="bg-unnes-surface text-[10px] uppercase tracking-wider text-slate-500 dark:bg-[#0d1730] dark:text-slate-400">
                 <tr>
-                  <th className="px-4 py-3">Ruang</th>
-                  <th className="px-4 py-3">Tanggal</th>
-                  <th className="px-4 py-3">Jam Dilaporkan</th>
-                  <th className="px-4 py-3">Pelapor</th>
+                  <th className="px-4 py-2.5">Ruang</th>
+                  <th className="px-4 py-2.5">Tanggal</th>
+                  <th className="px-4 py-2.5">Jam</th>
+                  <th className="px-4 py-2.5">Pelapor</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-unnes-border dark:divide-unnes-border-dark">
                 {reports.map((r) => (
                   <tr key={r.id}>
-                    <td className="px-4 py-3 font-bold text-[#0f1d3d] dark:text-white">{r.room_code}</td>
-                    <td className="px-4 py-3">{formatDateKeyLabel(r.report_date, days)}</td>
-                    <td className="px-4 py-3 font-semibold">{formatHour(r.report_hour)} WIB</td>
-                    <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{r.reported_by}</td>
+                    <td className="px-4 py-2.5 font-bold">{r.room_code}</td>
+                    <td className="px-4 py-2.5">{formatDateKeyLabel(r.report_date, days)}</td>
+                    <td className="px-4 py-2.5 font-semibold">{formatHour(r.report_hour)}</td>
+                    <td className="px-4 py-2.5 text-slate-500">{r.reported_by}</td>
                   </tr>
                 ))}
               </tbody>

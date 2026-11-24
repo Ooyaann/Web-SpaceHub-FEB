@@ -11,13 +11,17 @@ export const FACILITY_OPTIONS = ['AC', 'Proyektor', 'Whiteboard', 'WiFi', 'Colok
 export const SLOT_LABELS = {
   f: 'Kosong',
   k: 'Ada kelas',
-  o: 'Dipesan / terpakai',
-  m: 'Booking kamu',
-  p: 'Sudah lewat',
+  o: 'Terpakai',
+  m: 'Bookingmu',
+  p: 'Lewat',
 };
 
-export const BOOKING_RULES_TEXT =
-  'Aturan booking: pemesanan hingga 30 hari ke depan, durasi maksimal 3 jam per booking, maksimal 3 booking aktif, dan dapat dibatalkan sebelum jam mulai.';
+export const BOOKING_RULE_PILLS = [
+  'Maks. H+30',
+  'Durasi 1–3 jam',
+  'Maks. 3 aktif',
+  'Batal < jam mulai',
+];
 
 const ROOM_LAYOUT = {
   L2: {
@@ -68,13 +72,13 @@ export const FALLBACK_ROOMS = (() => {
           : FACILITY_PRESETS[(floor + i) % FACILITY_PRESETS.length];
         const pricePerHour = isLab ? 50000 : 0;
         const priceNote = isLab
-          ? 'Gratis untuk praktikum mata kuliah · Rp 50.000/jam untuk pelatihan/kegiatan non-akademik'
+          ? 'Praktikum kuliah gratis · Non-akademik Rp 50.000/jam'
           : capacity >= 60
-            ? 'Gratis untuk kegiatan akademik mahasiswa FEB · Tarif umum Rp 75.000/jam'
-            : 'Gratis untuk kegiatan akademik mahasiswa FEB · Tarif umum Rp 50.000/jam';
+            ? 'Mahasiswa FEB gratis · Umum Rp 75.000/jam'
+            : 'Mahasiswa FEB gratis · Umum Rp 50.000/jam';
         const description = isLab
-          ? `Laboratorium praktikum FEB UNNES di Gedung ${building} lantai ${floor}, lengkap dengan proyektor, AC, WiFi cepat, dan stopkontak di tiap meja.`
-          : `Ruang kuliah kapasitas ${capacity} kursi di Gedung ${building} lantai ${floor}, nyaman untuk diskusi kelompok, rapat organisasi, dan kuliah pengganti.`;
+          ? `Lab praktikum ${capacity} kursi · Gedung ${building} Lt. ${floor}.`
+          : `Ruang kuliah ${capacity} kursi · Gedung ${building} Lt. ${floor}.`;
 
         list.push({
           id: `fallback-${idx + 1}`,

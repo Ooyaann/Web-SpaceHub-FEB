@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import { RotateCcw, Search, SlidersHorizontal, Star } from 'lucide-react';
+import { RotateCcw, Search, Star } from 'lucide-react';
 import { FACILITY_OPTIONS, START_HOURS, getFloorOptions } from '../lib/constants';
 import { formatHour } from '../lib/dateWib';
 import { getFreeUntilHour, getSlotStatus, isWindowFree } from '../lib/schedule';
 import { useSpaceHub } from '../context/SpaceHubContext';
+import DatePickerPopover from '../components/DatePickerPopover';
 import RoomCard from '../components/RoomCard';
 import SkeletonCard from '../components/SkeletonCard';
 
@@ -54,6 +55,8 @@ export default function FindView() {
         }
         if (filters.floorKey && `${r.building}-${r.floor}` !== filters.floorKey) return false;
         if (r.capacity < filters.cap) return false;
+        if (filters.priceType === 'free' && Number(r.price_per_hour) > 0) return false;
+        if (filters.priceType === 'paid' && Number(r.price_per_hour) <= 0) return false;
         if (filters.facilities.length > 0 && !filters.facilities.every((f) => (r.facilities || []).includes(f))) {
           return false;
         }
@@ -102,121 +105,102 @@ export default function FindView() {
   const hasExtraFilter =
     Boolean(filters.floorKey) ||
     filters.cap > 0 ||
+    filters.priceType !== 'all' ||
     filters.facilities.length > 0 ||
     filters.favOnly ||
     Boolean(filters.search.trim());
 
   return (
     <div className="space-y-5">
-      {/* Hero Banner */}
+      {/* Compact Hero */}
       <section
-        className="overflow-hidden rounded-2xl p-6 text-white shadow-soft"
+        className="overflow-hidden rounded-2xl px-6 py-5 text-white shadow-soft"
         style={{
-          backgroundImage: `linear-gradient(95deg, rgba(11, 42, 111, 0.96) 45%, rgba(11, 42, 111, 0.6) 100%), url(/images/feb-hero.jpg)`,
+          backgroundImage: `linear-gradient(95deg, rgba(11, 42, 111, 0.94) 40%, rgba(11, 42, 111, 0.52) 100%), url(/images/feb-hero.jpg)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="max-w-md">
+          <div>
             <span className="inline-block rounded-full bg-white/15 px-2.5 py-0.5 text-[11px] font-bold text-unnes-gold">
-              {nowWib.timeLabel} · {days[0].label}
+              {nowWib.timeLabel}
             </span>
-            <h2 className="mt-2 text-2xl font-extrabold tracking-tight sm:text-3xl">
-              Halo, {user?.name}!
-            </h2>
-            <p className="mt-1 text-sm text-blue-100/90">
-              Temukan ruang kelas kosong FEB UNNES lengkap dengan fasilitas & tarif, lalu booking langsung tanpa bentrok.
-            </p>
+            <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight">Halo, {user?.name}!</h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-2.5">
-            <div className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 text-center backdrop-blur-sm">
-              <div className="text-2xl font-extrabold leading-none text-unnes-gold tabular-nums">
+          <div className="flex gap-2.5">
+            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center backdrop-blur-sm">
+              <div className="text-xl font-extrabold leading-none text-unnes-gold tabular-nums">
                 {freeNowCount}
               </div>
-              <div className="mt-1 text-[11px] text-blue-100">Kosong kini</div>
+              <div className="mt-1 text-[10px] font-medium text-blue-100">Kosong kini</div>
             </div>
-            <div className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 text-center backdrop-blur-sm">
-              <div className="text-2xl font-extrabold leading-none text-unnes-gold tabular-nums">
+            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center backdrop-blur-sm">
+              <div className="text-xl font-extrabold leading-none text-unnes-gold tabular-nums">
                 {filteredRooms.length}
               </div>
-              <div className="mt-1 text-[11px] text-blue-100">Cocok filter</div>
+              <div className="mt-1 text-[10px] font-medium text-blue-100">Tersedia</div>
             </div>
-            <div className="rounded-xl border border-white/20 bg-white/10 px-3.5 py-2.5 text-center backdrop-blur-sm">
-              <div className="text-2xl font-extrabold leading-none text-unnes-gold tabular-nums">
+            <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-center backdrop-blur-sm">
+              <div className="text-xl font-extrabold leading-none text-unnes-gold tabular-nums">
                 {favorites.size}
               </div>
-              <div className="mt-1 text-[11px] text-blue-100">Favorit</div>
+              <div className="mt-1 text-[10px] font-medium text-blue-100">Favorit</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Filter Card */}
-      <section className="sh-card p-4">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            <SlidersHorizontal className="h-3.5 w-3.5" />
-            Filter Ketersediaan Ruang
-          </div>
-          {hasExtraFilter && (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-unnes-blue hover:underline dark:text-unnes-blue-light"
-            >
-              <RotateCcw className="h-3 w-3" />
-              Reset filter
-            </button>
-          )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          <label className="block">
-            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tanggal</span>
-            <select
+      {/* Modern Booking Filter Bar */}
+      <section className="sh-card space-y-3.5 p-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
+          <div className="lg:col-span-3">
+            <DatePickerPopover
+              label="Tanggal"
+              days={days}
               value={filters.day}
-              onChange={(e) => updateFilter('day', Number(e.target.value))}
-              className="sh-input"
-            >
-              {days.map((d) => (
-                <option key={d.key} value={d.index}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={(idx) => updateFilter('day', idx)}
+            />
+          </div>
 
-          <label className="block">
+          <label className="block lg:col-span-2">
             <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Jam Mulai</span>
             <select
               value={filters.start}
               onChange={(e) => updateFilter('start', Number(e.target.value))}
-              className="sh-input"
+              className="sh-input font-semibold"
             >
               {START_HOURS.map((h) => (
                 <option key={h} value={h}>
-                  {formatHour(h)}
+                  {formatHour(h)} WIB
                 </option>
               ))}
             </select>
           </label>
 
-          <label className="block">
+          {/* Segmented Duration */}
+          <div className="lg:col-span-2">
             <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Durasi</span>
-            <select
-              value={filters.dur}
-              onChange={(e) => updateFilter('dur', Number(e.target.value))}
-              className="sh-input"
-            >
-              <option value={1}>1 jam</option>
-              <option value={2}>2 jam</option>
-              <option value={3}>3 jam</option>
-            </select>
-          </label>
+            <div className="grid grid-cols-3 rounded-xl border border-unnes-border bg-[#f7faff] p-0.5 dark:border-unnes-border-dark dark:bg-[#0d1730]">
+              {[1, 2, 3].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => updateFilter('dur', d)}
+                  className={`rounded-lg py-1.5 text-xs font-extrabold transition ${
+                    filters.dur === d
+                      ? 'bg-unnes-navy text-unnes-gold shadow-sm dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                      : 'text-slate-600 hover:text-unnes-navy dark:text-slate-400 dark:hover:text-white'
+                  }`}
+                >
+                  {d}j
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <label className="block">
+          <label className="block lg:col-span-3">
             <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
               Gedung / Lantai
             </span>
@@ -234,47 +218,35 @@ export default function FindView() {
             </select>
           </label>
 
-          <label className="block">
+          <label className="block lg:col-span-2">
             <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Kapasitas</span>
             <select
               value={filters.cap}
               onChange={(e) => updateFilter('cap', Number(e.target.value))}
               className="sh-input"
             >
-              <option value={0}>Bebas</option>
-              <option value={30}>30+ orang</option>
-              <option value={45}>45+ orang</option>
-              <option value={60}>60+ orang</option>
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="mb-1 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Urutkan</span>
-            <select
-              value={filters.sort}
-              onChange={(e) => updateFilter('sort', e.target.value)}
-              className="sh-input"
-            >
-              <option value="cap">Kapasitas terbesar</option>
-              <option value="long">Kosong paling lama</option>
+              <option value={0}>Semua</option>
+              <option value={30}>30+ kursi</option>
+              <option value={45}>45+ kursi</option>
+              <option value={60}>60+ kursi</option>
             </select>
           </label>
         </div>
 
-        {/* Search & Facility Chips */}
-        <div className="mt-3.5 flex flex-wrap items-center gap-2 border-t border-unnes-border/70 pt-3.5 dark:border-unnes-border-dark">
-          <div className="relative min-w-[180px] flex-1 sm:max-w-xs">
+        {/* Search + Facility + Tarif + Sort Row */}
+        <div className="flex flex-wrap items-center gap-2 border-t border-unnes-border/70 pt-3 dark:border-unnes-border-dark">
+          <div className="relative min-w-[170px] flex-1 sm:max-w-[210px]">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
               value={filters.search}
               onChange={(e) => updateFilter('search', e.target.value)}
-              placeholder="Cari kode ruang (mis. L4 512, Lab)..."
+              placeholder="Cari kode (L4 512, Lab)..."
               className="sh-input py-1.5 pl-8 text-xs"
             />
           </div>
 
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             {FACILITY_OPTIONS.map((fac) => {
               const active = filters.facilities.includes(fac);
               return (
@@ -288,41 +260,84 @@ export default function FindView() {
                 </button>
               );
             })}
+
             <button
               type="button"
               onClick={() => updateFilter('favOnly', !filters.favOnly)}
               className={`sh-chip ${filters.favOnly ? 'sh-chip-active' : ''}`}
             >
               <Star className={`h-3 w-3 ${filters.favOnly ? 'fill-unnes-gold-ink' : ''}`} />
-              Favorit saja
+              Favorit
             </button>
+
+            <span className="mx-0.5 hidden h-4 w-px bg-unnes-border dark:bg-unnes-border-dark sm:inline-block" />
+
+            {[
+              { id: 'all', label: 'Semua Tarif' },
+              { id: 'free', label: 'Gratis FEB' },
+              { id: 'paid', label: 'Lab' },
+            ].map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => updateFilter('priceType', t.id)}
+                className={`sh-chip ${filters.priceType === t.id && t.id !== 'all' ? 'sh-chip-active' : ''} ${
+                  filters.priceType === 'all' && t.id === 'all'
+                    ? 'border-unnes-navy/40 bg-unnes-surface font-bold dark:border-unnes-blue-light/40 dark:bg-[#19264a]'
+                    : ''
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <select
+              aria-label="Urutkan ruangan"
+              value={filters.sort}
+              onChange={(e) => updateFilter('sort', e.target.value)}
+              className="sh-input w-auto py-1.5 text-xs"
+            >
+              <option value="cap">Kapasitas terbesar</option>
+              <option value="long">Kosong terlama</option>
+            </select>
+
+            {hasExtraFilter && (
+              <button
+                type="button"
+                onClick={resetFilters}
+                title="Reset filter"
+                className="rounded-lg p-1.5 text-slate-500 transition hover:bg-unnes-surface hover:text-unnes-blue dark:text-slate-400 dark:hover:bg-[#19264a]"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Results Grid */}
+      {/* 3-Column Modern Room Grid */}
       {loading ? (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, idx) => (
             <SkeletonCard key={idx} />
           ))}
         </div>
       ) : filteredRooms.length > 0 ? (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filteredRooms.map((room) => (
             <RoomCard key={room.code} room={room} dayIndex={filters.day} />
           ))}
         </div>
       ) : (
         <div className="sh-card border-dashed px-6 py-12 text-center">
-          <p className="text-sm font-bold text-[#0f1d3d] dark:text-white">
-            Tidak ada ruang kosong pada waktu & filter ini.
-          </p>
+          <p className="text-sm font-bold text-[#0f1d3d] dark:text-white">Tidak ada ruang kosong di slot ini.</p>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Coba pilih tanggal besok, ganti jam mulai, kurangi durasi, atau lepas beberapa filter fasilitas.
+            Coba ganti tanggal, jam mulai, atau reset filter.
           </p>
           <button type="button" onClick={resetFilters} className="sh-btn-secondary mt-4">
-            Reset ke Filter Awal
+            Reset Filter
           </button>
         </div>
       )}

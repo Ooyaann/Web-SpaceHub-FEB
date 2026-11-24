@@ -26,19 +26,14 @@ export default function MobileNav() {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-unnes-navy text-white shadow-md dark:bg-unnes-navy-deep lg:hidden">
-      <div className="flex items-center justify-between px-4 py-3">
-        <button
-          type="button"
-          onClick={() => navigate('find')}
-          className="flex items-center gap-2 text-left"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-unnes-gold text-unnes-gold-ink">
+    <header className="sticky top-0 z-30 border-b border-unnes-border bg-white/95 backdrop-blur-md dark:border-unnes-border-dark dark:bg-[#0c152d]/95 lg:hidden">
+      <div className="flex items-center justify-between px-4 py-2.5">
+        <button type="button" onClick={() => navigate('find')} className="flex items-center gap-2 text-left">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-unnes-navy text-unnes-gold">
             <Compass className="h-4 w-4" />
           </div>
-          <span className="text-base font-extrabold tracking-tight">
-            Space<span className="text-unnes-gold">Hub</span>
-            <span className="ml-1.5 text-[10px] font-semibold text-blue-200/80">FEB UNNES</span>
+          <span className="text-base font-extrabold tracking-tight text-unnes-navy dark:text-white">
+            Space<span className="text-unnes-blue dark:text-unnes-gold">Hub</span>
           </span>
         </button>
 
@@ -47,16 +42,16 @@ export default function MobileNav() {
             type="button"
             onClick={() => refreshData(true)}
             disabled={syncing}
-            aria-label="Muat ulang data"
-            className="rounded-lg bg-white/10 p-2 text-blue-100 transition hover:bg-white/20"
+            aria-label="Muat ulang"
+            className="rounded-lg border border-unnes-border p-1.5 text-slate-600 dark:border-unnes-border-dark dark:text-slate-300"
           >
             <RefreshCw className={`h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
           </button>
           <button
             type="button"
             onClick={toggleTheme}
-            aria-label="Ubah mode terang atau gelap"
-            className="rounded-lg bg-white/10 p-2 text-blue-100 transition hover:bg-white/20"
+            aria-label="Ubah tema"
+            className="rounded-lg border border-unnes-border p-1.5 text-slate-600 dark:border-unnes-border-dark dark:text-slate-300"
           >
             {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -64,7 +59,7 @@ export default function MobileNav() {
             type="button"
             onClick={logout}
             aria-label="Keluar"
-            className="rounded-lg bg-white/10 p-2 text-blue-100 transition hover:bg-white/20"
+            className="rounded-lg border border-unnes-border p-1.5 text-slate-600 dark:border-unnes-border-dark dark:text-slate-300"
           >
             <LogOut className="h-4 w-4" />
           </button>
@@ -73,7 +68,7 @@ export default function MobileNav() {
 
       <nav
         aria-label="Navigasi mobile"
-        className="no-scrollbar flex gap-1.5 overflow-x-auto border-t border-white/10 px-3 py-2"
+        className="no-scrollbar flex gap-1.5 overflow-x-auto px-3 pb-2.5 pt-0.5"
       >
         {NAV_ITEMS.map(({ id, label, icon: Icon }) => {
           const isActive = currentNav === id;
@@ -85,16 +80,18 @@ export default function MobileNav() {
               onClick={() => navigate(id)}
               className={`flex flex-none items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition ${
                 isActive
-                  ? 'bg-unnes-gold font-extrabold text-unnes-gold-ink'
-                  : 'bg-white/10 text-blue-100 hover:bg-white/20'
+                  ? 'bg-unnes-navy text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                  : 'bg-unnes-surface text-slate-600 dark:bg-[#172344] dark:text-slate-300'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
               {label}
               {badge > 0 && (
                 <span
-                  className={`rounded-full px-1.5 py-0.2 text-[10px] font-extrabold ${
-                    isActive ? 'bg-unnes-navy text-white' : 'bg-unnes-gold text-unnes-gold-ink'
+                  className={`rounded-full px-1.5 text-[10px] font-extrabold ${
+                    isActive
+                      ? 'bg-unnes-gold text-unnes-gold-ink dark:bg-unnes-navy dark:text-white'
+                      : 'bg-unnes-navy/10 text-unnes-navy dark:bg-white/10 dark:text-unnes-gold'
                   }`}
                 >
                   {badge}
