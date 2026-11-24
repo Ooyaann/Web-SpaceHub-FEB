@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-  Compass,
   Eye,
   EyeOff,
   GraduationCap,
@@ -21,8 +20,8 @@ export default function LoginView() {
   const { loginOrRegister, loginAsAdmin } = useSpaceHub();
   const { theme, toggleTheme } = useTheme();
 
-  const [portal, setPortal] = useState('student'); // 'student' | 'admin'
-  const [mode, setMode] = useState('login'); // 'login' | 'register'
+  const [portal, setPortal] = useState('student');
+  const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('mahasiswa@student.unnes.ac.id');
   const [password, setPassword] = useState('contoh123');
   const [fullName, setFullName] = useState('');
@@ -68,36 +67,34 @@ export default function LoginView() {
           type="button"
           onClick={toggleTheme}
           aria-label="Ubah tema"
-          className="absolute right-5 top-5 rounded-xl border border-line-light bg-white p-2.5 text-slate-500 shadow-sm transition hover:bg-slate-50 dark:border-line-dark dark:bg-surface-dark dark:text-slate-400 dark:hover:bg-slate-800"
+          className="absolute right-5 top-5 rounded-lg border border-line-light bg-white p-2 text-[#526382] transition hover:bg-surface-subtle dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-unnes-night-muted dark:hover:bg-[#192746]"
         >
-          {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
+          {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
         </button>
 
         <div className="mx-auto w-full max-w-sm">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand text-brand-gold shadow-sm dark:bg-brand-dark/20">
-              <Compass className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-xl font-extrabold leading-none tracking-tight text-slate-900 dark:text-white">
-                Space<span className="text-brand dark:text-brand-dark">Hub</span>
-              </h1>
-              <p className="mt-0.5 text-[11px] font-semibold text-slate-400">Ruang Kelas FEB UNNES</p>
-            </div>
+          {/* Pure Wordmark: Space + yellow Hub */}
+          <div>
+            <h1 className="text-3xl font-extrabold leading-none tracking-[-0.03em] text-unnes-navy dark:text-white">
+              Space<span className="text-unnes-gold">Hub</span>
+            </h1>
+            <p className="mt-1.5 text-xs font-semibold tracking-wider text-[#526382] dark:text-unnes-night-muted">
+              FAKULTAS EKONOMIKA DAN BISNIS · UNNES
+            </p>
           </div>
 
-          {/* Role Switch: Mahasiswa vs Pengelola */}
-          <div className="mt-7 grid grid-cols-2 rounded-xl border border-line-light bg-slate-100 p-1 dark:border-line-dark dark:bg-surface-dark">
+          {/* Role Switch */}
+          <div className="mt-7 grid grid-cols-2 rounded-lg border border-line-light bg-surface-subtle p-1 dark:border-unnes-night-line dark:bg-unnes-night-card">
             <button
               type="button"
               onClick={() => {
                 setPortal('student');
                 setError('');
               }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-bold transition ${
                 portal === 'student'
-                  ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                  ? 'bg-unnes-royal text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                  : 'text-[#526382] hover:text-[#0F1B33] dark:text-unnes-night-muted dark:hover:text-white'
               }`}
             >
               <GraduationCap className="h-3.5 w-3.5" />
@@ -109,10 +106,10 @@ export default function LoginView() {
                 setPortal('admin');
                 setError('');
               }}
-              className={`inline-flex items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold transition ${
+              className={`inline-flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-bold transition ${
                 portal === 'admin'
-                  ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-800 dark:text-white'
-                  : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
+                  ? 'bg-unnes-royal text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                  : 'text-[#526382] hover:text-[#0F1B33] dark:text-unnes-night-muted dark:hover:text-white'
               }`}
             >
               <ShieldCheck className="h-3.5 w-3.5" />
@@ -123,7 +120,7 @@ export default function LoginView() {
           {portal === 'student' ? (
             <>
               <div className="mt-6 flex items-baseline justify-between">
-                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">
+                <h2 className="text-xl font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">
                   {mode === 'login' ? 'Masuk Mahasiswa' : 'Daftar Akun Baru'}
                 </h2>
                 <button
@@ -137,20 +134,20 @@ export default function LoginView() {
                       setPassword('');
                     }
                   }}
-                  className="text-xs font-semibold text-brand hover:underline dark:text-blue-400"
+                  className="text-xs font-bold text-unnes-royal hover:underline dark:text-unnes-gold"
                 >
-                  {mode === 'login' ? 'Belum punya akun?' : 'Sudah punya akun?'}
+                  {mode === 'login' ? 'Daftar akun' : 'Sudah punya akun'}
                 </button>
               </div>
 
               <form onSubmit={handleStudentSubmit} className="mt-4 space-y-3.5">
                 {mode === 'register' && (
                   <label className="block">
-                    <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                       Nama Lengkap
                     </span>
                     <div className="relative">
-                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
                       <input
                         type="text"
                         value={fullName}
@@ -163,11 +160,11 @@ export default function LoginView() {
                 )}
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                     Email UNNES
                   </span>
                   <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
                     <input
                       type="email"
                       autoComplete="username"
@@ -181,11 +178,11 @@ export default function LoginView() {
                 </label>
 
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                     Password
                   </span>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
                     <input
                       type={showPass ? 'text' : 'password'}
                       autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -199,7 +196,7 @@ export default function LoginView() {
                       type="button"
                       onClick={() => setShowPass((v) => !v)}
                       aria-label="Toggle password"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-[#6A7B9C] hover:text-[#0F1B33] dark:hover:text-white"
                     >
                       {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
@@ -209,7 +206,7 @@ export default function LoginView() {
                 {error && (
                   <div
                     role="alert"
-                    className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+                    className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
                   >
                     {error}
                   </div>
@@ -220,8 +217,8 @@ export default function LoginView() {
                 </button>
               </form>
 
-              <div className="mt-4 flex items-center justify-between rounded-xl border border-line-light bg-white px-3 py-2.5 text-[11px] dark:border-line-dark dark:bg-surface-dark">
-                <span className="font-mono text-slate-500 dark:text-slate-400">Demo: contoh123</span>
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-line-light bg-white px-3 py-2.5 text-[11px] dark:border-unnes-night-line dark:bg-unnes-night-card">
+                <span className="font-mono text-[#526382] dark:text-unnes-night-muted">Demo: contoh123</span>
                 <button
                   type="button"
                   onClick={() => {
@@ -230,7 +227,7 @@ export default function LoginView() {
                     setPassword('contoh123');
                     setError('');
                   }}
-                  className="inline-flex items-center gap-1 font-bold text-brand hover:underline dark:text-blue-400"
+                  className="inline-flex items-center gap-1 font-bold text-unnes-royal hover:underline dark:text-unnes-gold"
                 >
                   <Sparkles className="h-3 w-3" />
                   Isi akun demo
@@ -240,19 +237,19 @@ export default function LoginView() {
           ) : (
             <>
               <div className="mt-6">
-                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white">Portal Pengelola</h2>
-                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                  Pantau tingkat keterisian gedung & riwayat pemakaian ruang.
+                <h2 className="text-xl font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">Portal Pengelola</h2>
+                <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">
+                  Pantau keterisian gedung & riwayat pemakaian ruang.
                 </p>
               </div>
 
               <form onSubmit={handleAdminSubmit} className="mt-4 space-y-3.5">
                 <label className="block">
-                  <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                     PIN Pengelola
                   </span>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
                     <input
                       type="password"
                       required
@@ -267,7 +264,7 @@ export default function LoginView() {
                 {error && (
                   <div
                     role="alert"
-                    className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+                    className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
                   >
                     {error}
                   </div>
@@ -278,15 +275,15 @@ export default function LoginView() {
                 </button>
               </form>
 
-              <div className="mt-4 flex items-center justify-between rounded-xl border border-line-light bg-white px-3 py-2.5 text-[11px] dark:border-line-dark dark:bg-surface-dark">
-                <span className="font-mono text-slate-500 dark:text-slate-400">PIN Demo: {ADMIN_PIN}</span>
+              <div className="mt-4 flex items-center justify-between rounded-lg border border-line-light bg-white px-3 py-2.5 text-[11px] dark:border-unnes-night-line dark:bg-unnes-night-card">
+                <span className="font-mono text-[#526382] dark:text-unnes-night-muted">PIN Demo: {ADMIN_PIN}</span>
                 <button
                   type="button"
                   onClick={() => {
                     setAdminPin(ADMIN_PIN);
                     setError('');
                   }}
-                  className="inline-flex items-center gap-1 font-bold text-brand hover:underline dark:text-blue-400"
+                  className="inline-flex items-center gap-1 font-bold text-unnes-royal hover:underline dark:text-unnes-gold"
                 >
                   <Sparkles className="h-3 w-3" />
                   Isi PIN
@@ -297,20 +294,20 @@ export default function LoginView() {
         </div>
       </div>
 
-      {/* Right Visual Column */}
+      {/* Right Visual Column — UNNES Navy atmospheric tint */}
       <div
-        className="relative hidden overflow-hidden bg-slate-900 lg:flex lg:flex-col lg:justify-end lg:p-12"
+        className="relative hidden overflow-hidden bg-unnes-navy lg:flex lg:flex-col lg:justify-end lg:p-12"
         style={{
-          backgroundImage: `linear-gradient(180deg, rgba(15, 23, 42, 0.22) 0%, rgba(9, 13, 22, 0.88) 100%), url(/images/login-bg.jpg)`,
+          backgroundImage: `linear-gradient(180deg, rgba(11, 36, 89, 0.35) 0%, rgba(7, 13, 26, 0.92) 100%), url(/images/login-bg.jpg)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
         <div className="max-w-md text-white">
-          <span className="inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-slate-100 backdrop-blur-md">
-            64 Ruang · Gedung L2, L4, L5
+          <span className="inline-block rounded-md bg-unnes-gold px-2.5 py-1 font-mono text-[11px] font-bold text-unnes-gold-ink">
+            64 RUANG · L2 · L4 · L5
           </span>
-          <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight">
+          <h2 className="mt-3 text-3xl font-extrabold leading-tight tracking-[-0.025em]">
             Cari ruang kosong, cek tarif, booking tanpa bentrok.
           </h2>
         </div>

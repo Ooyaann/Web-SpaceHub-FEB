@@ -156,37 +156,35 @@ export default function FindView() {
 
   return (
     <div className="space-y-6">
-      {/* Clean Page Header (No bulky banner) */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
             Cari Ruang Kosong
           </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            {selectedDay.label} · {formatHour(filters.start)} ({filters.dur} jam) · {nowWib.timeLabel}
+          <p className="mt-1 font-mono text-xs text-[#526382] dark:text-unnes-night-muted">
+            {selectedDay.label} · {formatHour(filters.start)} ({filters.dur}j) · {nowWib.timeLabel}
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-slate-700 dark:border-line-dark dark:bg-surface-dark dark:text-slate-200">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-[#0F1B33] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-[#F1F5FB]">
             <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <strong className="tabular-nums">{filteredRooms.length}</strong> tersedia
+            <strong className="font-mono">{filteredRooms.length}</strong> tersedia
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-slate-500 dark:border-line-dark dark:bg-surface-dark dark:text-slate-400">
-            Kosong kini: <strong className="tabular-nums text-slate-800 dark:text-white">{freeNowCount}</strong>
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-medium text-[#526382] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-unnes-night-muted">
+            Kosong kini: <strong className="font-mono text-[#0F1B33] dark:text-[#F1F5FB]">{freeNowCount}</strong>
           </span>
           {!isAdmin && (
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-semibold text-slate-500 dark:border-line-dark dark:bg-surface-dark dark:text-slate-400">
-              <Star className="h-3.5 w-3.5 fill-brand-gold text-brand-gold" />
-              <strong className="tabular-nums text-slate-800 dark:text-white">{favorites.size}</strong>
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-white px-3 py-1.5 font-medium text-[#526382] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-unnes-night-muted">
+              <Star className="h-3.5 w-3.5 fill-unnes-gold text-unnes-gold" />
+              <strong className="font-mono text-[#0F1B33] dark:text-[#F1F5FB]">{favorites.size}</strong>
             </span>
           )}
         </div>
       </div>
 
-      {/* Symmetrical 2-Row Filter Card (100% uniform h-10 custom controls) */}
+      {/* Symmetrical 2-Row Filter Bar */}
       <section className="sh-card space-y-4 p-4 sm:p-5">
-        {/* Row 1: Waktu & Pencarian Cepat */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-3">
             <DatePickerPopover
@@ -208,17 +206,19 @@ export default function FindView() {
           </div>
 
           <div className="lg:col-span-2">
-            <span className="mb-1.5 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Durasi</span>
-            <div className="grid h-10 grid-cols-3 rounded-xl border border-line-light bg-slate-50 p-1 dark:border-line-dark dark:bg-surface-subtle-dark">
+            <span className="mb-1.5 block text-[11px] font-semibold text-[#526382] dark:text-unnes-night-muted">
+              Durasi
+            </span>
+            <div className="grid h-10 grid-cols-3 rounded-lg border border-line-light bg-surface-subtle p-1 dark:border-unnes-night-line dark:bg-unnes-night-input">
               {[1, 2, 3].map((d) => (
                 <button
                   key={d}
                   type="button"
                   onClick={() => updateFilter('dur', d)}
-                  className={`rounded-lg text-xs font-bold transition ${
+                  className={`rounded-md font-mono text-xs font-bold transition ${
                     filters.dur === d
-                      ? 'bg-brand text-white shadow-sm dark:bg-brand-dark'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                      ? 'bg-unnes-royal text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                      : 'text-[#4B5E82] hover:text-[#0F1B33] dark:text-unnes-night-muted dark:hover:text-white'
                   }`}
                 >
                   {d}j
@@ -228,11 +228,11 @@ export default function FindView() {
           </div>
 
           <div className="lg:col-span-4">
-            <span className="mb-1.5 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+            <span className="mb-1.5 block text-[11px] font-semibold text-[#526382] dark:text-unnes-night-muted">
               Cari Kode Ruang
             </span>
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
               <input
                 type="text"
                 value={filters.search}
@@ -244,8 +244,7 @@ export default function FindView() {
           </div>
         </div>
 
-        {/* Row 2: Filter Terstruktur Simetris (5 kolom rata) */}
-        <div className="grid grid-cols-1 gap-3 border-t border-line-light pt-3.5 dark:border-line-dark sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 border-t border-line-light pt-3.5 dark:border-unnes-night-line sm:grid-cols-2 lg:grid-cols-5">
           <SelectPopover
             icon={Building2}
             value={filters.floorKey}
@@ -280,7 +279,7 @@ export default function FindView() {
             onClick={() => setShowFacilities((s) => !s)}
             className={`sh-control flex items-center justify-between gap-2 ${
               showFacilities || activeFacCount > 0
-                ? 'border-brand text-brand dark:border-brand-dark dark:text-blue-300'
+                ? 'border-unnes-royal text-unnes-royal dark:border-unnes-gold dark:text-unnes-gold'
                 : ''
             }`}
           >
@@ -289,18 +288,19 @@ export default function FindView() {
               Fasilitas
             </span>
             {activeFacCount > 0 ? (
-              <span className="rounded-full bg-brand px-2 py-0.5 text-[10px] font-bold text-white dark:bg-brand-dark">
+              <span className="rounded bg-unnes-royal px-1.5 py-0.5 font-mono text-[10px] font-bold text-white dark:bg-unnes-gold dark:text-unnes-gold-ink">
                 {activeFacCount}
               </span>
             ) : (
-              <span className="text-xs text-slate-400">{showFacilities ? 'Tutup' : 'Pilih'}</span>
+              <span className="text-xs text-[#6A7B9C] dark:text-unnes-night-muted">
+                {showFacilities ? 'Tutup' : 'Pilih'}
+              </span>
             )}
           </button>
         </div>
 
-        {/* Collapsible Facility & Favorite Tray */}
         {(showFacilities || activeFacCount > 0) && (
-          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 px-3.5 py-2.5 dark:bg-surface-subtle-dark">
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-surface-subtle px-3.5 py-2.5 dark:bg-unnes-night-input">
             <div className="flex flex-wrap items-center gap-1.5">
               {FACILITY_OPTIONS.map((fac) => {
                 const active = filters.facilities.includes(fac);
@@ -332,7 +332,7 @@ export default function FindView() {
               <button
                 type="button"
                 onClick={resetFilters}
-                className="inline-flex items-center gap-1 text-xs font-semibold text-slate-500 transition hover:text-brand dark:text-slate-400 dark:hover:text-blue-300"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-[#526382] transition hover:text-unnes-royal dark:text-unnes-night-muted dark:hover:text-unnes-gold"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 Reset
@@ -342,7 +342,6 @@ export default function FindView() {
         )}
       </section>
 
-      {/* Room Cards Grid */}
       {loading ? (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, idx) => (
@@ -357,8 +356,8 @@ export default function FindView() {
         </div>
       ) : (
         <div className="sh-card border-dashed px-6 py-14 text-center">
-          <p className="text-sm font-bold text-slate-900 dark:text-white">Tidak ada ruang kosong di slot ini.</p>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">Tidak ada ruang kosong di slot ini.</p>
+          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">
             Ubah tanggal, jam mulai, atau reset filter untuk melihat ruang lain.
           </p>
           <button type="button" onClick={resetFilters} className="sh-btn-secondary mt-4">

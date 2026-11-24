@@ -3,7 +3,6 @@ import {
   BookOpen,
   CalendarDays,
   ClipboardList,
-  Compass,
   Grid2x2,
   LogOut,
   Map,
@@ -88,23 +87,19 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-60 flex-none flex-col border-r border-line-light bg-surface-light px-3.5 py-5 dark:border-line-dark dark:bg-surface-dark lg:flex">
-      <div className="flex items-center justify-between px-1.5 pb-6">
+    <aside className="sticky top-0 hidden h-screen w-60 flex-none flex-col border-r border-unnes-navy/90 bg-unnes-navy px-4 py-5 text-white dark:border-unnes-night-line dark:bg-unnes-night-rail lg:flex">
+      {/* Pure Prototype Wordmark: Space + yellow Hub (No compass icon) */}
+      <div className="flex items-center justify-between px-1 pb-6">
         <button
           type="button"
           onClick={() => navigate(isAdmin ? 'admin' : 'find')}
-          className="flex items-center gap-2.5 text-left"
+          className="text-left"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-brand-gold shadow-sm dark:bg-brand-dark/20">
-            <Compass className="h-5 w-5" />
+          <div className="text-[22px] font-extrabold leading-none tracking-[-0.03em] text-white">
+            Space<span className="text-unnes-gold">Hub</span>
           </div>
-          <div>
-            <div className="text-base font-extrabold leading-none tracking-tight text-slate-900 dark:text-white">
-              Space<span className="text-brand dark:text-brand-dark">Hub</span>
-            </div>
-            <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-              {isAdmin ? 'Portal Pengelola' : 'FEB UNNES'}
-            </div>
+          <div className="mt-1 text-[10px] font-semibold tracking-wider text-[#9BB2DF]">
+            {isAdmin ? 'PORTAL PENGELOLA' : 'FEB UNNES'}
           </div>
         </button>
 
@@ -113,16 +108,16 @@ export default function Sidebar() {
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
           aria-label="Ubah tema"
-          className="rounded-lg border border-line-light p-1.5 text-slate-500 transition hover:bg-slate-100 dark:border-line-dark dark:text-slate-400 dark:hover:bg-slate-800"
+          className="rounded-lg border border-white/15 bg-white/5 p-1.5 text-[#C7D7F5] transition hover:bg-white/15 hover:text-white"
         >
-          {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
+          {theme === 'dark' ? <Sun className="h-4 w-4 text-unnes-gold" /> : <Moon className="h-4 w-4" />}
         </button>
       </div>
 
       <nav className="flex-1 space-y-5 overflow-y-auto" aria-label="Menu utama">
         {groups.map((group) => (
           <div key={group.title}>
-            <div className="mb-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+            <div className="mb-1.5 px-2.5 text-[10px] font-bold uppercase tracking-wider text-[#7A94C9]">
               {group.title}
             </div>
             <div className="space-y-0.5">
@@ -134,26 +129,25 @@ export default function Sidebar() {
                     key={id}
                     type="button"
                     onClick={() => navigate(id)}
-                    className={`flex w-full items-center justify-between rounded-xl px-2.5 py-2 text-left text-[13px] transition ${
+                    className={`relative flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[13px] transition ${
                       isActive
-                        ? 'bg-brand/10 font-bold text-brand dark:bg-brand-dark/15 dark:text-blue-300'
-                        : 'font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-100'
+                        ? 'bg-white/12 font-bold text-white'
+                        : 'font-medium text-[#BDCEF0] hover:bg-white/[0.07] hover:text-white'
                     }`}
                   >
+                    {isActive && (
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-unnes-gold" />
+                    )}
                     <span className="flex items-center gap-2.5">
-                      <Icon
-                        className={`h-4 w-4 ${
-                          isActive ? 'text-brand dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'
-                        }`}
-                      />
+                      <Icon className={`h-4 w-4 ${isActive ? 'text-unnes-gold' : 'text-[#89A2D4]'}`} />
                       {label}
                     </span>
                     {badge > 0 && (
                       <span
-                        className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                        className={`rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold ${
                           isActive
-                            ? 'bg-brand text-white dark:bg-brand-dark'
-                            : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                            ? 'bg-unnes-gold text-unnes-gold-ink'
+                            : 'bg-white/10 text-[#DCE7FA]'
                         }`}
                       >
                         {badge}
@@ -167,11 +161,11 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-4 space-y-3 border-t border-line-light pt-4 dark:border-line-dark">
-        <div className="flex items-center justify-between rounded-xl bg-slate-50 px-2.5 py-1.5 text-[11px] font-medium text-slate-500 dark:bg-surface-subtle-dark dark:text-slate-400">
+      <div className="mt-4 space-y-3 border-t border-white/12 pt-4">
+        <div className="flex items-center justify-between rounded-lg bg-white/[0.06] px-2.5 py-1.5 text-[11px] font-medium text-[#BDCEF0]">
           <span className="flex items-center gap-1.5">
             <span
-              className={`h-2 w-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-500' : 'bg-amber-400'}`}
+              className={`h-2 w-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-400' : 'bg-unnes-gold'}`}
             />
             {isSupabaseConfigured ? 'Supabase Aktif' : 'Demo Lokal'}
           </span>
@@ -180,7 +174,7 @@ export default function Sidebar() {
             onClick={() => refreshData(true)}
             disabled={syncing}
             title="Sinkronkan data"
-            className="rounded-md p-1 transition hover:bg-white dark:hover:bg-slate-700 disabled:opacity-50"
+            className="rounded p-1 transition hover:bg-white/15 disabled:opacity-50"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${syncing ? 'animate-spin' : ''}`} />
           </button>
@@ -188,15 +182,15 @@ export default function Sidebar() {
 
         <div className="flex items-center justify-between gap-2 px-1">
           <div className="min-w-0">
-            <div className="truncate text-xs font-bold text-slate-900 dark:text-white">{user?.name}</div>
-            <div className="truncate text-[10px] text-slate-400">{user?.email}</div>
+            <div className="truncate text-xs font-bold text-white">{user?.name}</div>
+            <div className="truncate text-[10px] text-[#8EA6D6]">{user?.email}</div>
           </div>
           <button
             type="button"
             onClick={logout}
             title="Keluar"
             aria-label="Keluar"
-            className="rounded-lg border border-line-light p-1.5 text-slate-500 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-600 dark:border-line-dark dark:text-slate-400 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+            className="rounded-lg border border-white/15 p-1.5 text-[#BDCEF0] transition hover:border-rose-400/50 hover:bg-rose-500/15 hover:text-rose-200"
           >
             <LogOut className="h-3.5 w-3.5" />
           </button>

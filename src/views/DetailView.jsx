@@ -151,20 +151,19 @@ export default function DetailView() {
       </button>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left: Room Overview + Pricing */}
         <div className="lg:col-span-7">
           <div className="sh-card overflow-hidden">
             <div className="relative aspect-[16/9] w-full overflow-hidden">
               <img src={room.image_url} alt={`Ruang ${room.code}`} className="h-full w-full object-cover" />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent p-5 text-white">
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#070D1A]/85 via-[#070D1A]/30 to-transparent p-5 text-white">
                 <div className="flex flex-wrap items-end justify-between gap-2">
                   <div>
-                    <h1 className="text-2xl font-extrabold tracking-tight">{room.code}</h1>
-                    <p className="text-xs text-slate-200">{room.location_label}</p>
+                    <h1 className="font-mono text-2xl font-extrabold tracking-tight">{room.code}</h1>
+                    <p className="text-xs text-[#D5E0F5]">{room.location_label}</p>
                   </div>
                   <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${
-                      isFreeAtFilter ? 'bg-emerald-600 text-white' : 'bg-white/20 text-white backdrop-blur-md'
+                    className={`rounded-md px-2.5 py-1 text-xs font-bold ${
+                      isFreeAtFilter ? 'bg-emerald-700 text-white' : 'bg-white/20 text-white backdrop-blur-sm'
                     }`}
                   >
                     {isFreeAtFilter
@@ -177,72 +176,74 @@ export default function DetailView() {
 
             <div className="space-y-5 p-5">
               {/* Tarif Ruangan */}
-              <div className="rounded-xl border border-line-light bg-slate-50 p-4 dark:border-line-dark dark:bg-surface-subtle-dark">
+              <div className="rounded-lg border border-line-light bg-surface-subtle/70 p-4 dark:border-unnes-night-line dark:bg-unnes-night-input">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#526382] dark:text-unnes-night-muted">
                     <Tag className="h-3.5 w-3.5" />
                     Tarif Ruangan
                   </span>
                   <span
                     className={`rounded-md px-2.5 py-0.5 text-xs font-bold ${
                       pricePerHour > 0
-                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300'
+                        ? 'bg-amber-100 text-amber-800 dark:bg-unnes-gold/20 dark:text-unnes-gold'
                         : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
                     }`}
                   >
                     {formatPriceBadge(pricePerHour)}
                   </span>
                 </div>
-                <p className="mt-1.5 text-xs text-slate-600 dark:text-slate-300">
+                <p className="mt-1.5 text-xs text-[#3C4E70] dark:text-[#C5D2EA]">
                   {room.price_note || 'Mahasiswa FEB gratis'}
                 </p>
                 {pricePerHour > 0 && (
-                  <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                  <div className="mt-2.5 flex flex-wrap gap-1.5 font-mono text-[11px] font-semibold text-[#3C4E70] dark:text-[#C5D2EA]">
                     {[1, 2, 3].map((h) => (
-                      <span key={h} className="rounded-md bg-white px-2.5 py-0.5 dark:bg-slate-800">
-                        {h} jam: {formatRupiah(pricePerHour * h)}
+                      <span
+                        key={h}
+                        className="rounded border border-line-light bg-white px-2.5 py-0.5 dark:border-unnes-night-line dark:bg-unnes-night-card"
+                      >
+                        {h}j: {formatRupiah(pricePerHour * h)}
                       </span>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* 3 Specs */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="rounded-xl bg-slate-50 p-3 dark:bg-surface-subtle-dark">
-                  <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="rounded-lg bg-surface-subtle/70 p-3 dark:bg-unnes-night-input">
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-[#526382] dark:text-unnes-night-muted">
                     <Users className="h-3.5 w-3.5" />
                     Kapasitas
                   </div>
-                  <div className="mt-1 text-base font-extrabold">{room.capacity} kursi</div>
+                  <div className="mt-1 font-mono text-base font-bold">{room.capacity} kursi</div>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 dark:bg-surface-subtle-dark">
-                  <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="rounded-lg bg-surface-subtle/70 p-3 dark:bg-unnes-night-input">
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-[#526382] dark:text-unnes-night-muted">
                     <Building2 className="h-3.5 w-3.5" />
                     Lokasi
                   </div>
-                  <div className="mt-1 text-sm font-extrabold">
+                  <div className="mt-1 font-mono text-sm font-bold">
                     {room.building} · Lt. {room.floor}
                   </div>
                 </div>
-                <div className="rounded-xl bg-slate-50 p-3 dark:bg-surface-subtle-dark">
-                  <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="rounded-lg bg-surface-subtle/70 p-3 dark:bg-unnes-night-input">
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-[#526382] dark:text-unnes-night-muted">
                     <Clock className="h-3.5 w-3.5" />
                     Jam Kosong
                   </div>
-                  <div className="mt-1 text-base font-extrabold">
+                  <div className="mt-1 font-mono text-base font-bold">
                     {freeHoursOnDetailDay.length}/{OPERATIONAL_HOURS.length}j
                   </div>
                 </div>
               </div>
 
-              <p className="text-xs text-slate-600 dark:text-slate-300">{room.description}</p>
+              <p className="text-xs text-[#3C4E70] dark:text-[#C5D2EA]">{room.description}</p>
 
               <div className="flex flex-wrap gap-1.5">
                 {(room.facilities || []).map((f) => (
                   <span
                     key={f}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-line-light bg-surface-subtle/70 px-2.5 py-1 text-xs font-semibold text-[#1B2B4B] dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-[#D9E3F5]"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                     {f}
@@ -253,12 +254,11 @@ export default function DetailView() {
           </div>
         </div>
 
-        {/* Right: Schedule & Actions */}
         <div className="lg:col-span-5">
           <div className="sh-card space-y-4 p-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">Jadwal Ketersediaan</h2>
-              <span className="text-[11px] font-medium text-slate-400">07.00–17.00 WIB</span>
+              <h2 className="text-sm font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">Jadwal Ketersediaan</h2>
+              <span className="font-mono text-[11px] font-medium text-[#6A7B9C]">07.00–17.00 WIB</span>
             </div>
 
             <DatePickerPopover
@@ -286,7 +286,7 @@ export default function DetailView() {
 
             {!isAdmin && (
               <>
-                <div className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-[11px] font-medium text-slate-500 dark:bg-surface-subtle-dark dark:text-slate-400">
+                <div className="flex items-center gap-2 rounded-lg bg-surface-subtle px-3 py-2 text-[11px] font-medium text-[#526382] dark:bg-unnes-night-input dark:text-unnes-night-muted">
                   <MousePointerClick className="h-3.5 w-3.5 flex-none text-emerald-600 dark:text-emerald-400" />
                   <span>Klik kotak hijau untuk langsung booking di jam tersebut.</span>
                 </div>
@@ -302,7 +302,7 @@ export default function DetailView() {
 
                 <div className="grid grid-cols-2 gap-2.5">
                   <button type="button" onClick={() => toggleFavorite(room.code)} className="sh-btn-secondary text-xs">
-                    <Star className={`h-4 w-4 ${isFav ? 'fill-brand-gold text-brand-gold' : ''}`} />
+                    <Star className={`h-4 w-4 ${isFav ? 'fill-unnes-gold text-unnes-gold' : ''}`} />
                     {isFav ? 'Tersimpan' : 'Simpan'}
                   </button>
 
@@ -322,9 +322,8 @@ export default function DetailView() {
         </div>
       </div>
 
-      {/* Alternatif Kosong */}
       <section className="space-y-3">
-        <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
+        <h2 className="text-sm font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">
           Alternatif Kosong ({filterDay.label} · {formatHour(filters.start)})
         </h2>
 
@@ -335,7 +334,7 @@ export default function DetailView() {
             ))}
           </div>
         ) : (
-          <div className="sh-card border-dashed p-6 text-center text-xs text-slate-500 dark:text-slate-400">
+          <div className="sh-card border-dashed p-6 text-center text-xs text-[#526382] dark:text-unnes-night-muted">
             Belum ada alternatif kosong di jam ini.
           </div>
         )}

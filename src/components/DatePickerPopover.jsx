@@ -86,7 +86,7 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
   return (
     <div ref={containerRef} className="relative">
       {label && (
-        <span className="mb-1.5 block text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+        <span className="mb-1.5 block text-[11px] font-semibold text-[#526382] dark:text-unnes-night-muted">
           {label}
         </span>
       )}
@@ -96,23 +96,23 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className={`sh-control flex items-center justify-between gap-2 text-left ${
-          open ? 'border-brand ring-2 ring-brand/15 dark:border-brand-dark dark:ring-brand-dark/20' : ''
+          open ? 'border-unnes-royal ring-2 ring-unnes-royal/15 dark:border-unnes-gold dark:ring-unnes-gold/20' : ''
         }`}
       >
         <span className="flex min-w-0 items-center gap-2 truncate">
-          <CalendarDays className="h-4 w-4 flex-none text-slate-400" />
+          <CalendarDays className="h-4 w-4 flex-none text-[#6A7B9C] dark:text-[#6E82AA]" />
           <span className="truncate font-semibold">{selectedDay.label}</span>
         </span>
         <ChevronDown
-          className={`h-4 w-4 flex-none text-slate-400 transition-transform duration-150 ${
-            open ? 'rotate-180 text-brand dark:text-brand-dark' : ''
+          className={`h-4 w-4 flex-none text-[#6A7B9C] transition-transform duration-150 dark:text-[#6E82AA] ${
+            open ? 'rotate-180 text-unnes-royal dark:text-unnes-gold' : ''
           }`}
         />
       </button>
 
       {open && (
         <div
-          className={`absolute z-50 mt-1.5 w-[292px] rounded-2xl border border-line-light bg-white p-3.5 shadow-popover dark:border-line-dark dark:bg-[#131c2e] ${
+          className={`absolute z-50 mt-1.5 w-[292px] rounded-xl border border-line-light bg-white p-3.5 shadow-popover dark:border-unnes-night-line dark:bg-[#13203A] ${
             align === 'right' ? 'right-0' : 'left-0'
           }`}
         >
@@ -126,10 +126,10 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
                 key={s.idx}
                 type="button"
                 onClick={() => handleSelect(s.idx)}
-                className={`flex-1 rounded-lg py-1.5 text-[11px] font-semibold transition ${
+                className={`flex-1 rounded-md py-1.5 text-[11px] font-bold transition ${
                   value === s.idx
-                    ? 'bg-brand text-white dark:bg-brand-dark'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                    ? 'bg-unnes-royal text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                    : 'bg-surface-subtle text-[#334463] hover:bg-[#E1E7F2] dark:bg-[#1B2B4B] dark:text-[#CBD7EE] dark:hover:bg-[#24375E]'
                 }`}
               >
                 {s.text}
@@ -143,11 +143,11 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
               disabled={!canPrev}
               onClick={() => shiftMonth(-1)}
               aria-label="Bulan sebelumnya"
-              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:opacity-30 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="rounded-md p-1.5 text-[#526382] transition hover:bg-surface-subtle disabled:opacity-30 dark:text-unnes-night-muted dark:hover:bg-[#1B2B4B]"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <div className="text-xs font-bold text-slate-900 dark:text-white">
+            <div className="text-xs font-bold text-[#0F1B33] dark:text-[#F1F5FB]">
               {MONTH_NAMES[cursor.month]} {cursor.year}
             </div>
             <button
@@ -155,13 +155,13 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
               disabled={!canNext}
               onClick={() => shiftMonth(1)}
               aria-label="Bulan berikutnya"
-              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 disabled:opacity-30 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="rounded-md p-1.5 text-[#526382] transition hover:bg-surface-subtle disabled:opacity-30 dark:text-unnes-night-muted dark:hover:bg-[#1B2B4B]"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
           </div>
 
-          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase text-slate-400">
+          <div className="mb-1 grid grid-cols-7 gap-1 text-center text-[10px] font-semibold uppercase text-[#7B8BA9]">
             {WEEKDAYS.map((w) => (
               <div key={w} className="py-1">
                 {w}
@@ -181,17 +181,17 @@ export default function DatePickerPopover({ days, value, onChange, label, align 
                   type="button"
                   disabled={disabled}
                   onClick={() => handleSelect(cell.idx)}
-                  className={`relative flex h-9 items-center justify-center rounded-lg text-xs font-semibold tabular-nums transition ${
+                  className={`relative flex h-9 items-center justify-center rounded-md text-xs font-semibold tabular-nums transition ${
                     isSelected
-                      ? 'bg-brand font-bold text-white shadow-sm dark:bg-brand-dark'
+                      ? 'bg-unnes-royal font-bold text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
                       : disabled
-                        ? 'cursor-not-allowed text-slate-300 dark:text-slate-700'
-                        : 'text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800'
+                        ? 'cursor-not-allowed text-slate-300 dark:text-[#2A395B]'
+                        : 'text-[#1B2B4B] hover:bg-surface-subtle dark:text-[#D9E3F5] dark:hover:bg-[#1B2B4B]'
                   }`}
                 >
                   {cell.dt}
                   {isToday && !isSelected && (
-                    <span className="absolute bottom-1 h-1 w-1 rounded-full bg-brand dark:bg-brand-dark" />
+                    <span className="absolute bottom-1 h-1 w-1 rounded-full bg-unnes-gold" />
                   )}
                 </button>
               );

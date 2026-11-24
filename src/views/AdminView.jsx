@@ -98,10 +98,10 @@ export default function AdminView() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
             Dashboard Pengelola
           </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">
             Ringkasan tingkat keterisian & riwayat pemakaian ruang FEB UNNES.
           </p>
         </div>
@@ -116,76 +116,75 @@ export default function AdminView() {
         </div>
       </div>
 
-      {/* 4 KPI */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div className="sh-card p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between text-xs font-medium text-[#526382] dark:text-unnes-night-muted">
             <span>Total Ruang</span>
-            <Building2 className="h-4 w-4 text-slate-400" />
+            <Building2 className="h-4 w-4 text-[#6A7B9C]" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.totalRooms}</div>
+          <div className="mt-2 font-mono text-2xl font-bold">{stats.totalRooms}</div>
         </div>
 
         <div className="sh-card p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between text-xs font-medium text-[#526382] dark:text-unnes-night-muted">
             <span>Booking Aktif</span>
-            <CalendarCheck2 className="h-4 w-4 text-emerald-500" />
+            <CalendarCheck2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.activeBookingsCount}</div>
+          <div className="mt-2 font-mono text-2xl font-bold">{stats.activeBookingsCount}</div>
         </div>
 
         <div className="sh-card p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between text-xs font-medium text-[#526382] dark:text-unnes-night-muted">
             <span>Keterisian</span>
-            <BarChart3 className="h-4 w-4 text-brand dark:text-blue-400" />
+            <BarChart3 className="h-4 w-4 text-unnes-royal dark:text-unnes-gold" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.occupancyPct}%</div>
+          <div className="mt-2 font-mono text-2xl font-bold">{stats.occupancyPct}%</div>
         </div>
 
         <div className="sh-card p-4">
-          <div className="flex items-center justify-between text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div className="flex items-center justify-between text-xs font-medium text-[#526382] dark:text-unnes-night-muted">
             <span>Laporan Lapangan</span>
             <AlertTriangle className="h-4 w-4 text-amber-500" />
           </div>
-          <div className="mt-2 text-2xl font-extrabold tabular-nums">{stats.totalReports}</div>
+          <div className="mt-2 font-mono text-2xl font-bold">{stats.totalReports}</div>
         </div>
       </div>
 
-      {/* Keterisian per Gedung */}
       <section className="sh-card p-5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-extrabold">Keterisian per Gedung</h2>
-          <span className="text-xs font-medium text-slate-400">{targetDay.label}</span>
+          <span className="font-mono text-xs font-medium text-[#6A7B9C] dark:text-unnes-night-muted">
+            {targetDay.label}
+          </span>
         </div>
 
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {stats.buildings.map((b) => (
-            <div key={b.building} className="rounded-xl bg-slate-50 p-4 dark:bg-surface-subtle-dark">
+            <div key={b.building} className="rounded-lg bg-surface-subtle/70 p-4 dark:bg-unnes-night-input">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold">
                   Gedung {b.building}{' '}
-                  <span className="font-normal text-slate-400">({b.roomCount})</span>
+                  <span className="font-mono font-normal text-[#6A7B9C]">({b.roomCount})</span>
                 </span>
-                <span className="font-extrabold tabular-nums text-brand dark:text-blue-400">{b.pct}%</span>
+                <span className="font-mono font-bold text-unnes-royal dark:text-unnes-gold">{b.pct}%</span>
               </div>
-              <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+              <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-[#DCE3F0] dark:bg-[#1B2B4B]">
                 <div
-                  className="h-full rounded-full bg-brand transition-all dark:bg-brand-dark"
+                  className="h-full rounded-full bg-unnes-royal transition-all dark:bg-unnes-gold"
                   style={{ width: `${b.pct}%` }}
                 />
               </div>
-              <div className="mt-2 flex justify-between text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                <span>Kuliah: {b.classSlots} slot</span>
-                <span>Booking: {b.bookedSlots} slot</span>
+              <div className="mt-2 flex justify-between font-mono text-[11px] text-[#526382] dark:text-unnes-night-muted">
+                <span>Kuliah: {b.classSlots}</span>
+                <span>Booking: {b.bookedSlots}</span>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Tabel Riwayat */}
       <section className="sh-card overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-light p-4 dark:border-line-dark">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-light p-4 dark:border-unnes-night-line">
           <div className="flex gap-1.5">
             <button
               type="button"
@@ -206,7 +205,7 @@ export default function AdminView() {
           {tab === 'bookings' && (
             <div className="flex flex-wrap items-center gap-2.5">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6A7B9C]" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -230,11 +229,13 @@ export default function AdminView() {
 
         {tab === 'bookings' ? (
           filteredBookings.length === 0 ? (
-            <div className="p-10 text-center text-xs text-slate-500 dark:text-slate-400">Belum ada data booking.</div>
+            <div className="p-10 text-center text-xs text-[#526382] dark:text-unnes-night-muted">
+              Belum ada data booking.
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] text-left text-xs">
-                <thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500 dark:bg-surface-subtle-dark dark:text-slate-400">
+                <thead className="bg-surface-subtle/80 text-[10px] uppercase tracking-wider text-[#526382] dark:bg-unnes-night-input dark:text-unnes-night-muted">
                   <tr>
                     <th className="px-4 py-3">Kode</th>
                     <th className="px-4 py-3">Ruang</th>
@@ -244,30 +245,30 @@ export default function AdminView() {
                     <th className="px-4 py-3 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-line-light dark:divide-line-dark">
+                <tbody className="divide-y divide-line-light dark:divide-unnes-night-line">
                   {filteredBookings.map((b) => (
-                    <tr key={b.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40">
-                      <td className="px-4 py-3 font-mono font-bold text-brand dark:text-blue-400">{b.id}</td>
-                      <td className="px-4 py-3 font-bold">{b.room_code}</td>
+                    <tr key={b.id} className="hover:bg-surface-subtle/40 dark:hover:bg-[#15223D]/70">
+                      <td className="px-4 py-3 font-mono font-bold text-unnes-royal dark:text-unnes-gold">{b.id}</td>
+                      <td className="px-4 py-3 font-mono font-bold">{b.room_code}</td>
                       <td className="px-4 py-3">
                         <span className="font-semibold">{formatDateKeyLabel(b.booking_date, days)}</span>
-                        <span className="ml-1.5 text-[11px] text-slate-400">
+                        <span className="ml-1.5 font-mono text-[11px] text-[#6A7B9C]">
                           {formatHourRange(b.start_hour, b.duration)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <span className="font-semibold">{b.user_name}</span>
-                        <span className="ml-1.5 text-[11px] text-slate-400">{b.nim}</span>
+                        <span className="ml-1.5 font-mono text-[11px] text-[#6A7B9C]">{b.nim}</span>
                       </td>
-                      <td className="max-w-[180px] truncate px-4 py-3 text-slate-600 dark:text-slate-300">
+                      <td className="max-w-[180px] truncate px-4 py-3 text-[#3C4E70] dark:text-[#C5D2EA]">
                         {b.purpose}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <span
-                          className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold ${
+                          className={`inline-block rounded px-2 py-0.5 text-[10px] font-bold ${
                             b.status === 'confirmed'
                               ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
-                              : 'bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300'
+                              : 'bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300'
                           }`}
                         >
                           {b.status}
@@ -280,11 +281,11 @@ export default function AdminView() {
             </div>
           )
         ) : reports.length === 0 ? (
-          <div className="p-10 text-center text-xs text-slate-500 dark:text-slate-400">Belum ada laporan.</div>
+          <div className="p-10 text-center text-xs text-[#526382] dark:text-unnes-night-muted">Belum ada laporan.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px] text-left text-xs">
-              <thead className="bg-slate-50 text-[10px] uppercase tracking-wider text-slate-500 dark:bg-surface-subtle-dark dark:text-slate-400">
+              <thead className="bg-surface-subtle/80 text-[10px] uppercase tracking-wider text-[#526382] dark:bg-unnes-night-input dark:text-unnes-night-muted">
                 <tr>
                   <th className="px-4 py-3">Ruang</th>
                   <th className="px-4 py-3">Tanggal</th>
@@ -292,13 +293,13 @@ export default function AdminView() {
                   <th className="px-4 py-3">Pelapor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line-light dark:divide-line-dark">
+              <tbody className="divide-y divide-line-light dark:divide-unnes-night-line">
                 {reports.map((r) => (
                   <tr key={r.id}>
-                    <td className="px-4 py-3 font-bold">{r.room_code}</td>
+                    <td className="px-4 py-3 font-mono font-bold">{r.room_code}</td>
                     <td className="px-4 py-3">{formatDateKeyLabel(r.report_date, days)}</td>
-                    <td className="px-4 py-3 font-semibold">{formatHour(r.report_hour)} WIB</td>
-                    <td className="px-4 py-3 text-slate-500">{r.reported_by}</td>
+                    <td className="px-4 py-3 font-mono font-semibold">{formatHour(r.report_hour)} WIB</td>
+                    <td className="px-4 py-3 text-[#526382] dark:text-unnes-night-muted">{r.reported_by}</td>
                   </tr>
                 ))}
               </tbody>

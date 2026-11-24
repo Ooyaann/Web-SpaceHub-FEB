@@ -8,11 +8,11 @@ const CATEGORY_META = {
   },
   cancel: {
     icon: XCircle,
-    badge: 'bg-rose-50 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300',
+    badge: 'bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300',
   },
   favorite: {
     icon: Star,
-    badge: 'bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
+    badge: 'bg-amber-50 text-amber-700 dark:bg-unnes-gold/15 dark:text-unnes-gold',
   },
   report: {
     icon: AlertTriangle,
@@ -27,8 +27,10 @@ export default function NotificationsView() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Notifikasi</h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Riwayat aktivitas in-app.</p>
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
+            Notifikasi
+          </h1>
+          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">Riwayat aktivitas in-app.</p>
         </div>
 
         {notifications.length > 0 && (
@@ -41,8 +43,8 @@ export default function NotificationsView() {
 
       {notifications.length === 0 ? (
         <div className="sh-card border-dashed px-6 py-14 text-center">
-          <Bell className="mx-auto h-7 w-7 text-slate-400" />
-          <p className="mt-2 text-sm font-bold text-slate-900 dark:text-white">Belum ada notifikasi.</p>
+          <Bell className="mx-auto h-7 w-7 text-[#6A7B9C]" />
+          <p className="mt-2 text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">Belum ada notifikasi.</p>
         </div>
       ) : (
         <div className="space-y-2.5">
@@ -54,15 +56,17 @@ export default function NotificationsView() {
             const Icon = meta.icon;
             return (
               <article key={n.id} className="sh-card flex items-center gap-3.5 p-4">
-                <div className={`flex h-9 w-9 flex-none items-center justify-center rounded-xl ${meta.badge}`}>
+                <div className={`flex h-9 w-9 flex-none items-center justify-center rounded-lg ${meta.badge}`}>
                   <Icon className="h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="text-xs font-bold text-slate-900 dark:text-white">{n.title}</h2>
-                    <span className="text-[11px] font-medium text-slate-400">{n.at}</span>
+                    <h2 className="text-xs font-bold text-[#0F1B33] dark:text-[#F1F5FB]">{n.title}</h2>
+                    <span className="font-mono text-[11px] font-medium text-[#6A7B9C] dark:text-unnes-night-muted">
+                      {n.at}
+                    </span>
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{n.body}</p>
+                  <p className="mt-0.5 truncate text-xs text-[#526382] dark:text-unnes-night-muted">{n.body}</p>
                 </div>
               </article>
             );

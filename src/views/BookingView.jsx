@@ -133,14 +133,16 @@ export default function BookingView() {
       </button>
 
       <form onSubmit={handleSubmit} className="sh-card space-y-5 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-light pb-4 dark:border-line-dark">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-light pb-4 dark:border-unnes-night-line">
           <div>
-            <h1 className="text-xl font-extrabold text-slate-900 dark:text-white">Booking {room.code}</h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <h1 className="font-mono text-xl font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">
+              Booking {room.code}
+            </h1>
+            <p className="text-xs text-[#526382] dark:text-unnes-night-muted">
               {room.location_label} · Maks. {room.capacity} kursi
             </p>
           </div>
-          <span className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-200">
+          <span className="rounded-md bg-surface-subtle px-3 py-1 font-mono text-xs font-bold text-[#1B2B4B] dark:bg-unnes-night-input dark:text-unnes-gold">
             Kuota {myActiveBookingCount}/{MAX_ACTIVE_BOOKINGS}
           </span>
         </div>
@@ -155,13 +157,13 @@ export default function BookingView() {
         </div>
 
         {freeStartHours.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-line-light p-6 text-center text-xs text-slate-500 dark:border-line-dark dark:text-slate-400">
+          <div className="rounded-lg border border-dashed border-line-light p-6 text-center text-xs text-[#526382] dark:border-unnes-night-line dark:text-unnes-night-muted">
             Semua slot pada <strong>{selectedDay.label}</strong> sudah terisi atau lewat. Pilih tanggal lain.
           </div>
         ) : (
           <>
             <div>
-              <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+              <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                 Jam Mulai
               </span>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
@@ -174,15 +176,15 @@ export default function BookingView() {
                       type="button"
                       disabled={!isFree}
                       onClick={() => setStartHour(hour)}
-                      className={`rounded-xl border px-2 py-2 text-center transition ${
+                      className={`rounded-lg border px-2 py-2 text-center transition ${
                         isSelected
-                          ? 'border-brand bg-brand text-white shadow-sm dark:border-brand-dark dark:bg-brand-dark'
+                          ? 'border-unnes-royal bg-unnes-royal text-white dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink'
                           : isFree
-                            ? 'border-line-light bg-white text-slate-800 hover:border-brand dark:border-line-dark dark:bg-surface-subtle-dark dark:text-slate-100'
-                            : 'cursor-not-allowed border-transparent bg-slate-100 text-slate-400 line-through opacity-55 dark:bg-slate-800/60 dark:text-slate-500'
+                            ? 'border-line-light bg-white text-[#0F1B33] hover:border-unnes-royal dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-[#F1F5FB] dark:hover:border-unnes-gold'
+                            : 'cursor-not-allowed border-transparent bg-surface-subtle text-[#8B9AB5] line-through opacity-55 dark:bg-[#0D1628] dark:text-[#4D6085]'
                       }`}
                     >
-                      <div className="text-xs font-bold tabular-nums">{formatHour(hour)}</div>
+                      <div className="font-mono text-xs font-bold">{formatHour(hour)}</div>
                       {!isFree && <div className="text-[9px] no-underline">{SLOT_LABELS[status]}</div>}
                     </button>
                   );
@@ -191,7 +193,9 @@ export default function BookingView() {
             </div>
 
             <div>
-              <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">Durasi</span>
+              <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
+                Durasi
+              </span>
               <div className="grid grid-cols-3 gap-2">
                 {[1, 2, 3].map((d) => {
                   const allowed = d <= maxDuration;
@@ -202,40 +206,46 @@ export default function BookingView() {
                       type="button"
                       disabled={!allowed}
                       onClick={() => setDuration(d)}
-                      className={`rounded-xl border px-3 py-2 text-center transition ${
+                      className={`rounded-lg border px-3 py-2 text-center transition ${
                         selected
-                          ? 'border-brand bg-brand text-white dark:border-brand-dark dark:bg-brand-dark'
+                          ? 'border-unnes-royal bg-unnes-royal text-white dark:border-unnes-gold dark:bg-unnes-gold dark:text-unnes-gold-ink'
                           : allowed
-                            ? 'border-line-light bg-white text-slate-800 hover:border-brand dark:border-line-dark dark:bg-surface-subtle-dark dark:text-slate-200'
-                            : 'cursor-not-allowed border-transparent bg-slate-100 text-slate-400 opacity-50 dark:bg-slate-800/60'
+                            ? 'border-line-light bg-white text-[#0F1B33] hover:border-unnes-royal dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-[#F1F5FB] dark:hover:border-unnes-gold'
+                            : 'cursor-not-allowed border-transparent bg-surface-subtle text-[#8B9AB5] opacity-50 dark:bg-[#0D1628]'
                       }`}
                     >
                       <div className="text-xs font-bold">{d} Jam</div>
-                      {allowed && <div className="text-[10px] opacity-80">{formatHourRange(startHour, d)}</div>}
+                      {allowed && (
+                        <div className="font-mono text-[10px] opacity-80">{formatHourRange(startHour, d)}</div>
+                      )}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-2.5 text-xs dark:bg-surface-subtle-dark">
-              <span className="flex items-center gap-1.5 font-semibold text-slate-600 dark:text-slate-300">
+            <div className="flex items-center justify-between rounded-lg border border-line-light bg-surface-subtle/70 px-4 py-2.5 text-xs dark:border-unnes-night-line dark:bg-unnes-night-input">
+              <span className="flex items-center gap-1.5 font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                 <Tag className="h-3.5 w-3.5" />
                 Estimasi Tarif ({duration} jam)
               </span>
-              <span className="font-bold text-slate-900 dark:text-white">
+              <span className="font-mono font-bold text-[#0F1B33] dark:text-unnes-gold">
                 {pricePerHour > 0 ? formatRupiah(estimatedPrice) : 'Gratis Mahasiswa FEB'}
               </span>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">Nama</span>
+                <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
+                  Nama
+                </span>
                 <input type="text" value={user?.name || ''} readOnly className="sh-control opacity-75" />
               </label>
 
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">NIM</span>
+                <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
+                  NIM
+                </span>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -243,12 +253,12 @@ export default function BookingView() {
                   value={nim}
                   onChange={(e) => setNim(e.target.value.replace(/\D/g, '').slice(0, 12))}
                   placeholder="8–12 digit angka"
-                  className="sh-control"
+                  className="sh-control font-mono"
                 />
               </label>
 
               <label className="block sm:col-span-2">
-                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                   Keperluan
                 </span>
                 <input
@@ -262,7 +272,7 @@ export default function BookingView() {
               </label>
 
               <label className="block">
-                <span className="mb-1.5 block text-xs font-semibold text-slate-600 dark:text-slate-300">
+                <span className="mb-1.5 block text-xs font-semibold text-[#3C4E70] dark:text-unnes-night-muted">
                   Jumlah Peserta
                 </span>
                 <input
@@ -273,7 +283,7 @@ export default function BookingView() {
                   value={participants}
                   onChange={(e) => setParticipants(e.target.value)}
                   placeholder={`1–${room.capacity}`}
-                  className="sh-control"
+                  className="sh-control font-mono"
                 />
               </label>
             </div>
@@ -283,7 +293,7 @@ export default function BookingView() {
             {error && (
               <div
                 role="alert"
-                className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+                className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
               >
                 {error}
               </div>

@@ -47,14 +47,16 @@ export default function MyBookingsView() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Booking Saya</h1>
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
+            Booking Saya
+          </h1>
           <div className="mt-2">
             <BookingRulesPills />
           </div>
         </div>
-        <div className="rounded-xl border border-line-light bg-white px-3.5 py-2 text-xs font-bold text-slate-700 dark:border-line-dark dark:bg-surface-dark dark:text-slate-200">
+        <div className="rounded-lg border border-line-light bg-white px-3.5 py-2 font-mono text-xs font-bold text-[#0F1B33] dark:border-unnes-night-line dark:bg-unnes-night-card dark:text-[#F1F5FB]">
           Aktif:{' '}
-          <span className="text-brand dark:text-blue-400">
+          <span className="text-unnes-royal dark:text-unnes-gold">
             {myActiveBookingCount}/{MAX_ACTIVE_BOOKINGS}
           </span>
         </div>
@@ -62,7 +64,7 @@ export default function MyBookingsView() {
 
       {myBookings.length === 0 ? (
         <div className="sh-card border-dashed px-6 py-14 text-center">
-          <p className="text-sm font-bold text-slate-900 dark:text-white">Belum ada booking.</p>
+          <p className="text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">Belum ada booking.</p>
           <button type="button" onClick={() => navigate('find')} className="sh-btn-primary mt-4">
             Cari Ruang Kosong
           </button>
@@ -85,21 +87,21 @@ export default function MyBookingsView() {
                       <button
                         type="button"
                         onClick={() => openRoomDetail(b.room_code, 0)}
-                        className="text-lg font-extrabold leading-tight text-slate-900 hover:text-brand dark:text-white dark:hover:text-blue-400"
+                        className="font-mono text-lg font-bold leading-tight text-[#0F1B33] hover:text-unnes-royal dark:text-[#F1F5FB] dark:hover:text-unnes-gold"
                       >
                         {b.room_code}
                       </button>
                       <div className="mt-1">
                         {isCancelled ? (
-                          <span className="rounded-md bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-600 dark:bg-rose-500/15 dark:text-rose-300">
+                          <span className="rounded bg-rose-50 px-2 py-0.5 text-[11px] font-bold text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">
                             Dibatalkan
                           </span>
                         ) : active ? (
-                          <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
+                          <span className="rounded bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">
                             Aktif · Disetujui
                           </span>
                         ) : (
-                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                          <span className="rounded bg-surface-subtle px-2 py-0.5 text-[11px] font-bold text-[#6A7B9C] dark:bg-unnes-night-input dark:text-unnes-night-muted">
                             Selesai
                           </span>
                         )}
@@ -110,39 +112,39 @@ export default function MyBookingsView() {
                       type="button"
                       onClick={() => handleCopyCode(b.id)}
                       title="Salin kode booking"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-slate-50 px-2.5 py-1.5 font-mono text-xs font-bold text-slate-700 transition hover:border-brand hover:text-brand dark:border-line-dark dark:bg-surface-subtle-dark dark:text-slate-200 dark:hover:border-brand-dark"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-line-light bg-surface-subtle px-2.5 py-1.5 font-mono text-xs font-bold text-[#0F1B33] transition hover:border-unnes-royal dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-unnes-gold dark:hover:border-unnes-gold"
                     >
                       {b.id}
                       {copiedId === b.id ? (
                         <Check className="h-3.5 w-3.5 text-emerald-600" />
                       ) : (
-                        <Copy className="h-3.5 w-3.5 text-slate-400" />
+                        <Copy className="h-3.5 w-3.5 opacity-60" />
                       )}
                     </button>
                   </div>
 
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-slate-600 dark:text-slate-300">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-medium text-[#3C4E70] dark:text-[#C5D2EA]">
                     <span className="inline-flex items-center gap-1.5">
-                      <Calendar className="h-3.5 w-3.5 text-slate-400" />
+                      <Calendar className="h-3.5 w-3.5 text-[#6A7B9C]" />
                       {formatDateKeyLabel(b.booking_date, days)}
                     </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="inline-flex items-center gap-1.5 font-mono">
+                      <Clock className="h-3.5 w-3.5 text-[#6A7B9C]" />
                       {formatHourRange(b.start_hour, b.duration)}
                     </span>
                     <span className="inline-flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5 text-slate-400" />
+                      <Users className="h-3.5 w-3.5 text-[#6A7B9C]" />
                       {b.participants} orang
                     </span>
                   </div>
 
-                  <div className="truncate text-xs text-slate-500 dark:text-slate-400">
-                    {b.purpose} · NIM {b.nim}
+                  <div className="truncate text-xs text-[#526382] dark:text-unnes-night-muted">
+                    {b.purpose} · NIM <span className="font-mono">{b.nim}</span>
                   </div>
                 </div>
 
                 {cancellable && (
-                  <div className="border-t border-line-light pt-3 dark:border-line-dark">
+                  <div className="border-t border-line-light pt-3 dark:border-unnes-night-line">
                     {confirmId === b.id ? (
                       <div className="flex items-center justify-end gap-2">
                         <button

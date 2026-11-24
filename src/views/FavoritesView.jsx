@@ -19,8 +19,12 @@ export default function FavoritesView() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Ruang Favorit</h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{favRooms.length} ruang tersimpan.</p>
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
+            Ruang Favorit
+          </h1>
+          <p className="mt-1 font-mono text-xs text-[#526382] dark:text-unnes-night-muted">
+            {favRooms.length} ruang tersimpan.
+          </p>
         </div>
 
         <div className="grid w-full max-w-sm grid-cols-2 gap-3">
@@ -49,7 +53,7 @@ export default function FavoritesView() {
         </div>
       ) : (
         <div className="sh-card border-dashed px-6 py-14 text-center">
-          <p className="text-sm font-bold text-slate-900 dark:text-white">Belum ada ruang favorit.</p>
+          <p className="text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">Belum ada ruang favorit.</p>
           <button type="button" onClick={() => navigate('find')} className="sh-btn-primary mt-4">
             Cari Ruang
           </button>

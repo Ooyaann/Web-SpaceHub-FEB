@@ -3,11 +3,11 @@ import { formatHour, pad2 } from '../lib/dateWib';
 import { getSlotStatus } from '../lib/schedule';
 
 const BAR_COLORS = {
-  f: 'bg-emerald-100 border border-emerald-300/80 text-emerald-700 dark:bg-emerald-500/20 dark:border-emerald-500/40 dark:text-emerald-300',
-  k: 'bg-blue-100/90 border border-blue-200 text-blue-700 dark:bg-blue-500/20 dark:border-blue-500/35 dark:text-blue-300',
-  o: 'bg-amber-100/90 border border-amber-200 text-amber-700 dark:bg-amber-500/20 dark:border-amber-500/35 dark:text-amber-300',
-  m: 'bg-yellow-200 border border-yellow-400 text-yellow-900 dark:bg-yellow-500/35 dark:border-yellow-400/60 dark:text-yellow-200',
-  p: 'bg-slate-100 border border-slate-200/70 text-slate-400 dark:bg-slate-800/60 dark:border-slate-700/60 dark:text-slate-600',
+  f: 'bg-emerald-100 border border-emerald-300 dark:bg-emerald-500/20 dark:border-emerald-500/45',
+  k: 'bg-blue-100 border border-blue-200 dark:bg-[#25458A]/55 dark:border-[#3A65BF]/60',
+  o: 'bg-amber-100 border border-amber-200 dark:bg-amber-500/20 dark:border-amber-500/45',
+  m: 'bg-unnes-gold/75 border border-unnes-gold dark:bg-unnes-gold/80 dark:border-unnes-gold',
+  p: 'bg-slate-100 border border-slate-200/80 dark:bg-[#17223B] dark:border-[#223152]',
 };
 
 export default function HourBar({
@@ -27,7 +27,7 @@ export default function HourBar({
 }) {
   return (
     <div className="w-full">
-      <div className="grid grid-cols-10 gap-1.5">
+      <div className="grid grid-cols-10 gap-1">
         {OPERATIONAL_HOURS.map((h) => {
           const status = getSlotStatus({
             roomCode,
@@ -43,9 +43,9 @@ export default function HourBar({
           const highlighted = highlightStart >= 0 && h >= highlightStart && h < highlightStart + highlightDur;
           const clickable = Boolean(onSelectHour) && status === 'f' && h <= 15;
 
-          const baseClass = `${compact ? 'h-6' : 'h-8'} rounded-lg transition-all ${BAR_COLORS[status]} ${
+          const baseClass = `${compact ? 'h-5' : 'h-7'} rounded-[5px] transition ${BAR_COLORS[status]} ${
             highlighted
-              ? 'ring-2 ring-brand ring-offset-1 ring-offset-white dark:ring-brand-dark dark:ring-offset-surface-dark'
+              ? 'ring-2 ring-unnes-royal ring-offset-1 ring-offset-white dark:ring-unnes-gold dark:ring-offset-unnes-night-card'
               : ''
           }`;
 
@@ -55,27 +55,21 @@ export default function HourBar({
                 key={h}
                 type="button"
                 onClick={() => onSelectHour(h)}
-                title={`Klik untuk booking jam ${formatHour(h)}`}
-                className={`${baseClass} cursor-pointer hover:border-emerald-500 hover:bg-emerald-200/80 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/35`}
+                title={`Klik untuk booking ${formatHour(h)}`}
+                className={`${baseClass} cursor-pointer hover:border-emerald-600 hover:bg-emerald-200 dark:hover:border-emerald-300 dark:hover:bg-emerald-500/35`}
               />
             );
           }
 
-          return (
-            <div
-              key={h}
-              title={`${formatHour(h)} · ${SLOT_LABELS[status]}`}
-              className={baseClass}
-            />
-          );
+          return <div key={h} title={`${formatHour(h)} · ${SLOT_LABELS[status]}`} className={baseClass} />;
         })}
       </div>
       {showLabels && (
-        <div className="mt-1.5 grid grid-cols-10 gap-1.5">
+        <div className="mt-1.5 grid grid-cols-10 gap-1">
           {OPERATIONAL_HOURS.map((h) => (
             <span
               key={h}
-              className="text-center text-[10px] font-semibold tabular-nums text-slate-400 dark:text-slate-500"
+              className="text-center font-mono text-[10px] font-medium tabular-nums text-[#6A7B9C] dark:text-[#6E82AA]"
             >
               {pad2(h)}
             </span>

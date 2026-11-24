@@ -6,7 +6,7 @@ export default function BookingRulesPills() {
       {BOOKING_RULE_PILLS.map((rule) => (
         <span
           key={rule}
-          className="rounded-md bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+          className="rounded-md border border-line-light bg-surface-subtle px-2.5 py-1 text-[11px] font-semibold text-[#3C4E70] dark:border-unnes-night-line dark:bg-unnes-night-input dark:text-unnes-night-muted"
         >
           {rule}
         </span>

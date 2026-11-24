@@ -9,19 +9,19 @@ import SelectPopover from '../components/SelectPopover';
 import Legend from '../components/Legend';
 
 const TILE_STYLES = {
-  f: 'border-emerald-300/90 bg-emerald-50/70 hover:border-emerald-500 hover:bg-emerald-50 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:hover:border-emerald-400',
-  k: 'border-blue-200 bg-blue-50/60 hover:border-blue-400 dark:border-blue-500/30 dark:bg-blue-500/10 dark:hover:border-blue-400',
-  o: 'border-amber-200 bg-amber-50/60 hover:border-amber-400 dark:border-amber-500/30 dark:bg-amber-500/10 dark:hover:border-amber-400',
-  m: 'border-yellow-400 bg-yellow-50/80 hover:border-yellow-500 dark:border-yellow-400/50 dark:bg-yellow-500/15',
-  p: 'border-line-light bg-slate-50 opacity-70 dark:border-line-dark dark:bg-slate-800/40',
+  f: 'border-emerald-300 bg-emerald-50/75 hover:border-emerald-600 dark:border-emerald-500/40 dark:bg-emerald-500/12 dark:hover:border-emerald-400',
+  k: 'border-[#BFDBFE] bg-[#EFF6FF]/75 hover:border-[#3B82F6] dark:border-[#2C529E] dark:bg-[#193061]/60 dark:hover:border-[#5B8EFF]',
+  o: 'border-[#FDE68A] bg-[#FFFBEB]/80 hover:border-amber-500 dark:border-[#784A12] dark:bg-[#3A250C]/60 dark:hover:border-amber-400',
+  m: 'border-unnes-gold bg-[#FEF9C3]/80 hover:border-unnes-gold-hover dark:border-unnes-gold/70 dark:bg-unnes-gold/15',
+  p: 'border-line-light bg-surface-subtle/60 opacity-65 dark:border-unnes-night-line dark:bg-unnes-night-input/60',
 };
 
 const BADGE_STYLES = {
-  f: 'bg-emerald-600 text-white dark:bg-emerald-500',
-  k: 'bg-blue-100 text-blue-700 dark:bg-blue-500/25 dark:text-blue-300',
-  o: 'bg-amber-100 text-amber-800 dark:bg-amber-500/25 dark:text-amber-300',
-  m: 'bg-yellow-400 text-slate-950',
-  p: 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400',
+  f: 'bg-emerald-700 text-white dark:bg-emerald-500 dark:text-[#07150E]',
+  k: 'bg-[#DBEAFE] text-[#1E40AF] dark:bg-[#25458A] dark:text-[#BBD3FF]',
+  o: 'bg-[#FEF3C7] text-[#92400E] dark:bg-[#663E0E] dark:text-[#FCD385]',
+  m: 'bg-unnes-gold text-unnes-gold-ink',
+  p: 'bg-slate-200 text-slate-500 dark:bg-[#1B2B4B] dark:text-[#6E82AA]',
 };
 
 export default function FloorPlanView() {
@@ -129,7 +129,9 @@ export default function FloorPlanView() {
 
   const renderWing = (list, wingLabel) => (
     <div>
-      <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">{wingLabel}</div>
+      <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[#6A7B9C] dark:text-[#6E82AA]">
+        {wingLabel}
+      </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {list.map((r) => {
           const isLab = r.code.includes('Lab');
@@ -139,30 +141,28 @@ export default function FloorPlanView() {
               type="button"
               title={`${r.code} · ${(r.facilities || []).join(', ')} · ${formatPriceBadge(r.price_per_hour)}`}
               onClick={() => openRoomDetail(r.code, filters.day)}
-              className={`group flex flex-col justify-between rounded-xl border p-3.5 text-left transition duration-150 hover:-translate-y-0.5 ${TILE_STYLES[r.status]}`}
+              className={`group flex flex-col justify-between rounded-lg border p-3.5 text-left transition ${TILE_STYLES[r.status]}`}
             >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-extrabold text-slate-900 dark:text-white">{r.code}</span>
-                    {isLab && (
-                      <span className="rounded bg-slate-900/10 px-1.5 py-0.5 text-[9px] font-bold text-slate-700 dark:bg-white/15 dark:text-slate-200">
-                        LAB
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                    <Users className="h-3 w-3" />
-                    {r.capacity} kursi
-                  </div>
+              <div>
+                <div className="flex items-center justify-between gap-1.5">
+                  <span className="font-mono text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">{r.code}</span>
+                  {isLab && (
+                    <span className="rounded bg-unnes-navy/10 px-1.5 py-0.5 font-mono text-[9px] font-bold text-unnes-navy dark:bg-unnes-gold/20 dark:text-unnes-gold">
+                      LAB
+                    </span>
+                  )}
+                </div>
+                <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[#526382] dark:text-unnes-night-muted">
+                  <Users className="h-3 w-3" />
+                  {r.capacity} kursi
                 </div>
               </div>
 
               <div className="mt-3 flex items-center justify-between gap-1">
-                <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold ${BADGE_STYLES[r.status]}`}>
+                <span className={`rounded px-2 py-0.5 text-[10px] font-bold ${BADGE_STYLES[r.status]}`}>
                   {r.status === 'f' ? `Kosong s.d. ${formatHour(r.freeUntil)}` : SLOT_LABELS[r.status]}
                 </span>
-                <span className="text-[10px] font-medium text-slate-400 opacity-0 transition group-hover:opacity-100">
+                <span className="text-[10px] font-semibold text-[#526382] opacity-0 transition group-hover:opacity-100 dark:text-unnes-night-muted">
                   Detail →
                 </span>
               </div>
@@ -175,12 +175,13 @@ export default function FloorPlanView() {
 
   return (
     <div className="space-y-6">
-      {/* Header + Time Controls */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Denah Lantai</h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            Posisi dan status ruang tiap lantai · klik ruang untuk lihat detail & booking.
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
+            Denah Lantai
+          </h1>
+          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">
+            Posisi dan status ruang tiap lantai · klik ruang untuk detail & booking.
           </p>
         </div>
 
@@ -205,7 +206,7 @@ export default function FloorPlanView() {
       {/* 2-Level Building -> Floor Selector */}
       <div className="sh-card space-y-3.5 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex rounded-xl border border-line-light bg-slate-50 p-1 dark:border-line-dark dark:bg-surface-subtle-dark">
+          <div className="inline-flex rounded-lg border border-line-light bg-surface-subtle p-1 dark:border-unnes-night-line dark:bg-unnes-night-input">
             {buildings.map(({ building }) => {
               const active = building === selectedBuilding;
               return (
@@ -213,10 +214,10 @@ export default function FloorPlanView() {
                   key={building}
                   type="button"
                   onClick={() => setSelectedBuilding(building)}
-                  className={`rounded-lg px-4 py-1.5 text-xs font-bold transition ${
+                  className={`rounded-md px-4 py-1.5 text-xs font-bold transition ${
                     active
-                      ? 'bg-brand text-white shadow-sm dark:bg-brand-dark'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
+                      ? 'bg-unnes-royal text-white dark:bg-unnes-gold dark:text-unnes-gold-ink'
+                      : 'text-[#4B5E82] hover:text-[#0F1B33] dark:text-unnes-night-muted dark:hover:text-white'
                   }`}
                 >
                   Gedung {building}
@@ -225,16 +226,16 @@ export default function FloorPlanView() {
             })}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-600 dark:text-slate-300">
-            <span className="text-emerald-600 dark:text-emerald-400">{summary.free} Kosong</span>
-            <span className="text-slate-300 dark:text-slate-700">·</span>
-            <span className="text-blue-600 dark:text-blue-400">{summary.kuliah} Ada kelas</span>
-            <span className="text-slate-300 dark:text-slate-700">·</span>
-            <span className="text-amber-600 dark:text-amber-400">{summary.used} Dibooking</span>
+          <div className="flex flex-wrap items-center gap-3 font-mono text-xs font-semibold">
+            <span className="text-emerald-700 dark:text-emerald-400">{summary.free} Kosong</span>
+            <span className="text-[#CBD5E1] dark:text-unnes-night-line">·</span>
+            <span className="text-[#1D4ED8] dark:text-[#79A6FF]">{summary.kuliah} Kuliah</span>
+            <span className="text-[#CBD5E1] dark:text-unnes-night-line">·</span>
+            <span className="text-amber-700 dark:text-amber-400">{summary.used} Dibooking</span>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 border-t border-line-light pt-3 dark:border-line-dark">
+        <div className="flex flex-wrap items-center gap-1.5 border-t border-line-light pt-3 dark:border-unnes-night-line">
           {(activeBuildingObj?.floors || []).map((fl) => {
             const count = floorCounts.get(fl) || { free: 0, total: 0 };
             const active = fl === selectedFloor;
@@ -246,7 +247,13 @@ export default function FloorPlanView() {
                 className={`sh-chip ${active ? 'sh-chip-active' : ''}`}
               >
                 <span>Lantai {fl}</span>
-                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                <span
+                  className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold ${
+                    active
+                      ? 'bg-white/20 text-white dark:bg-unnes-navy/20 dark:text-unnes-gold-ink'
+                      : 'bg-surface-subtle text-[#3C4E70] dark:bg-[#192746] dark:text-[#CBD7EE]'
+                  }`}
+                >
                   {count.free}/{count.total}
                 </span>
               </button>
@@ -255,10 +262,9 @@ export default function FloorPlanView() {
         </div>
       </div>
 
-      {/* Architectural Floor Plan Canvas */}
       <section className="sh-card space-y-5 p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-extrabold text-slate-900 dark:text-white">
+          <h2 className="text-sm font-extrabold text-[#0F1B33] dark:text-[#F1F5FB]">
             Gedung {selectedBuilding} · Lantai {selectedFloor}
           </h2>
           <Legend compact />
@@ -266,15 +272,14 @@ export default function FloorPlanView() {
 
         {renderWing(northWing, 'Sisi Utara')}
 
-        {/* Corridor Divider */}
-        <div className="flex items-center justify-between rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-2.5 text-[11px] font-semibold text-slate-500 dark:border-slate-700 dark:bg-surface-subtle-dark dark:text-slate-400">
+        <div className="flex items-center justify-between rounded-lg border border-dashed border-[#C5CFE0] bg-surface-subtle/70 px-4 py-2.5 text-[11px] font-semibold text-[#526382] dark:border-[#293B61] dark:bg-unnes-night-input dark:text-unnes-night-muted">
           <span className="inline-flex items-center gap-1.5">
             <DoorOpen className="h-3.5 w-3.5" />
-            Akses Tangga Barat
+            Tangga Barat
           </span>
-          <span className="tracking-widest uppercase">Koridor Lantai {selectedFloor}</span>
+          <span className="font-mono tracking-widest uppercase">Koridor Lt. {selectedFloor}</span>
           <span className="inline-flex items-center gap-1.5">
-            Akses Tangga Timur
+            Tangga Timur
             <DoorOpen className="h-3.5 w-3.5" />
           </span>
         </div>

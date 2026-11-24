@@ -1,5 +1,7 @@
 # Client internal docs (brief & implementation plan)
+Client/
 Client/docx/
+Client/progress/
 
 # Project-scoped AI skills (vendor)
 skills/

@@ -25,8 +25,10 @@ export default function FlowView() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">Alur Sistem</h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">6 langkah penggunaan SpaceHub.</p>
+          <h1 className="text-2xl font-extrabold tracking-[-0.025em] text-[#0F1B33] dark:text-[#F1F5FB]">
+            Alur Sistem
+          </h1>
+          <p className="mt-1 text-xs text-[#526382] dark:text-unnes-night-muted">6 langkah penggunaan SpaceHub.</p>
         </div>
         <button type="button" onClick={() => navigate('find')} className="sh-btn-primary h-9 px-3.5 text-xs">
           Cari Ruang
@@ -37,15 +39,15 @@ export default function FlowView() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, desc }, idx) => (
           <div key={title} className="sh-card flex items-start gap-3.5 p-4">
-            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-brand/10 text-brand dark:bg-brand-dark/15 dark:text-blue-400">
+            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-unnes-navy text-unnes-gold dark:bg-unnes-gold/15 dark:text-unnes-gold">
               <Icon className="h-5 w-5" />
             </div>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Langkah {idx + 1}
+              <div className="font-mono text-[10px] font-bold uppercase tracking-wider text-[#6A7B9C] dark:text-unnes-night-muted">
+                0{idx + 1}
               </div>
-              <h2 className="mt-0.5 text-sm font-bold text-slate-900 dark:text-white">{title}</h2>
-              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{desc}</p>
+              <h2 className="mt-0.5 text-sm font-bold text-[#0F1B33] dark:text-[#F1F5FB]">{title}</h2>
+              <p className="mt-0.5 text-xs text-[#526382] dark:text-unnes-night-muted">{desc}</p>
             </div>
           </div>
         ))}
