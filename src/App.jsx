@@ -2,6 +2,7 @@ import { Database } from 'lucide-react';
 import { useSpaceHub } from './context/SpaceHubContext';
 import Sidebar from './components/Sidebar';
 import MobileNav, { MobileBottomBar } from './components/MobileNav';
+import NotificationPermissionBar from './components/NotificationPermissionBar';
 import Toast from './components/Toast';
 import LoginView from './views/LoginView';
 import FindView from './views/FindView';
@@ -64,6 +65,7 @@ export default function App() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden">
         <MobileNav />
+        <NotificationPermissionBar />
         {!isSupabaseConfigured && (
           <div className="border-b border-[#E4E7EE] bg-white px-3.5 py-2 text-[11px] text-[#475467] sm:px-4 sm:text-xs dark:border-ink-line dark:bg-ink-card dark:text-[#B0B8C9]">
             <div className="mx-auto flex max-w-6xl items-center gap-2">

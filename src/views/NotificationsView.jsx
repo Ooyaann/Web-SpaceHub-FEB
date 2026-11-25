@@ -1,6 +1,22 @@
-import { useState } from 'react';
-import { AlertTriangle, Bell, BellRing, CalendarCheck2, Sparkles, Star, Trash2, XCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import {
+  AlertTriangle,
+  Bell,
+  BellRing,
+  CalendarCheck2,
+  CheckCircle2,
+  Download,
+  Sparkles,
+  Star,
+  Trash2,
+  XCircle,
+} from 'lucide-react';
 import { useSpaceHub } from '../context/SpaceHubContext';
+import {
+  isSystemNotificationSupported,
+  promptInstallPwa,
+  subscribeInstallPrompt,
+} from '../lib/systemNotification';
 
 const CATEGORY_META = {
   booking: {
@@ -22,35 +38,28 @@ const CATEGORY_META = {
 };
 
 export default function NotificationsView() {
-  const { notifications, clearNotifications, showToast } = useSpaceHub();
-  const supportsBrowserNotif = typeof window !== 'undefined' && 'Notification' in window;
-  const [perm, setPerm] = useState(() => (supportsBrowserNotif ? Notification.permission : 'unsupported'));
+  const {
+    notifications,
+    clearNotifications,
+    notifPermission,
+    enableSystemNotifications,
+    testSystemNotification,
+    showToast,
+  } = useSpaceHub();
+  const supportsNotif = isSystemNotificationSupported();
+  const [canInstallPwa, setCanInstallPwa] = useState(false);
 
-  const handleRequestPerm = async () => {
-    if (!supportsBrowserNotif) return;
-    try {
-      const result = await Notification.requestPermission();
-      setPerm(result);
-      if (result === 'granted') {
-        showToast({
-          title: 'Notifikasi Browser Aktif!',
-          message: 'Pemberitahuan booking & pembaruan jadwal akan muncul di layar perangkatmu.',
-          type: 'success',
-        });
-      }
-    } catch {
-      // ignore
+  useEffect(() => subscribeInstallPrompt(setCanInstallPwa), []);
+
+  const handleInstallPwa = async () => {
+    const installed = await promptInstallPwa();
+    if (installed) {
+      showToast({
+        title: 'Aplikasi SpaceHub Dipasang!',
+        message: 'SpaceHub telah ditambahkan ke layar utama HP kamu.',
+        type: 'success',
+      });
     }
-  };
-
-  const handleTestPopup = () => {
-    showToast({
-      title: 'Contoh Pop-up Notifikasi SpaceHub',
-      message: 'Ruang L2 301 · Besok, 09.00–11.00 WIB telah dikonfirmasi (Kode SH-9K4M2).',
-      type: 'success',
-      actionLabel: 'Lihat Tiket',
-      actionView: 'mine',
-    });
   };
 
   return (
@@ -61,15 +70,22 @@ export default function NotificationsView() {
             Notifikasi
           </h1>
           <p className="mt-0.5 text-xs text-[#475467] sm:mt-1 sm:text-[13px] dark:text-[#B0B8C9]">
-            Pop-up pemberitahuan booking, pembatalan pengelola, dan laporan ruang.
+            Notifikasi panel atas HP, konfirmasi tiket booking, dan pembaruan jadwal pengelola.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={handleTestPopup} className="sh-btn-secondary h-9 px-3 text-xs">
-            <Sparkles className="h-3.5 w-3.5 text-unnes-navy dark:text-unnes-gold" />
-            Tes pop-up
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={testSystemNotification} className="sh-btn-primary h-9 px-3.5 text-xs">
+            <Sparkles className="h-3.5 w-3.5" />
+            Tes Notifikasi HP
           </button>
+
+          {canInstallPwa && (
+            <button type="button" onClick={handleInstallPwa} className="sh-btn-secondary h-9 px-3 text-xs">
+              <Download className="h-3.5 w-3.5" />
+              Install Aplikasi
+            </button>
+          )}
 
           {notifications.length > 0 && (
             <button type="button" onClick={clearNotifications} className="sh-btn-secondary h-9 px-3 text-xs">
@@ -80,26 +96,47 @@ export default function NotificationsView() {
         </div>
       </div>
 
-      {/* Browser System Notification Opt-In Banner */}
-      {supportsBrowserNotif && perm === 'default' && (
+      {/* Kartu Status Notifikasi Sistem HP (Android / Desktop / iOS PWA) */}
+      {supportsNotif && notifPermission === 'default' && (
         <div className="sh-panel flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 flex-none items-center justify-center rounded-xl bg-[#EEF3FC] text-unnes-navy dark:bg-ink-subtle dark:text-unnes-gold">
-              <BellRing className="h-4 w-4" />
+            <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-[#EEF3FC] text-unnes-navy dark:bg-ink-subtle dark:text-unnes-gold">
+              <BellRing className="h-5 w-5" />
             </div>
             <div>
               <div className="text-xs font-bold text-[#101828] sm:text-[13px] dark:text-[#F5F7FA]">
-                Izinkan notifikasi sistem browser di perangkat ini?
+                Munculkan notifikasi di panel atas layar HP kamu
               </div>
-              <div className="text-xs text-[#667085] dark:text-[#B0B8C9]">
-                Agar pemberitahuan tetap tampil di bar atas browser saat kamu booking atau ada info dari pengelola.
+              <div className="mt-0.5 text-xs text-[#667085] dark:text-[#B0B8C9]">
+                Klik <strong>Aktifkan</strong> agar tiket booking &amp; info dari Pengelola masuk ke bar notifikasi sistem HP seperti aplikasi.
               </div>
             </div>
           </div>
 
-          <button type="button" onClick={handleRequestPerm} className="sh-btn-primary h-9 px-3.5 text-xs">
+          <button type="button" onClick={enableSystemNotifications} className="sh-btn-primary h-9 px-4 text-xs">
             Aktifkan
           </button>
+        </div>
+      )}
+
+      {supportsNotif && notifPermission === 'granted' && (
+        <div className="sh-panel flex flex-wrap items-center justify-between gap-3 border-[#BBF7D0] bg-[#F0FDF4]/70 p-3.5 dark:border-[#22C55E]/30 dark:bg-[#14532D]/20">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="h-4 w-4 flex-none text-[#16A34A] dark:text-[#4ADE80]" />
+            <span className="text-xs font-semibold text-[#15803D] dark:text-[#86EFAC]">
+              Notifikasi sistem HP aktif — pemberitahuan booking akan muncul langsung di panel atas HP kamu.
+            </span>
+          </div>
+        </div>
+      )}
+
+      {supportsNotif && notifPermission === 'denied' && (
+        <div className="sh-panel flex items-start gap-3 border-amber-200 bg-amber-50/70 p-4 dark:border-amber-500/30 dark:bg-amber-950/20">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-none text-amber-600 dark:text-amber-400" />
+          <div className="text-xs leading-relaxed text-[#475467] dark:text-[#D0D5DD]">
+            <span className="font-bold text-[#101828] dark:text-white">Izin notifikasi masih diblokir browser.</span>{' '}
+            Ketuk ikon pengaturan di sebelah kiri alamat URL Chrome, pilih <strong>Izin / Permissions</strong>, lalu aktifkan <strong>Notifikasi</strong>.
+          </div>
         </div>
       )}
 

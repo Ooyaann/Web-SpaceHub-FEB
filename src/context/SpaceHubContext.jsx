@@ -17,6 +17,11 @@ import {
   saveLocalNotifications,
   toggleFavoriteSafe,
 } from '../lib/supabase';
+import {
+  getSystemNotificationPermission,
+  requestSystemNotificationPermission,
+  sendSystemNotification,
+} from '../lib/systemNotification';
 
 const SpaceHubContext = createContext(null);
 
@@ -47,22 +52,9 @@ function loadSessionUser() {
   }
 }
 
-function triggerBrowserNotification(title, body) {
-  try {
-    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-      new Notification(title, {
-        body,
-        icon: '/apple-touch-icon.png',
-        badge: '/favicon-32x32.png',
-      });
-    }
-  } catch {
-    // Abaikan pada browser mobile yang membatasi konstruktor Notification langsung
-  }
-}
-
 export function SpaceHubProvider({ children }) {
   const [user, setUser] = useState(loadSessionUser);
+  const [notifPermission, setNotifPermission] = useState(getSystemNotificationPermission);
   const [rooms, setRooms] = useState(FALLBACK_ROOMS);
   const [bookings, setBookings] = useState([]);
   const [reports, setReports] = useState([]);
@@ -181,7 +173,7 @@ export function SpaceHubProvider({ children }) {
   }, []);
 
   const pushNotification = useCallback(
-    (title, body, category = 'info', triggerNative = false) => {
+    (title, body, category = 'info', nativeOpts = null) => {
       const { timeLabel, dateKey } = getNowWib();
       const item = {
         id: `nt-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -196,12 +188,80 @@ export function SpaceHubProvider({ children }) {
         return next;
       });
       updateUnread((c) => c + 1);
-      if (triggerNative) {
-        triggerBrowserNotification(`SpaceHub — ${title}`, body);
+      if (nativeOpts) {
+        const opts = typeof nativeOpts === 'object' ? nativeOpts : {};
+        sendSystemNotification({
+          title: opts.title || `SpaceHub — ${title}`,
+          body: opts.body || body,
+          tag: opts.tag || `sh-nt-${Date.now()}`,
+          view: opts.view || 'mine',
+        });
       }
     },
     [updateUnread]
   );
+
+  const enableSystemNotifications = useCallback(async () => {
+    const result = await requestSystemNotificationPermission();
+    setNotifPermission(result);
+    if (result === 'granted') {
+      showToast({
+        title: 'Notifikasi Sistem HP Aktif!',
+        message: 'Tarik layar atas HP kamu — contoh notifikasi SpaceHub baru saja dikirim.',
+        type: 'success',
+        durationMs: 5500,
+      });
+      await sendSystemNotification({
+        title: 'SpaceHub FEB — Notifikasi Aktif!',
+        body: 'Tiket booking & info dari Pengelola kini muncul di panel notifikasi atas HP kamu.',
+        tag: `sh-welcome-${Date.now()}`,
+        view: user?.role === 'admin' ? 'admin' : 'mine',
+      });
+    } else if (result === 'denied') {
+      showToast({
+        title: 'Izin Notifikasi Diblokir Browser',
+        message: 'Ketuk ikon pengaturan di sebelah kiri alamat URL Chrome, lalu ubah Notifikasi menjadi Izinkan.',
+        type: 'warning',
+        durationMs: 6500,
+      });
+    }
+    return result;
+  }, [showToast, user]);
+
+  const testSystemNotification = useCallback(async () => {
+    let currentPerm = getSystemNotificationPermission();
+    if (currentPerm === 'default') {
+      currentPerm = await requestSystemNotificationPermission();
+    }
+    setNotifPermission(currentPerm);
+
+    const sampleTitle = 'Booking Dikonfirmasi · L2 301';
+    const sampleBody = 'Besok, 09.00–11.00 WIB · Kode Tiket SH-9K4M2 (Contoh Notifikasi)';
+
+    showToast({
+      title: sampleTitle,
+      message: sampleBody,
+      type: 'success',
+      actionLabel: 'Lihat Tiket',
+      actionView: 'mine',
+    });
+
+    if (currentPerm === 'granted') {
+      await sendSystemNotification({
+        title: sampleTitle,
+        body: sampleBody,
+        tag: `sh-test-${Date.now()}`,
+        view: user?.role === 'admin' ? 'admin' : 'mine',
+      });
+    } else if (currentPerm === 'denied') {
+      showToast({
+        title: 'Notifikasi Sistem HP Diblokir',
+        message: 'Ketuk ikon pengaturan di kiri URL Chrome → Izin → Notifikasi → Izinkan agar muncul di bar atas HP.',
+        type: 'warning',
+        durationMs: 6500,
+      });
+    }
+  }, [showToast, user]);
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);
@@ -255,7 +315,12 @@ export function SpaceHubProvider({ children }) {
                 actionLabel: 'Cari Ruang Lain',
                 actionView: 'find',
               });
-              pushNotification(title, msg, 'cancel', true);
+              pushNotification(title, msg, 'cancel', {
+                title,
+                body: msg,
+                tag: `sh-adm-cancel-${oldId}`,
+                view: 'find',
+              });
             }
           }
         }
@@ -299,7 +364,12 @@ export function SpaceHubProvider({ children }) {
               actionLabel: 'Lihat Booking',
               actionView: 'admin',
             });
-            triggerBrowserNotification(`SpaceHub — ${title}`, msg);
+            sendSystemNotification({
+              title: `Booking Baru · ${newBk.room_code}`,
+              body: msg,
+              tag: `sh-new-bk-${newBk.id}`,
+              view: 'admin',
+            });
           }
         }
 
@@ -316,7 +386,12 @@ export function SpaceHubProvider({ children }) {
               type: 'warning',
               durationMs: 6000,
             });
-            triggerBrowserNotification(`SpaceHub — ${title}`, msg);
+            sendSystemNotification({
+              title: `Laporan Ruang · ${newRep.room_code}`,
+              body: msg,
+              tag: `sh-new-rep-${newRep.id}`,
+              view: 'admin',
+            });
           }
         }
 
@@ -365,6 +440,7 @@ export function SpaceHubProvider({ children }) {
   useEffect(() => {
     if (!user) return undefined;
     const handleVisibility = () => {
+      setNotifPermission(getSystemNotificationPermission());
       if (document.visibilityState === 'visible') {
         refreshData(true);
       }
@@ -383,6 +459,32 @@ export function SpaceHubProvider({ children }) {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [user, refreshData]);
+
+  // Tangkap klik pada Notifikasi Sistem HP (Service Worker) untuk langsung membuka halaman terkait
+  useEffect(() => {
+    if (!user) return undefined;
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlView = params.get('view');
+      if (urlView && VIEW_LABELS[urlView]) {
+        setActiveView(user.role === 'admin' ? 'admin' : urlView);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    } catch {
+      // ignore
+    }
+
+    if (!('serviceWorker' in navigator)) return undefined;
+    const onSwMessage = (event) => {
+      if (event.data?.type === 'SH_NOTIF_CLICK' && event.data.view) {
+        setNavHistory([]);
+        setActiveView(user.role === 'admin' ? 'admin' : event.data.view);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onSwMessage);
+    return () => navigator.serviceWorker.removeEventListener('message', onSwMessage);
+  }, [user]);
 
   const loginOrRegister = useCallback(
     async ({ email, password, fullName, mode }) => {
@@ -675,7 +777,12 @@ export function SpaceHubProvider({ children }) {
         type: 'success',
         durationMs: 5500,
       });
-      pushNotification('Booking Disetujui', detailMsg, 'booking', true);
+      pushNotification('Booking Disetujui', detailMsg, 'booking', {
+        title: `Booking Dikonfirmasi · ${roomCode}`,
+        body: detailMsg,
+        tag: `sh-bk-${code}`,
+        view: user.role === 'admin' ? 'admin' : 'mine',
+      });
       setBookingPresetHour(null);
       setNavHistory([]);
       setActiveView(user.role === 'admin' ? 'admin' : 'mine');
@@ -699,7 +806,12 @@ export function SpaceHubProvider({ children }) {
       await refreshData(true);
       const msg = `Booking Ruang ${booking.room_code} (${booking.id}) berhasil dibatalkan.`;
       showToast({ title: 'Booking Dibatalkan', message: msg, type: 'warning' });
-      pushNotification('Booking Dibatalkan', msg, 'cancel', false);
+      pushNotification('Booking Dibatalkan', msg, 'cancel', {
+        title: `Booking Dibatalkan · ${booking.room_code}`,
+        body: msg,
+        tag: `sh-cancel-${booking.id}`,
+        view: 'mine',
+      });
       return res;
     },
     [user, refreshData, showToast, pushNotification]
@@ -811,6 +923,9 @@ export function SpaceHubProvider({ children }) {
     favorites,
     notifications,
     unreadCount,
+    notifPermission,
+    enableSystemNotifications,
+    testSystemNotification,
     loading,
     syncing,
     isSupabaseConfigured,
