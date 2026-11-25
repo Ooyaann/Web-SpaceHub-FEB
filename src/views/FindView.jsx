@@ -367,13 +367,13 @@ export default function FindView() {
 
       {/* Room Cards Grid */}
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
           {Array.from({ length: 6 }).map((_, idx) => (
             <SkeletonCard key={idx} />
           ))}
         </div>
       ) : filteredRooms.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
           {filteredRooms.map((room) => (
             <RoomCard key={room.code} room={room} dayIndex={filters.day} />
           ))}

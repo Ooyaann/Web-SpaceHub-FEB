@@ -232,7 +232,7 @@ export default function MobileNav() {
                 className="flex items-center gap-2.5 rounded-xl border border-[#E4E7EE] bg-[#F8F9FB] p-3 text-left text-xs font-semibold text-[#101828] active:scale-[0.98] dark:border-ink-line dark:bg-ink-subtle dark:text-[#F5F7FA]"
               >
                 <RefreshCw className={`h-4 w-4 text-[#16A34A] ${syncing ? 'animate-spin' : ''}`} />
-                <span>{syncing ? 'Sinkron...' : 'Muat ulang'}</span>
+                <span>{syncing ? 'Sinkron...' : 'Sinkron jadwal'}</span>
               </button>
             </div>
 

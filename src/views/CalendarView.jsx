@@ -209,9 +209,9 @@ export default function CalendarView() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
         {/* Left: Monthly Calendar Panel — Proporsional di layar 360px */}
-        <section className="sh-panel p-3.5 sm:p-5 lg:col-span-7">
+        <section className="sh-panel min-w-0 p-3.5 sm:p-5 lg:col-span-7">
           <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2 sm:mb-4">
             <div className="flex items-center gap-1.5">
               <button

@@ -374,7 +374,7 @@ export default function AdminView() {
       </div>
 
       {/* Building Occupancy */}
-      <section className="grid gap-3 sm:gap-4 md:grid-cols-3">
+      <section className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-3">
         {stats.buildings.map((b) => (
           <div key={b.building} className="sh-panel p-3.5 sm:p-4">
             <div className="flex items-baseline justify-between text-[13px]">

@@ -36,7 +36,7 @@ export default function FlowView() {
         </button>
       </div>
 
-      <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {STEPS.map(({ icon: Icon, title, desc }, idx) => (
           <li key={title} className="sh-panel flex items-start gap-3.5 p-5">
             <div className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-[#EEF3FC] text-unnes-navy dark:bg-ink-subtle dark:text-unnes-gold">

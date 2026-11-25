@@ -46,7 +46,7 @@ export default function FavoritesView() {
       </div>
 
       {favRooms.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
           {favRooms.map((r) => (
             <RoomCard key={r.code} room={r} dayIndex={filters.day} />
           ))}

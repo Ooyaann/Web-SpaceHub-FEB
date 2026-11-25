@@ -60,9 +60,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] text-[#101828] dark:bg-ink-canvas dark:text-[#F5F7FA] lg:flex">
+    <div className="min-h-screen overflow-x-hidden bg-[#F8F9FB] text-[#101828] dark:bg-ink-canvas dark:text-[#F5F7FA] lg:flex">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden">
         <MobileNav />
         {!isSupabaseConfigured && (
           <div className="border-b border-[#E4E7EE] bg-white px-3.5 py-2 text-[11px] text-[#475467] sm:px-4 sm:text-xs dark:border-ink-line dark:bg-ink-card dark:text-[#B0B8C9]">

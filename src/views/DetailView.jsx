@@ -152,9 +152,9 @@ export default function DetailView() {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-12">
         {/* Left: Photo & Room Details Card */}
-        <div className="sh-panel overflow-hidden lg:col-span-7">
+        <div className="sh-panel min-w-0 overflow-hidden lg:col-span-7">
           <div className="aspect-[16/10] w-full overflow-hidden bg-[#EBEEF4] sm:aspect-[16/9] dark:bg-ink-subtle">
             <img src={room.image_url} alt={`Ruang ${room.code}`} className="h-full w-full object-cover" />
           </div>
@@ -305,7 +305,7 @@ export default function DetailView() {
         </h2>
 
         {alternatives.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 xl:grid-cols-3">
             {alternatives.map((alt) => (
               <RoomCard key={alt.code} room={alt} dayIndex={filters.day} />
             ))}

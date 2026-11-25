@@ -160,6 +160,22 @@ export function SpaceHubProvider({ children }) {
     }
   }, [user, refreshData]);
 
+  // Sinkronisasi otomatis di latar belakang setiap kali pengguna kembali membuka tab / aplikasi
+  useEffect(() => {
+    if (!user) return undefined;
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        refreshData(true);
+      }
+    };
+    window.addEventListener('focus', handleVisibility);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('focus', handleVisibility);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
+  }, [user, refreshData]);
+
   const loginOrRegister = useCallback(
     async ({ email, password, fullName, mode }) => {
       const res = await authUnnesUser({ email, password, fullName, mode });
