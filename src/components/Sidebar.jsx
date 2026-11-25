@@ -69,7 +69,7 @@ export default function Sidebar() {
     logout,
     favorites,
     myActiveBookingCount,
-    notifications,
+    unreadCount,
     syncing,
     refreshData,
     isSupabaseConfigured,
@@ -81,7 +81,7 @@ export default function Sidebar() {
   const getBadge = (id) => {
     if (id === 'favs') return favorites.size;
     if (id === 'mine') return myActiveBookingCount;
-    if (id === 'notif') return notifications.length;
+    if (id === 'notif') return unreadCount;
     return 0;
   };
 

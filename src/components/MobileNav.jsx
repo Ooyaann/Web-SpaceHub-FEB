@@ -48,6 +48,7 @@ export default function MobileNav() {
     logout,
     favorites,
     notifications,
+    unreadCount,
     syncing,
     refreshData,
     isSupabaseConfigured,
@@ -135,9 +136,9 @@ export default function MobileNav() {
                     }`}
                   >
                     <Bell className="h-4 w-4" />
-                    {notifications.length > 0 && (
-                      <span className="absolute right-1 top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-unnes-gold px-1 text-[9px] font-extrabold text-unnes-gold-ink">
-                        {notifications.length > 9 ? '9+' : notifications.length}
+                    {unreadCount > 0 && (
+                      <span className="absolute right-1 top-1 flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-extrabold text-white">
+                        {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
